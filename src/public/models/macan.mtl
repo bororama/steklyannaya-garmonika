@@ -1,0 +1,373 @@
+# Blender MTL File: 'render.blend'
+# Material Count: 33
+
+newmtl Material.001
+Ns 758.752047
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump E:\\TEXTURE\\87_varnished dirty wood plank texture-seamless.jpg
+map_Ke E:\\TEXTURE\\87_varnished dirty wood plank texture-seamless.jpg
+
+newmtl Material.002
+Ns 851.578506
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump E:\\TEXTURE\\115_street paving cobblestone whit leaves dead texture-seamless.jpg
+map_Ke E:\\TEXTURE\\107_varnished dirty wood plank texture-seamless.jpg
+
+newmtl Material.004
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.008076 0.002793 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.012
+Ns 900.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 1.000000 1.000000 1.000000
+Ni 1.450000
+d 1.000000
+illum 1
+
+newmtl Material.018
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 0.908409 0.087307
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump E:\\bahan semester akhir\\animasi\\2434-normal.jpg
+map_Kd E:\\bahan semester akhir\\animasi\\Untitled.001.1005.png
+map_Ke E:\\bahan semester akhir\\animasi\\Untitled.001.1005.png
+
+newmtl Material.019
+Ns 900.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump E:\\bahan semester akhir\\animasi\\2434-normal.jpg
+map_Kd E:\\bahan semester akhir\\animasi\\Untitled.1006.png
+map_Ke E:\\bahan semester akhir\\animasi\\Untitled.1006.png
+
+newmtl Material_1
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.286275 0.294118 0.254902
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\Material_1.jpg
+
+newmtl Material_4
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.454902 0.501961 0.149020
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\Material_4.jpg
+
+newmtl Old_Wood
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\TEXTURE\\pexels-photo-326311.jpeg
+map_Ns E:\\TEXTURE\\hardwood+gaps.jpeg
+
+newmtl Wood_styalized
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump D:\\Alphas, Textures etc\\Texturen\\eigene\\wood\\wood 4\\wood normal.bmp
+map_Kd E:\\TEXTURE\\87_varnished dirty wood plank texture-seamless.jpg
+map_Ns E:\\TEXTURE\\38_varnished dirty wood plank texture-seamless.jpg
+
+newmtl folhas_fdsf0sdf1s50af160a5d1f0a6sdf1a6d1w
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.568627 0.678431 0.733333
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_leaf_002251_base2.png
+
+newmtl folhas_sdwerw9000sd1f5sd1f06sd51f055500505werwe5
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.482353 0.603922 0.658824
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\folhas_sdwerw9000sd1f5sd1f06sd51f055500505werwe2.png
+
+newmtl free_vintage_digital_stamp_saguaro_cactus
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_d E:\\bahan semester akhir\\animasi\\free vintage digital stamp_saguaro cactus.png
+
+newmtl padang_pasir
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\Untitled.003.1001.png
+map_Ke E:\\bahan semester akhir\\animasi\\Untitled.003.1001.png
+
+newmtl rambut
+Ns 29.613846
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.244186 0.244186 0.244186
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl rumput
+Ns 859.555771
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.013636 0.013636 0.013636
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\TEXTURE\\sid_grass1.jpg
+map_Ke E:\\TEXTURE\\sid_grass1.jpg
+
+newmtl skatter_leaf_002251_base
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.713725 0.756863 0.580392
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\Material_4.jpg
+
+newmtl skatter_leaf_02022351
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.701961 0.701961 0.694118
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_leaf_002251_base22.png
+
+newmtl skatter_leaf_02022351_base
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.701961 0.701961 0.694118
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\Material_4.jpg
+
+newmtl skatter_leaf_0202251
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.674510 0.705882 0.603922
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\Material_4.jpg
+
+newmtl skatter_t0101606501615901
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.325490 0.274510 0.168627
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_t0101606501615901.jpg
+
+newmtl skatter_t0101606501615901_1_
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.325490 0.274510 0.168627
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_t0101606501615901_1_.jpg
+
+newmtl skatter_t0101606501615901_2_
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.325490 0.274510 0.168627
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_t0101606501615901_2_.jpg
+
+newmtl skatter_t0101606501615901_3_
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.325490 0.274510 0.168627
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_t0101606501615901_3_.jpg
+
+newmtl skatter_tru0156106501615901
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.392157 0.376471 0.290196
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_tru0156106501615901.jpg
+
+newmtl skatter_tru0156106501615901_1_
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.392157 0.376471 0.290196
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_tru0156106501615901_1_.jpg
+
+newmtl skatter_tru0156106501615901_2_
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.392157 0.376471 0.290196
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_tru0156106501615901_2_.jpg
+
+newmtl skatter_tru0156106501615901_3_
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.392157 0.376471 0.290196
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\skatter_tru0156106501615901_3_.jpg
+
+newmtl tronco_sdaf000s00s0s15wr1e056w0156fsd0f1s56w
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.341176 0.321569 0.235294
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\tronco_sdaf000s00s0s15wr1e056w0156fsd0f1s56w.png
+
+newmtl tronco_sdf0sd51f0sd1f06a1d06f5a10d6f01a101vcd
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.333333 0.321569 0.219608
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\tronco_sdf0sd51f0sd1f06a1d06f5a10d6f01a101vcd.png
+
+newmtl tronco_sdfs0fd1s50af1a06df1a056df01w560e1r
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.341176 0.329412 0.278431
+Ks 0.330000 0.330000 0.330000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\bahan semester akhir\\animasi\\tree pack 002\\tronco_sdfs0fd1s50af1a06df1a056df01w560e1r.jpg
+
+newmtl wood-texture-floor-brown-furniture-door-1015862-pxhere.com
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\TEXTURE\\wood-texture-floor-brown-furniture-door-1015862-pxhere.com.jpg
+
+newmtl wood-texture-floor-brown-furniture-door-1015862-pxhere.com.001
+Ns 0.669420
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\TEXTURE\\wood-texture-floor-brown-furniture-door-1015862-pxhere.com.jpg

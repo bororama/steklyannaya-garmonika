@@ -1,0 +1,17 @@
+services:
+    metaverse:
+        tty: true
+        build: .
+        ports: 
+            - "8080:8080"
+            - "433:433"
+            - "9229:9229"
+        volumes:
+            - type: bind
+              source: ./src/
+              target: /meta-app
+        container_name: curroverso-expanded
+        env_file: 
+            - .env
+        environment:
+            HOST_ADDRESS: ${IP:-host.docker.internal}
