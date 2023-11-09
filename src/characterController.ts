@@ -1,7 +1,10 @@
-import { Scene, Mesh, TransformNode, DynamicTexture, ShadowGenerator, StandardMaterial, Vector3, ArcRotateCamera, UniversalCamera, Quaternion, Ray, Scalar, Plane, MeshBuilder, Color3 } from "@babylonjs/core";
-import { AnimationGroup } from "babylonjs";
-import { clamp } from "./utils";
+import { Scene, Mesh, TransformNode, DynamicTexture, ShadowGenerator,
+        StandardMaterial, Vector3, ArcRotateCamera, UniversalCamera, Quaternion,
+        Ray, Scalar, Plane, MeshBuilder, Color3, Animation, AnimationGroup} from "@babylonjs/core";
+import { AdvancedDynamicTexture, InputText, Control, Rectangle, TextBlock } from "@babylonjs/gui"
+import { clamp, getFadeOutAnimation } from "./utils";
 import { PlayerInput } from "./inputController";
+
 
 
 enum Animations { IDLE = 1, JUMP = 2, LAND = 3, RUN = 4 };
@@ -39,6 +42,12 @@ export class Player extends TransformNode {
     private _nameLabel: Mesh;
 
 
+    //Chat-related
+    private _bubble : AdvancedDynamicTexture;
+    private _messageBox : Rectangle;
+    private _messageText : TextBlock;
+
+
     constructor(assets: any, scene: Scene, shadowGenerator: ShadowGenerator, input : PlayerInput) {
         super("player", scene);
         this.scene = scene;
@@ -53,7 +62,73 @@ export class Player extends TransformNode {
         this._animations = assets.animationGroups;
         this._setUpAnimations();
         this._setUpPlayerLabel();
+        this._setUpChatBox();
     }
+
+    private _setUpChatBox() {
+        let chatBoxTexture = AdvancedDynamicTexture.CreateFullscreenUI("chatbox");
+
+       //chatBoxTexture.vOffset = 0.2;
+
+        let input = new InputText();
+        input.width = 0.2;
+        input.maxWidth = 0.2;
+        input.height = "40px";
+        input.text = "";
+        input.color = "white";
+        input.background = "transparent";
+        input.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        input.top = "-10%";
+        //console.log("padding : ", input.margin)
+        chatBoxTexture.addControl(input);
+
+        this._bubble = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
+        this._messageBox = new Rectangle();
+        this._messageBox.cornerRadius = 25;
+        this._messageBox.thickness = 0;
+        //this._messageBox.setPadding(0, 8, 0, 8);
+        this._messageBox.background = "white";
+        this._messageBox.height = "10%";
+        this._messageBox.top = "30%";
+        this._messageBox.left = "-5%";
+        this._messageBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this._messageText = new TextBlock();
+
+        input.onKeyboardEventProcessedObservable.add((eventData) => {
+            if (eventData.key === "Enter") {
+                // Get the text from the input field
+                let message = input.text;
+                
+                // Do something with the message
+                this._say(message);
+                
+                // Clear the input field
+                input.text = "";
+            }
+        });
+    }
+
+    private _say(message : string) {
+        //TODO abstract this into a  context (singleton if possible)
+        this._messageBox.alpha = 1.0;
+        this._messageBox.top = ((Math.random() * (45 - 30)) + 30).toString() + "%";
+        this._messageBox.left = ((Math.random() * (5 -(-5))) - 5).toString() + "%";
+        console.log("top:", this._messageBox.top);
+        this._messageText.text = message;
+        this._messageText.color = "black";  // Text color
+
+        this._messageBox.addControl(this._messageText);
+        let context = this._bubble.getContext();
+
+        this._messageBox.width = (clamp((context.measureText(message).width + 24), 64, 256).toString() + "px");
+        this._bubble.addControl(this._messageBox);
+        let fadeOut = new AnimationGroup("fadeOut");
+        fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._messageBox);
+        setTimeout(() => {
+            fadeOut.play(false);
+        }, 1000);
+    }
+
 
     private _setUpPlayerLabel() {
         this._nameLabel = MeshBuilder.CreatePlane("label", {width: 5, height : 1}, this.scene);
@@ -72,7 +147,6 @@ export class Player extends TransformNode {
         const font = "bold 16px monospace";
         labelTexture.drawText("fgata-va", (32 * 5) / 2 - textureContext.measureText("fgata-va").width, 16, font, "white", "transparent", true, true);
 
-    
     }
 
     private _setUpAnimations(): void {
@@ -136,15 +210,12 @@ export class Player extends TransformNode {
         return this.camera;
     }
 
-
     private _beforeRenderUpdate(): void {
         this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
         this._processInput();
         this._updateCharacter();
         this._switchAnimations();
     }
-
-
 
     private _processInput() {
 

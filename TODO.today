@@ -1,3 +1,8 @@
-- temporary nickname label [X]
-- chat interface []
-- text bubbles []
+- toggle chat interface []
+- bubbles :
+    - text to a singleton [X]
+    - hiding routine [X]
+    - fix input bugs []
+- interclient server comms :
+    - open socket connection on Player instance []
+    - comunicate coordinates between different clients []

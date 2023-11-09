@@ -7,7 +7,8 @@ export class PlayerInput {
     public vertical: number = 0;
     public horizontal: number = 0;
     public camera: number = 0;
-    public jumping
+    public jumping: boolean;
+    public toggleChatBox: boolean;
 
     constructor(scene: Scene) {
         scene.actionManager = new ActionManager(scene);
@@ -55,7 +56,7 @@ export class PlayerInput {
         {
             this.vertical = 0;
         }
-
+        
         if (this.inputMap["ArrowLeft"] || this.inputMap["a"]) {
             this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.15);
 
@@ -65,6 +66,13 @@ export class PlayerInput {
         }
         else {
             this.horizontal = 0;
+        }
+
+        if (this.inputMap["t"]) {
+            this.toggleChatBox = true;
+        }
+        else {
+            this.toggleChatBox = false;
         }
 
 
