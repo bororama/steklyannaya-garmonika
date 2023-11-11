@@ -8,7 +8,7 @@ import { PlayerInput } from "./inputController";
 
 
 enum Animations { IDLE = 1, JUMP = 2, LAND = 3, RUN = 4 };
-enum playerStates { IDLING = 1, JUMPING = 2, RUNNING = 3 };
+enum playerStates { SPEAKING = 0, IDLING = 1, JUMPING = 2, RUNNING = 3 };
 
 
 export class Player extends TransformNode {
@@ -43,9 +43,12 @@ export class Player extends TransformNode {
 
 
     //Chat-related
-    private _bubble : AdvancedDynamicTexture;
-    private _messageBox : Rectangle;
+    private _bubbleTexture : AdvancedDynamicTexture;
+    private _bubble : Rectangle;
     private _messageText : TextBlock;
+
+    private _inputBoxTexture : AdvancedDynamicTexture;
+    private _inputBox : InputText;
 
 
     constructor(assets: any, scene: Scene, shadowGenerator: ShadowGenerator, input : PlayerInput) {
@@ -66,64 +69,67 @@ export class Player extends TransformNode {
     }
 
     private _setUpChatBox() {
-        let chatBoxTexture = AdvancedDynamicTexture.CreateFullscreenUI("chatbox");
+        this._inputBoxTexture = AdvancedDynamicTexture.CreateFullscreenUI("chatbox");
 
        //chatBoxTexture.vOffset = 0.2;
 
-        let input = new InputText();
-        input.width = 0.2;
-        input.maxWidth = 0.2;
-        input.height = "40px";
-        input.text = "";
-        input.color = "white";
-        input.background = "transparent";
-        input.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        input.top = "-10%";
+        this._inputBox = new InputText();
+        this._inputBox.width = 0.2;
+        this._inputBox.maxWidth = 0.2;
+        this._inputBox.height = "40px";
+        this._inputBox.text = "";
+        this._inputBox.color = "white";
+        this._inputBox.background = "transparent";
+        this._inputBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this._inputBox.top = "-10%";
         //console.log("padding : ", input.margin)
-        chatBoxTexture.addControl(input);
+        this._inputBoxTexture.addControl(this._inputBox);
 
-        this._bubble = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
-        this._messageBox = new Rectangle();
-        this._messageBox.cornerRadius = 25;
-        this._messageBox.thickness = 0;
-        //this._messageBox.setPadding(0, 8, 0, 8);
-        this._messageBox.background = "white";
-        this._messageBox.height = "10%";
-        this._messageBox.top = "30%";
-        this._messageBox.left = "-5%";
-        this._messageBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this._bubbleTexture = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
+        this._bubble = new Rectangle();
+        this._bubble.cornerRadius = 25;
+        this._bubble.thickness = 0;
+        //this._bubble.setPadding(0, 8, 0, 8);
+        this._bubble.background = "white";
+        this._bubble.height = "10%";
+        this._bubble.top = "30%";
+        this._bubble.left = "-5%";
+        this._bubble.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this._messageText = new TextBlock();
+        
+        this._inputBox.isVisible = false;
 
-        input.onKeyboardEventProcessedObservable.add((eventData) => {
+        this._inputBox.onKeyboardEventProcessedObservable.add((eventData) => {
             if (eventData.key === "Enter") {
                 // Get the text from the input field
-                let message = input.text;
+                let message = this._inputBox.text;
                 
                 // Do something with the message
                 this._say(message);
                 
                 // Clear the input field
-                input.text = "";
+                this._inputBox.text = "";
+                this._inputBox.isVisible = false;
             }
         });
     }
 
     private _say(message : string) {
         //TODO abstract this into a  context (singleton if possible)
-        this._messageBox.alpha = 1.0;
-        this._messageBox.top = ((Math.random() * (45 - 30)) + 30).toString() + "%";
-        this._messageBox.left = ((Math.random() * (5 -(-5))) - 5).toString() + "%";
-        console.log("top:", this._messageBox.top);
+        this._bubble.alpha = 1.0;
+        this._bubble.top = ((Math.random() * (45 - 30)) + 30).toString() + "%";
+        this._bubble.left = ((Math.random() * (5 -(-5))) - 5).toString() + "%";
+        console.log("top:", this._bubble.top);
         this._messageText.text = message;
         this._messageText.color = "black";  // Text color
 
-        this._messageBox.addControl(this._messageText);
-        let context = this._bubble.getContext();
+        this._bubble.addControl(this._messageText);
+        let context = this._bubbleTexture.getContext();
 
-        this._messageBox.width = (clamp((context.measureText(message).width + 24), 64, 256).toString() + "px");
-        this._bubble.addControl(this._messageBox);
+        this._bubble.width = (clamp((context.measureText(message).width + 24), 64, 256).toString() + "px");
+        this._bubbleTexture.addControl(this._bubble);
         let fadeOut = new AnimationGroup("fadeOut");
-        fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._messageBox);
+        fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._bubble);
         setTimeout(() => {
             fadeOut.play(false);
         }, 1000);
@@ -194,7 +200,6 @@ export class Player extends TransformNode {
     private _updateCamera(): void {
         this._camRoot.position =  new Vector3(this.mesh.position.x, this.mesh.position.y + 2, this.mesh.position.z);
         if (this._input.camera !== 0) {
-            console.log("rotate this");
             this._camRoot.rotation = new Vector3(this._camRoot.rotation.x, this._camRoot.rotation.y + ((0.6 * this._input.camera) * this._deltaTime));
         }
     }
@@ -219,11 +224,20 @@ export class Player extends TransformNode {
 
     private _processInput() {
 
-        let correctedVertical = this._camRoot.forward.scaleInPlace(this._input.vertical);
-        let correctedHorizontal = this._camRoot.right.scaleInPlace(this._input.horizontal);
 
-        this._moveDirection = (correctedHorizontal.addInPlace(correctedVertical).normalize());
-        this._inputMagnitude = clamp(Math.abs(this._input.horizontal) + Math.abs(this._input.vertical), 0, 1);
+        if (this._input.toggleChatBox && this._state == playerStates.IDLING) {
+            this._inputBox.isVisible = !this._inputBox.isVisible;
+        }
+        if (!this._inputBox.isVisible) {
+            let correctedVertical = this._camRoot.forward.scaleInPlace(this._input.vertical);
+            let correctedHorizontal = this._camRoot.right.scaleInPlace(this._input.horizontal);
+    
+            this._moveDirection = (correctedHorizontal.addInPlace(correctedVertical).normalize());
+            this._inputMagnitude = clamp(Math.abs(this._input.horizontal) + Math.abs(this._input.vertical), 0, 1);
+        }
+        else {
+            this._inputBox.focus();
+        }
     }
 
     private _floorRaycast(raycastlen: number): Vector3 {

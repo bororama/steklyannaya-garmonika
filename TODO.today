@@ -1,8 +1,8 @@
-- toggle chat interface []
+- toggle chat interface [X]
 - bubbles :
     - text to a singleton [X]
     - hiding routine [X]
-    - fix input bugs []
+    - fix input bugs [X]
 - interclient server comms :
     - open socket connection on Player instance []
     - comunicate coordinates between different clients []

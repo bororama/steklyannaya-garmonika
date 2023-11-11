@@ -9,6 +9,7 @@ export class PlayerInput {
     public camera: number = 0;
     public jumping: boolean;
     public toggleChatBox: boolean;
+    private _switch: boolean;
 
     constructor(scene: Scene) {
         scene.actionManager = new ActionManager(scene);
@@ -24,6 +25,8 @@ export class PlayerInput {
         scene.onBeforeRenderObservable.add(() => {
             this._updateFromKeyboard();
         });
+
+        this._switch = false;
     }
 
     private _updateFromKeyboard(): void {
@@ -69,10 +72,16 @@ export class PlayerInput {
         }
 
         if (this.inputMap["t"]) {
-            this.toggleChatBox = true;
+            if (this._switch)
+                this.toggleChatBox = false;
+            else {
+                this.toggleChatBox = true;
+                this._switch = true;
+            }
         }
         else {
             this.toggleChatBox = false;
+            this._switch = false;
         }
 
 
