@@ -1,16 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "noResolve": false,
-    "noImplicitAny": false,
-    "sourceMap": true,
-    "preserveConstEnums":true,
-    "lib": [
-        "dom",
-        "es6"
-    ],
-    "rootDir": "."
-  }
+    "target": "ES5",
+    "module": "commonjs",
+    "outDir": "dist",
+    "sourceMap": true
+  },
+
+  "exclude": [
+    "node_modules"
+  ]
 }

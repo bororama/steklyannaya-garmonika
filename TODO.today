@@ -3,6 +3,7 @@
     - text to a singleton [X]
     - hiding routine [X]
     - fix input bugs [X]
+    - block input until current bubble disappears []
 - interclient server comms :
     - open socket connection on Player instance []
     - comunicate coordinates between different clients []

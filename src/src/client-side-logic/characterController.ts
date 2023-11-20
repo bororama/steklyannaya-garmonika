@@ -9,7 +9,7 @@ import { PlayerInput } from "./inputController";
 
 enum Animations { IDLE = 1, JUMP = 2, LAND = 3, RUN = 4 };
 enum playerStates { SPEAKING = 0, IDLING = 1, JUMPING = 2, RUNNING = 3 };
-
+enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
 
 export class Player extends TransformNode {
 
@@ -46,6 +46,7 @@ export class Player extends TransformNode {
     private _bubbleTexture : AdvancedDynamicTexture;
     private _bubble : Rectangle;
     private _messageText : TextBlock;
+    private _bubbleState : number;
 
     private _inputBoxTexture : AdvancedDynamicTexture;
     private _inputBox : InputText;
@@ -98,9 +99,10 @@ export class Player extends TransformNode {
         this._messageText = new TextBlock();
         
         this._inputBox.isVisible = false;
+        this._bubbleState = bubbleStates.INVISIBLE;
 
         this._inputBox.onKeyboardEventProcessedObservable.add((eventData) => {
-            if (eventData.key === "Enter") {
+            if (eventData.key === "Enter" && this._bubbleState == bubbleStates.INVISIBLE) {
                 // Get the text from the input field
                 let message = this._inputBox.text;
                 
@@ -129,8 +131,12 @@ export class Player extends TransformNode {
         this._bubble.width = (clamp((context.measureText(message).width + 24), 64, 256).toString() + "px");
         this._bubbleTexture.addControl(this._bubble);
         let fadeOut = new AnimationGroup("fadeOut");
+        this._bubbleState = bubbleStates.VISIBLE;
         fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._bubble);
-        setTimeout(() => {
+        fadeOut.onAnimationGroupEndObservable.add( () => {
+            this._bubbleState = bubbleStates.INVISIBLE;
+        });
+        setTimeout(async () => {
             fadeOut.play(false);
         }, 1000);
     }
@@ -224,6 +230,7 @@ export class Player extends TransformNode {
 
     private _processInput() {
 
+        //console.log("toggle?: ", this._input.toggleChatBox);
 
         if (this._input.toggleChatBox && this._state == playerStates.IDLING) {
             this._inputBox.isVisible = !this._inputBox.isVisible;

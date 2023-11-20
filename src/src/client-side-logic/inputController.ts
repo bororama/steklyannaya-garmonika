@@ -72,6 +72,7 @@ export class PlayerInput {
         }
 
         if (this.inputMap["t"]) {
+            this.inputMap["t"] = false;
             if (this._switch)
                 this.toggleChatBox = false;
             else {
