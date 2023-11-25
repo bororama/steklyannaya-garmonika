@@ -1,17 +1,29 @@
 services:
-    metaverse:
-        tty: true
-        build: .
-        ports: 
-            - "8080:8080"
-            - "433:433"
-            - "9229:9229"
-        volumes:
-            - type: bind
-              source: ./src/
-              target: /meta-app
-        container_name: curroverso-expanded
-        env_file: 
-            - .env
-        environment:
-            HOST_ADDRESS: ${IP:-host.docker.internal}
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    container_name: backend
+    tty: true
+    restart: always
+    volumes:
+      - type: bind
+        source: ./src/backend
+        target: /app
+    ports:
+      - 3000:3000
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    tty: true
+    restart: always
+    environment:
+      VITE_HOST_IP: ${IP:-host.docker.internal}
+    volumes:
+      - type: bind
+        source: ./src/frontend
+        target: /app
+    ports:
+      - 5173:5173
