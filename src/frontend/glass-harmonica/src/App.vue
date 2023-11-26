@@ -54,15 +54,21 @@
 		<h6>Sólo curro</h6>
 
     <BabylonScene/>
+	<ConnectionState/>
+	<ConnectionManager/>
   
 </template>
 
 <script>
 import BabylonScene from './components/BabylonScene.vue';
+import ConnectionManager from './components/ConnectionManager.vue';
+import ConnectionState from './components/ConnectionState.vue';
 
 export default {
   components : {
     BabylonScene,
+	ConnectionManager,
+	ConnectionState,
   },
 };
 </script>
