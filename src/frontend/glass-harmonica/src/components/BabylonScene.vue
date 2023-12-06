@@ -1,21 +1,18 @@
-  
-<script>
-import { ref, onMounted } from "@vue/runtime-core";
-import { initializeGame } from "./game/app.ts";
+<template>
+</template>
 
-export default {
-  name: "BabylonScene",
-  setup() {
-    const bjsCanvas = ref(null);
+<script setup lang="ts">
 
-    onMounted(() => {
-        initializeGame();
-    });
+import { onMounted } from "@vue/runtime-core";
+import { initializeMetaverse } from "./metaverse/app.ts";
+import { Socket } from 'socket.io-client'
 
-    return {
-      bjsCanvas,
-    };
-  },
-};
+const props = defineProps({
+  metaSocket : Socket,
+});
+
+onMounted(() => {
+  initializeMetaverse(props.metaSocket);
+});
+
 </script>
-  

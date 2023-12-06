@@ -4,6 +4,7 @@ import { Scene, Mesh, TransformNode, DynamicTexture, ShadowGenerator,
 import { AdvancedDynamicTexture, InputText, Control, Rectangle, TextBlock } from "@babylonjs/gui"
 import { clamp, getFadeOutAnimation } from "./utils";
 import { PlayerInput } from "./inputController";
+import { Socket } from "socket.io-client";
 
 
 
@@ -14,9 +15,12 @@ enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
 export class Player extends TransformNode {
 
     public camera;
+    
     private _camRoot;
-
+    private _metaSocket : Socket;
     public scene: Scene;
+
+
     private _input : PlayerInput;
     private _inputMagnitude;
 
@@ -39,6 +43,7 @@ export class Player extends TransformNode {
 
     //Player
     public mesh: Mesh;
+    private _userName: string;
     private _nameLabel: Mesh;
 
 
@@ -52,10 +57,12 @@ export class Player extends TransformNode {
     private _inputBox : InputText;
 
 
-    constructor(assets: any, scene: Scene, shadowGenerator: ShadowGenerator, input : PlayerInput) {
+    constructor(assets: any, scene: Scene, shadowGenerator: ShadowGenerator, input : PlayerInput, metaSocket : Socket) {
         super("player", scene);
         this.scene = scene;
+        this._metaSocket = metaSocket;
         this._setupPlayerCamera();
+        this._userName = "fgata-va";
 
         this.mesh = assets.mesh;
         this.mesh.parent = this;
@@ -117,14 +124,14 @@ export class Player extends TransformNode {
     }
 
     private _say(message : string) {
-        //TODO abstract this into a  context (singleton if possible)
         this._bubble.alpha = 1.0;
         this._bubble.top = ((Math.random() * (45 - 30)) + 30).toString() + "%";
         this._bubble.left = ((Math.random() * (5 -(-5))) - 5).toString() + "%";
-        console.log("top:", this._bubble.top);
+        //console.log("top:", this._bubble.top);
         this._messageText.text = message;
         this._messageText.color = "black";  // Text color
 
+        this._metaSocket.emit('chat', {user : { userId : 1, userName: this._userName}, message : message}, response => console.log('Server:', response));
         this._bubble.addControl(this._messageText);
         let context = this._bubbleTexture.getContext();
 
@@ -157,7 +164,16 @@ export class Player extends TransformNode {
         this._nameLabel.material = material;
 
         const font = "bold 16px monospace";
-        labelTexture.drawText("fgata-va", (32 * 5) / 2 - textureContext.measureText("fgata-va").width, 16, font, "white", "transparent", true, true);
+        labelTexture.drawText(
+            this._userName, 
+            (32 * 5) / 2 - textureContext.measureText(this._userName).width, 
+            16, 
+            font, 
+            "white", 
+            "transparent", 
+            true, 
+            true
+        );
 
     }
 

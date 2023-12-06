@@ -5,12 +5,13 @@ import { Engine, Scene, ArcRotateCamera, HemisphericLight, Mesh, MeshBuilder, Fr
 import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui"
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
-import { Player } from "./characterController"
-import { PlayerInput } from "./inputController"
+import { Player } from "./player";
+import { PlayerInput } from "./inputController";
+import { Socket } from "socket.io-client";
 
 enum STATES { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
 
-class App {
+class Metaverse {
     private _scene: Scene;
     private _cutScene: Scene;
 
@@ -19,6 +20,7 @@ class App {
 
     private _canvas: HTMLCanvasElement;
     private _engine: Engine;
+    private _metaSocket : Socket;
 
     private _state: number = 0;
     public assets;
@@ -28,8 +30,9 @@ class App {
     private _input;
 
 
-    constructor() {
+    constructor( metaSocket : Socket ) {
         this._canvas = this._createCanvas();
+        this._metaSocket = metaSocket;
 
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
@@ -178,7 +181,6 @@ class App {
         await this._environment.load(); //environment
         await this._loadCharacterAssets(scene); //character
 
-
     }
 
     private async _goToGame() {
@@ -326,18 +328,18 @@ class App {
         shadowGenerator.darkness = 0.6;
 
         //Create the player
-        this._player = new Player(this.assets, scene, shadowGenerator, this._input);
+        this._player = new Player(this.assets, scene, shadowGenerator, this._input, this._metaSocket);
         const camera = this._player.activatePlayerCamera();
 
 
     }
 }
 
-const initializeGame = () => {
-    new App();
+const initializeMetaverse = (metaSocket : Socket) => {
+    new Metaverse(metaSocket);
 }
 
-export {initializeGame};
+export {initializeMetaverse};
 
 /*static async #getSocketHost() {
     const currentURL = new URL(window.location.href);
