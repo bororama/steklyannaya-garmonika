@@ -5,11 +5,12 @@ import {
   WebSocketServer,
   OnGatewayInit,
   OnGatewayConnection,
-  OnGatewayDisconnect
+  OnGatewayDisconnect,
+  ConnectedSocket
 } from '@nestjs/websockets';
 import { Logger } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
-import { ServerToClientEvents, ClientToServerEvents, Message } from "../shared/meta.interface"
+import { ServerToClientEvents, ClientToServerEvents, Message, type Player } from "../shared/meta.interface"
 
 
 
@@ -39,11 +40,16 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
   
   @SubscribeMessage('chat')
-  async handleEvent(@MessageBody() payload: Message): Promise<String> {
+  async onChatMessage(@MessageBody() payload: Message, @ConnectedSocket() Socket : Socket): Promise<String> {
 
-    this.server.emit('chat', payload ,(e)=> {
-      console.log("where's this e going? : ", e);
-    });
-    return `You sent : ${ payload }`;
+    Socket.broadcast.emit('chat', payload);
+    return `You sent : chat ${ payload }`;
+  }
+
+  @SubscribeMessage('playerUpdate')
+  async onPlayerUpdateMessage(@MessageBody() payload: Player, @ConnectedSocket() Socket : Socket): Promise<String> {
+
+    Socket.broadcast.emit('playerUpdate', payload);
+    return `You sent : playerUpdate ${ payload }`;
   }
 }

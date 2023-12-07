@@ -5,6 +5,7 @@ import { AdvancedDynamicTexture, InputText, Control, Rectangle, TextBlock } from
 import { clamp, getFadeOutAnimation } from "./utils";
 import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
+import { PlayerData } from "./playerData";
 
 
 
@@ -43,8 +44,8 @@ export class Player extends TransformNode {
 
     //Player
     public mesh: Mesh;
-    private _userName: string;
     private _nameLabel: Mesh;
+    private _playerData: PlayerData;
 
 
     //Chat-related
@@ -62,7 +63,7 @@ export class Player extends TransformNode {
         this.scene = scene;
         this._metaSocket = metaSocket;
         this._setupPlayerCamera();
-        this._userName = "fgata-va";
+        this._playerData = new PlayerData();
 
         this.mesh = assets.mesh;
         this.mesh.parent = this;
@@ -78,36 +79,16 @@ export class Player extends TransformNode {
 
     private _setUpChatBox() {
         this._inputBoxTexture = AdvancedDynamicTexture.CreateFullscreenUI("chatbox");
-
-       //chatBoxTexture.vOffset = 0.2;
-
-        this._inputBox = new InputText();
-        this._inputBox.width = 0.2;
-        this._inputBox.maxWidth = 0.2;
-        this._inputBox.height = "40px";
-        this._inputBox.text = "";
-        this._inputBox.color = "white";
-        this._inputBox.background = "transparent";
-        this._inputBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this._inputBox.top = "-10%";
-        //console.log("padding : ", input.margin)
+        this._inputBox = createLocalPlayerInputBox();
         this._inputBoxTexture.addControl(this._inputBox);
+        this._inputBox.isVisible = false;
 
         this._bubbleTexture = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
-        this._bubble = new Rectangle();
-        this._bubble.cornerRadius = 25;
-        this._bubble.thickness = 0;
-        //this._bubble.setPadding(0, 8, 0, 8);
-        this._bubble.background = "white";
-        this._bubble.height = "10%";
-        this._bubble.top = "30%";
-        this._bubble.left = "-5%";
-        this._bubble.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        this._messageText = new TextBlock();
-        
-        this._inputBox.isVisible = false;
+        this._bubble = createLocalPlayerBubble();
+        this._bubbleTexture.addControl(this._bubble);
         this._bubbleState = bubbleStates.INVISIBLE;
 
+        this._messageText = new TextBlock();
         this._inputBox.onKeyboardEventProcessedObservable.add((eventData) => {
             if (eventData.key === "Enter" && this._bubbleState == bubbleStates.INVISIBLE) {
                 // Get the text from the input field
@@ -127,16 +108,14 @@ export class Player extends TransformNode {
         this._bubble.alpha = 1.0;
         this._bubble.top = ((Math.random() * (45 - 30)) + 30).toString() + "%";
         this._bubble.left = ((Math.random() * (5 -(-5))) - 5).toString() + "%";
-        //console.log("top:", this._bubble.top);
         this._messageText.text = message;
-        this._messageText.color = "black";  // Text color
+        this._messageText.color = "black";
 
-        this._metaSocket.emit('chat', {user : { userId : 1, userName: this._userName}, message : message}, response => console.log('Server:', response));
+        this._metaSocket.emit('chat', {user : this._playerData.user, message : message}, response => console.log('Server:', response));
         this._bubble.addControl(this._messageText);
         let context = this._bubbleTexture.getContext();
 
         this._bubble.width = (clamp((context.measureText(message).width + 24), 64, 256).toString() + "px");
-        this._bubbleTexture.addControl(this._bubble);
         let fadeOut = new AnimationGroup("fadeOut");
         this._bubbleState = bubbleStates.VISIBLE;
         fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._bubble);
@@ -165,8 +144,8 @@ export class Player extends TransformNode {
 
         const font = "bold 16px monospace";
         labelTexture.drawText(
-            this._userName, 
-            (32 * 5) / 2 - textureContext.measureText(this._userName).width, 
+            this._playerData.user.name, 
+            (32 * 5) / 2 - textureContext.measureText(this._playerData.user.name).width, 
             16, 
             font, 
             "white", 
@@ -347,8 +326,47 @@ export class Player extends TransformNode {
         }
         else {
             this._groundCharacter();
-        }
-
+        }        
         this.mesh.moveWithCollisions(this._moveDirection.addInPlace(this._gravity));
+        if (this._state !== playerStates.IDLING) {
+            this._playerData.setPosition(this.mesh.position);
+            this._metaSocket.emit('playerUpdate', this._playerData);
+        }
     }
+}
+
+
+
+
+
+//temporary helpers, should be refactored into the generic Player class
+function createLocalPlayerInputBox() : InputText {
+    let inputBox : InputText = new InputText();
+    inputBox.width = 0.2;
+    inputBox.maxWidth = 0.2;
+    inputBox.height = "40px";
+    inputBox.text = "";
+    inputBox.color = "white";
+    inputBox.background = "transparent";
+    inputBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+    inputBox.top = "-10%";
+
+    return inputBox;
+}
+
+
+function createLocalPlayerBubble() : Rectangle {
+    let bubble = new Rectangle();
+
+    bubble.cornerRadius = 25;
+    bubble.thickness = 0;
+    bubble.setPadding(0, 8, 0, 8);
+    bubble.background = "white";
+    bubble.height = "10%";
+    bubble.top = "30%";
+    bubble.left = "-5%";
+    bubble.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    bubble.alpha = 0;
+
+    return bubble;
 }

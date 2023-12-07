@@ -5,7 +5,7 @@ import { Engine, Scene, ArcRotateCamera, HemisphericLight, Mesh, MeshBuilder, Fr
 import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui"
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
-import { Player } from "./player";
+import { Player } from "./localPlayer";
 import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
 

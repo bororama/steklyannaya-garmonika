@@ -10,6 +10,9 @@ services:
       - type: bind
         source: ./src/backend
         target: /app
+      - type: bind
+        source: ./src/shared
+        target: /app/glass-harmonica-back/src/components/shared
     ports:
       - 3000:3000
       - 4000:4000
@@ -26,5 +29,8 @@ services:
       - type: bind
         source: ./src/frontend
         target: /app
+      - type: bind
+        source: ./src/shared
+        target: /app/glass-harmonica/src/components/metaverse/shared
     ports:
       - 5173:5173

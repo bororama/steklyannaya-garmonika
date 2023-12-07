@@ -1,7 +1,7 @@
 
 
 export interface User {
-  userId: string;
+  userId: number;
   userName: string;
 }
 
@@ -17,7 +17,7 @@ export interface Player {
 }
 
 export interface ServerToClientEvents {
-  chat: (e: Message) => void;
+  chat: (message : Message) => void;
 }
 
 export interface ClientToServerEvents {

@@ -30,4 +30,24 @@ function getFadeOutAnimation(durationMs: number, initialOpacity : number, finalO
     return animation;
 }
 
-export {clamp, getFadeOutAnimation}
+function getRandomUsername () : string {
+    const availableNames : Array<string> = Array<string>(
+        "fgata-va", 
+        "pdiaz-pa", 
+        "javgonza",
+        "mmateo-t", 
+        "guilmira", 
+        "rcabezas",
+        "npinto-g",
+    );
+    let pickedName : string = "anon"
+
+    if (availableNames.length) {
+        pickedName = availableNames[Math.floor(Math.random() * availableNames.length)];
+        availableNames.filter(name => name === pickedName);
+    }
+    
+    return pickedName;
+}
+
+export {clamp, getFadeOutAnimation, getRandomUsername}
