@@ -4,12 +4,15 @@ import { getRandomUsername } from "./utils";
 import { Vector3 } from "@babylonjs/core"
 
 export class PlayerData implements Player {
+    
+    static numberOfPlayers : number = 0;
     public user : User;
     public position : Array<number>;
     public state : number;
 
+
     constructor() {
-        this.user  = { id: 0, name: getRandomUsername()};
+        this.user  = { locator: PlayerData.numberOfPlayers, name: getRandomUsername()};
         this.position = Array(3);
         this.state = 0;
 
@@ -21,5 +24,5 @@ export class PlayerData implements Player {
        this.position[0] = u.x;
        this.position[1] = u.y;
        this.position[2] = u.z;
-    } 
+    }
 }

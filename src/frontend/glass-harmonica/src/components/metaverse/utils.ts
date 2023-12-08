@@ -33,12 +33,21 @@ function getFadeOutAnimation(durationMs: number, initialOpacity : number, finalO
 function getRandomUsername () : string {
     const availableNames : Array<string> = Array<string>(
         "fgata-va", 
-        "pdiaz-pa", 
         "javgonza",
+        "pdiaz-pa", 
         "mmateo-t", 
         "guilmira", 
         "rcabezas",
         "npinto-g",
+        "vicgarci",
+        "agallipo",
+        "tomartin",
+        "crisfern",
+        "vcodrean",
+        "v-florez",
+        "bazuara-",
+        "e-ligero",
+        "jvacaris",
     );
     let pickedName : string = "anon"
 

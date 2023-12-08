@@ -55,6 +55,11 @@ class Metaverse {
         this._main();
     }
 
+
+    test () {
+        console.log("CONNECTION MANAGER requesting something from metaverse");
+    }
+
     private _createCanvas(): HTMLCanvasElement {
         let canvas = document.createElement("canvas");
         canvas.style.width = "100%";
@@ -330,16 +335,15 @@ class Metaverse {
         //Create the player
         this._player = new Player(this.assets, scene, shadowGenerator, this._input, this._metaSocket);
         const camera = this._player.activatePlayerCamera();
-
-
     }
 }
 
-const initializeMetaverse = (metaSocket : Socket) => {
-    new Metaverse(metaSocket);
+function initializeMetaverse(metaSocket : Socket) : Metaverse {
+    const metaverseInstance = new Metaverse(metaSocket);
+    return metaverseInstance;
 }
 
-export {initializeMetaverse};
+export {initializeMetaverse, Metaverse};
 
 /*static async #getSocketHost() {
     const currentURL = new URL(window.location.href);

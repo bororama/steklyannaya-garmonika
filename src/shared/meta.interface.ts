@@ -1,7 +1,6 @@
 
-
 export interface User {
-  id: number;
+  locator: number;
   name: string;
 } 
 
@@ -18,6 +17,7 @@ export interface Player {
 
 export interface ServerToClientEvents {
   chat: (message : Message) => void;
+  newPlayer: (player : Player) => void;
 }
 
 export interface ClientToServerEvents {

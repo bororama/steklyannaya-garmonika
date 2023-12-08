@@ -51,27 +51,14 @@
 	<h6>S ó l o</h6>
 	<h6>S . ó . l . o</h6>
 	<h6>Sólo curro</h6>
-	<BabylonScene :metaSocket="metaSocket" />
-	<ConnectionManager :metaSocket="metaSocket" />
+	<Metaverse/>
 </template>
 
 <script setup lang="ts">
 
 import { ref } from 'vue';
 import { Socket, io } from "socket.io-client";
-import BabylonScene from './components/BabylonScene.vue';
-import ConnectionManager from './components/ConnectionManager.vue';
-import { ServerToClientEvents, ClientToServerEvents, Messsage} from "./metaverse/meta.interface.ts";
-
-
-
-const metaSocket : Ref<Socket> = ref(initializeSocket());
-
-function initializeSocket() : Socket {
-
-	return io<ServerToClientEvents, ClientToServerEvents>(`http://${import.meta.env.VITE_HOST_IP}:3000`);
-}
-
+import Metaverse from './components/Metaverse.vue';
 
 </script>
 

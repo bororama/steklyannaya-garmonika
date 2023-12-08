@@ -15,6 +15,7 @@
         - remotePlayers array that registers server reports about the other players in the world[]
     - share socket event types interfaces between client and server side [X]
 - refactor game/*ts []
+    - GENERAL REFCTRNG []
     - Create generic game entity []
     - Create playerData class for db interaction []
     - Make player extend entity []
