@@ -19,6 +19,7 @@ import { ServerToClientEvents, ClientToServerEvents, Message, type Player } from
     origin: '*',
   },
 })
+
 export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
   
   private logger : Logger = new Logger("MetaverseGateway");
@@ -32,10 +33,11 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   handleConnection(client: any, ...args: any[]) {
-      console.log("connection start");
-    }
+    console.log("connection start");
+    this.server.emit("welcomePack", 1);
+  }
     
-    handleDisconnect(client: Socket) {
+  handleDisconnect(client: Socket) {
     console.log("connection end");
   }
   

@@ -58,18 +58,15 @@ export class Player extends TransformNode {
     private _inputBox : InputText;
 
 
-    constructor(assets: any, scene: Scene, shadowGenerator: ShadowGenerator, input : PlayerInput, metaSocket : Socket) {
+    constructor(assets: any, scene: Scene, input : PlayerInput, metaSocket : Socket, playerData : PlayerData) {
         super("player", scene);
         this.scene = scene;
         this._metaSocket = metaSocket;
         this._setupPlayerCamera();
-        this._playerData = new PlayerData();
+        this._playerData = playerData;
 
         this.mesh = assets.mesh;
         this.mesh.parent = this;
-
-        shadowGenerator.addShadowCaster(assets.mesh);
-
         this._input = input;
         this._animations = assets.animationGroups;
         this._setUpAnimations();

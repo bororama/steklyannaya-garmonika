@@ -5,6 +5,7 @@ import { Engine, Scene, ArcRotateCamera, HemisphericLight, Mesh, MeshBuilder, Fr
 import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui"
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
+import { PlayerData } from "./playerData";
 import { Player } from "./localPlayer";
 import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
@@ -13,8 +14,6 @@ enum STATES { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
 
 class Metaverse {
     private _scene: Scene;
-    private _cutScene: Scene;
-
     private _gamescene: Scene;
 
 
@@ -22,12 +21,14 @@ class Metaverse {
     private _engine: Engine;
     private _metaSocket : Socket;
 
+    public  assets : any;
     private _state: number = 0;
-    public assets;
-    private _environment: Environment;
-    private _player: Player;
+    private _environment: Environment | null;
+    private _playerData : PlayerData;
 
-    private _input;
+    private _player: Player;
+    private _input : PlayerInput;
+
 
 
     constructor( metaSocket : Socket ) {
@@ -37,7 +38,9 @@ class Metaverse {
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
         this._scene = new Scene(this._engine);
-
+        this._gamescene = new Scene(this._engine);
+        this._playerData = new PlayerData(-1, "anon");
+        this._environment = null;
 
         // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
@@ -55,9 +58,8 @@ class Metaverse {
         this._main();
     }
 
-
-    test () {
-        console.log("CONNECTION MANAGER requesting something from metaverse");
+    initPlayerData(locator : number, username : string) {
+        this._playerData = new PlayerData(locator, username);
     }
 
     private _createCanvas(): HTMLCanvasElement {
@@ -75,21 +77,6 @@ class Metaverse {
 
         // Register a render loop to repeatedly render the scene
         this._engine.runRenderLoop(() => {
-            /* switch (this._state) {
-                 case STATES.START:
-                     this._scene.render();
-                     break;
-                 case STATES.CUTSCENE:
-                     this._scene.render();
-                     break;
-                 case STATES.GAME:
-                     this._scene.render();
-                     break;
-                 case STATES.LOSE:
-                     this._scene.render();
-                     break;
-                 default: break;
-             }*/
             this._scene.render();
         });
 
@@ -130,61 +117,15 @@ class Metaverse {
         this._state = STATES.LOSE;
     }
 
-    private async _goToCutScene() {
-        this._engine.displayLoadingUI();
-        //--SETUP SCENE--
-        //dont detect any inputs from this ui while the game is loading
-        this._scene.detachControl();
-        this._cutScene = new Scene(this._engine);
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 1), this._cutScene);
-        camera.setTarget(Vector3.Zero());
-        this._cutScene.clearColor = new Color4(1, 0, 0, 1);
-
-        //--GUI--
-        const cutScene = AdvancedDynamicTexture.CreateFullscreenUI("cutscene");
-
-        //--PROGRESS DIALOGUE--
-        const next = Button.CreateSimpleButton("next", "NEXT");
-        next.color = "white";
-        next.thickness = 0;
-        next.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        next.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        next.width = "64px";
-        next.height = "64px";
-        next.top = "-3%";
-        next.left = "-12%";
-        cutScene.addControl(next);
-
-
-
-        next.onPointerUpObservable.add(() => {
-            this._goToGame();
-        });
-
-
-        await this._cutScene.whenReadyAsync();
-        this._engine.hideLoadingUI();
-        this._scene.dispose();
-        this._state = STATES.CUTSCENE;
-        this._scene = this._cutScene;
-
-        let finishedLoading = false;
-        await this._setUpGame().then((res) => {
-            finishedLoading = true;
-        });
-        this._engine.hideLoadingUI();
-    }
-
     private async _setUpGame() {
-        //create scene
-        let scene = new Scene(this._engine);
-        this._gamescene = scene;
 
+        console.log("SET UP");
+        this._gamescene = new Scene(this._engine);
         // create environment
-        const environment = new Environment(scene);
+        const environment = new Environment(this._gamescene);
         this._environment = environment; //class variable for App
         await this._environment.load(); //environment
-        await this._loadCharacterAssets(scene); //character
+        await this._loadCharacterAssets(this._gamescene); //character
 
     }
 
@@ -192,6 +133,7 @@ class Metaverse {
         //--SETUP SCENE--
         this._scene.detachControl();
         let scene = this._gamescene;
+
         scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098); // a color that fit the overall color scheme better
 
         //--GUI--
@@ -259,12 +201,13 @@ class Metaverse {
 
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(() => {
-            this._goToCutScene();
+            this._goToGame();
             scene.detachControl(); //observables disabled
         });
 
         //--SCENE FINISHED LOADING--
-        await scene.whenReadyAsync();
+        await this._setUpGame();
+
         this._engine.hideLoadingUI();
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
@@ -273,48 +216,54 @@ class Metaverse {
 
     }
 
-    private async _loadCharacterAssets(scene) {
-        async function loadCharacter() {
-            //collision mesh
-            const outer = MeshBuilder.CreateBox("outer", { width: 1, depth: 1, height: 1}, scene);
-            outer.isVisible = false;
-            outer.isPickable = false;
-            outer.checkCollisions = true;
-
-            outer.bakeTransformIntoVertices(Matrix.Translation(0, 0, 0))
-
-            //for collisions
-            outer.ellipsoid = new Vector3(1, 1, 1);
-            outer.ellipsoidOffset = new Vector3(0, outer.ellipsoid._y / 2, 0);
-
-            outer.rotationQuaternion = new Quaternion(0, 1, 0, 0);
-
-        //    //debugging ray
-        //    let debugRay = MeshBuilder.CreateDashedLines("debugray", {points: [new Vector3(0,0,0), new Vector3(0,-1,0)]})
-        //    debugRay.parent = outer;
-        //    debugRay.isPickable = false;
-        //    debugRay.checkCollisions = false;
+    async   loadLocalPlayerModel(scene : Scene, collisionMesh : Mesh) {
         
+        const importedMesh =  await SceneLoader.ImportMeshAsync(null, "/3d/", "player.glb", scene);
+        //const root = result.meshes[0];
+        //body is our actual player mesh
+        const body = importedMesh.meshes[0];
+        body.parent = collisionMesh;
+        body.isPickable = false;
+        body.getChildMeshes().forEach(m => {
+            m.isPickable = false;
+        })
+        body.translate(Vector3.Up(), -0.6);
 
+        return importedMesh;
+    }
 
-            return SceneLoader.ImportMeshAsync(null, "/3d/", "player.glb", scene).then((result) => {
-                const root = result.meshes[0];
-                //body is our actual player mesh
-                const body = root;
-                body.parent = outer;
-                body.isPickable = false;
-                body.getChildMeshes().forEach(m => {
-                    m.isPickable = false;
-                })
-                body.translate(Vector3.Up(), -0.6);
+    async   loadCharacter(scene : Scene) {
+        //collision mesh
+        const outer = MeshBuilder.CreateBox("outer", { width: 1, depth: 1, height: 1}, scene);
+        outer.isVisible = false;
+        outer.isPickable = false;
+        outer.checkCollisions = true;
 
-                return {
-                    mesh: outer as Mesh,
-                    animationGroups: result.animationGroups,
-                }
-            });
+        outer.bakeTransformIntoVertices(Matrix.Translation(0, 0, 0))
+
+        //for collisions
+        outer.ellipsoid = new Vector3(1, 1, 1);
+        outer.ellipsoidOffset = new Vector3(0, outer.ellipsoid._y / 2, 0);
+
+        outer.rotationQuaternion = new Quaternion(0, 1, 0, 0);
+
+    //    //debugging ray
+    //    let debugRay = MeshBuilder.CreateDashedLines("debugray", {points: [new Vector3(0,0,0), new Vector3(0,-1,0)]})
+    //    debugRay.parent = outer;
+    //    debugRay.isPickable = false;
+    //    debugRay.checkCollisions = false;
+    
+        let importedMesh : any = await this.loadLocalPlayerModel(scene, outer);
+
+        return {
+            mesh: outer as Mesh,
+            animationGroups: importedMesh.animationGroups,
         }
-        return loadCharacter().then(assets => {
+    }
+
+    private async _loadCharacterAssets(scene : Scene) {
+
+        return this.loadCharacter(scene).then(assets => {
             this.assets = assets;
         })
 
@@ -322,18 +271,10 @@ class Metaverse {
 
     private async _initializeGameAsync(scene : Scene): Promise<void> {
         //temporary light to light the entire scene
-        var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
-
-        const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
-        light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
-        light.intensity = 5;
-        light.radius = 1000;
-
-        const shadowGenerator = new ShadowGenerator(1024, light);
-        shadowGenerator.darkness = 0.6;
+        const light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
 
         //Create the player
-        this._player = new Player(this.assets, scene, shadowGenerator, this._input, this._metaSocket);
+        this._player = new Player(this.assets, scene, this._input, this._metaSocket, <PlayerData>this._playerData);
         const camera = this._player.activatePlayerCamera();
     }
 }

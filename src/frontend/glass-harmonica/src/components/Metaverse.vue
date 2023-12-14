@@ -14,7 +14,7 @@ function initializeSocket(hostAddress : string) : Socket {
 }
 
 const hostAddress = `http://${import.meta.env.VITE_HOST_IP}:3000`;
-const metaSocket = initializeSocket(hostAddress);
+const metaSocket = initializeSocket(hostAddress, );
 const localPlayerData = 
 
 onMounted(() => {

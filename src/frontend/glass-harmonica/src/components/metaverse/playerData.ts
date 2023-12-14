@@ -11,8 +11,8 @@ export class PlayerData implements Player {
     public state : number;
 
 
-    constructor() {
-        this.user  = { locator: PlayerData.numberOfPlayers, name: getRandomUsername()};
+    constructor(locator : number, name : string) {
+        this.user  = { locator : locator,  name : name};
         this.position = Array(3);
         this.state = 0;
 

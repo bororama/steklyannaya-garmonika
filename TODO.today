@@ -12,6 +12,7 @@
     - send chat messages from babylon game [X]
     - report new coordinates on movement [X]
     - comm data structures  []
+        - Assign locator from backend []
         - remotePlayers array that registers server reports about the other players in the world[]
     - share socket event types interfaces between client and server side [X]
 - refactor game/*ts []
