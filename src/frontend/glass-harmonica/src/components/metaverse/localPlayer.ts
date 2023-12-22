@@ -13,7 +13,7 @@ enum Animations { IDLE = 1, JUMP = 2, LAND = 3, RUN = 4 };
 enum playerStates { SPEAKING = 0, IDLING = 1, JUMPING = 2, RUNNING = 3 };
 enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
 
-export class Player extends TransformNode {
+export class LocalPlayer extends TransformNode {
 
     public camera;
     
@@ -59,7 +59,7 @@ export class Player extends TransformNode {
 
 
     constructor(assets: any, scene: Scene, input : PlayerInput, metaSocket : Socket, playerData : PlayerData) {
-        super("player", scene);
+        super("LocalPlayer", scene);
         this.scene = scene;
         this._metaSocket = metaSocket;
         this._setupPlayerCamera();
@@ -269,7 +269,7 @@ export class Player extends TransformNode {
 
 
     private _setMeshTransformations() {
-        this._moveDirection = this._moveDirection.scaleInPlace(this._inputMagnitude * Player.PLAYER_SPEED);
+        this._moveDirection = this._moveDirection.scaleInPlace(this._inputMagnitude * LocalPlayer.PLAYER_SPEED);
 
         if (this._inputMagnitude > 0) {
             let angle = Math.atan2(this._input.horizontal, this._input.vertical);
@@ -290,14 +290,14 @@ export class Player extends TransformNode {
     }
 
     private _addGravity() {
-        this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
-        this._gravity.y = Math.max(this._gravity.y, -Player.JUMP_FORCE);
+        this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * LocalPlayer.GRAVITY));
+        this._gravity.y = Math.max(this._gravity.y, -LocalPlayer.JUMP_FORCE);
         this._grounded = false;
     }
 
     private _jump() {
         this._state = playerStates.JUMPING;
-        this._gravity.y = Player.JUMP_FORCE;
+        this._gravity.y = LocalPlayer.JUMP_FORCE;
         this._jumpCount--;
     }
 

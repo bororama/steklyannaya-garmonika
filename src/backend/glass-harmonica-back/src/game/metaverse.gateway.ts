@@ -10,9 +10,10 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
-import { ServerToClientEvents, ClientToServerEvents, Message, type Player } from "../shared/meta.interface"
+import { ServerToClientEvents, ClientToServerEvents, Message, Player, User } from "../components/shared/meta.interface"
 
 
+const livePlayers : Array<Player> = Array();
 
 @WebSocketGateway({
   cors: {
@@ -34,11 +35,23 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   handleConnection(client: any, ...args: any[]) {
     console.log("connection start");
-    this.server.emit("welcomePack", 1);
   }
     
   handleDisconnect(client: Socket) {
     console.log("connection end");
+  }
+
+  
+  @SubscribeMessage('userData')
+  async onUserDataMessage(@MessageBody() payload: string, @ConnectedSocket() Socket : Socket): Promise<String> {
+    
+    const newUser : User = { locator: livePlayers.length, name : payload };
+    const newPlayer : Player = { user : newUser, position : [0,0,0], state : 0};
+    livePlayers.push(newPlayer);
+
+    Socket.emit('welcomePack', {newPlayer, livePlayers}); // previously spawned player list should be sent aswell
+    Socket.broadcast.emit('newPlayer', newPlayer);
+    return `You sent : userData ${ payload }`;
   }
   
   @SubscribeMessage('chat')
