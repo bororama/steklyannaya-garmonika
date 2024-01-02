@@ -31,3 +31,4 @@
     - make a server limit, administrate locators so that the players are accessed directly []
 - Word triggers []
 - Pop up []
+- Fix when the first request is made from the connection manager in the frontend[] <---- SUPERIMPORTANT

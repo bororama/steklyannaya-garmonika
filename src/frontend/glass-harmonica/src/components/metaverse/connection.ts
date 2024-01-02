@@ -11,7 +11,9 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse) {
 	console.log("socket is ", metaSocket);
 	metaSocket.on('connect', () => {
 		console.log('Connected');
-		metaSocket.emit('userData', globalThis.username);
+		setTimeout( () => {
+			metaSocket.emit('userData', globalThis.username);
+		}, 1)
 	});
 	
 	metaSocket.on('welcomePack', async (payload : { newPlayer : Player, livePlayers : Array<Player>}) => {
@@ -22,7 +24,6 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse) {
 		);
 		await metaverse.initGameWorld(metaSocket);
 		metaverse.gameWorld.spawnPlayers(payload.livePlayers);
-
 	});
  
 	metaSocket.on('chat', (payload : Messsage) => { 

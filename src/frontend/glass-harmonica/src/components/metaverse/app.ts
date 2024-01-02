@@ -82,9 +82,6 @@ class GameWorld {
     }
     //SOCKETS
 
-
-
-
     async spawnPlayers(playersToSpawn: Array<PlayerData>) {
         for (let player of playersToSpawn) {
             async () => {}
