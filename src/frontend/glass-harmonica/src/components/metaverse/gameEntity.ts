@@ -21,8 +21,11 @@ export class GameEntity extends TransformNode {
     private _bubbleState : number;
 
     constructor (assets : any, scene: Scene, name : string) {
+
         super("GameEntity", scene);
-        this.mesh = assets.mesh;
+        console.log("CREATING NEW ENTITY!!!!!!!!!"),
+        //this.mesh = assets.mesh;
+        this.mesh = MeshBuilder.CreateBox("test", { width: 2, depth: 2, height: 3 });
         this.name = name;
         this._animations = assets.animationGroups;
         this._bubbleState = bubbleStates.INVISIBLE;
@@ -32,6 +35,7 @@ export class GameEntity extends TransformNode {
         this._setUpBubble();
         this._nameLabel = MeshBuilder.CreatePlane("label", {width: 5, height : 1}, scene);
         this._setUpLabel();
+
     }
 
     private _setUpBubble() {
@@ -52,6 +56,7 @@ export class GameEntity extends TransformNode {
         this._nameLabel.translate(Vector3.Up(), 4);
         this._nameLabel.parent = this.mesh;
 
+        
         const labelTexture = new DynamicTexture("label-texture", { width: 32 * (5), height : 32}, this._scene);
         const textureContext = labelTexture.getContext();
         const material = new StandardMaterial("mat", this._scene);
@@ -74,8 +79,15 @@ export class GameEntity extends TransformNode {
     }
 
     updatePosition(newPosition : Vector3) {
-        console.log("mesh.pos>>", this.mesh.position);
-        console.log("mesh>>", this.mesh);
         this.mesh.position = newPosition;
+    }
+
+    updateRotation(newRotation : Quaternion) {
+        this.mesh.rotationQuaternion = newRotation;
+    }
+
+    updateMesh(newPosition : Vector3, newRotation : Quaternion) {
+        this.updatePosition(newPosition);
+        this.updateRotation(newRotation);
     }
 }

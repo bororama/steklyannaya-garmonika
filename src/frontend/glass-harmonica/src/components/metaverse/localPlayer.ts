@@ -327,11 +327,13 @@ export class LocalPlayer extends TransformNode {
         this.mesh.moveWithCollisions(this._moveDirection.addInPlace(this._gravity));
         if (this._state !== playerStates.IDLING) {
             this._playerData.setPosition(this.mesh.position);
+            this._playerData.setRotation(<Quaternion>this.mesh.rotationQuaternion);
+            this._playerData.state = this._state;
             this._metaSocket.emit('playerUpdate', this._playerData);
         }
     }
 }
-
+      
 
 
 

@@ -46,10 +46,13 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   async onUserDataMessage(@MessageBody() payload: string, @ConnectedSocket() Socket : Socket): Promise<String> {
     
     const newUser : User = { locator: livePlayers.length, name : payload };
-    const newPlayer : Player = { user : newUser, position : [0,0,0], state : 0};
+    const newPlayer : Player = { user : newUser, position : [0,0,0], rotation : [0,0,0,1.0], state : 0};
     livePlayers.push(newPlayer);
 
-    Socket.emit('welcomePack', {newPlayer, livePlayers}); // previously spawned player list should be sent aswell
+    for (let p of livePlayers) {
+      console.log("p of liveplayers : ", p);
+    }
+    Socket.emit('welcomePack', {newPlayer, livePlayers});
     Socket.broadcast.emit('newPlayer', newPlayer);
     return `You sent : userData ${ payload }`;
   }

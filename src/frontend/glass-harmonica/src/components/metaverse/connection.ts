@@ -14,28 +14,30 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse) {
 		metaSocket.emit('userData', globalThis.username);
 	});
 	
-	metaSocket.on('welcomePack', (payload : { newPlayer : Player, livePlayers : Array<Player>}) => {
+	metaSocket.on('welcomePack', async (payload : { newPlayer : Player, livePlayers : Array<Player>}) => {
 		console.log('welcomePack>>', payload)
-		metaverse.initPlayerData(
+		await metaverse.initPlayerData(
 			payload.newPlayer.user.locator,
 			payload.newPlayer.user.name
 		);
-		metaverse.spawnPlayers(payload.livePlayers);
-	});
+		await metaverse.initGameWorld(metaSocket);
+		metaverse.gameWorld.spawnPlayers(payload.livePlayers);
 
+	});
+ 
 	metaSocket.on('chat', (payload : Messsage) => { 
 		console.log('chat>>', `${payload.user.name}:`, payload.message);
-		metaverse.makeRemotePlayerSay()
+		metaverse.gameWorld.makeRemotePlayerSay()
 	});
 	
 	metaSocket.on('newPlayer', (payload : Player) => { 
 		console.log('newPLayer joined ....>>', `${payload.user.name}:`, payload.message);
-		metaverse.spawnPlayers([payload]);
+		metaverse.gameWorld.spawnPlayers([payload]);
 	});
 
 	metaSocket.on('playerUpdate', (payload : Player) => {
 		console.log('playerMovement>>', `${payload.user.name} position: `, payload.position[0], payload.position[1], payload.position[2]);
-		metaverse.applyRemotePlayerUpdate(payload);
+		metaverse.gameWorld.applyRemotePlayerUpdate(payload);
 	});
 
 	metaSocket.on('exception', (data) => {

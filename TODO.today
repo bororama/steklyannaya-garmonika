@@ -17,6 +17,7 @@
     - share socket event types interfaces between client and server side [X]
 - Conditionally start the metaverse after player data and assets are loaded (loading?) []
 - refactor game/*ts []
+    - proper asynchronicity []
     - GENERAL REFCTRNG []
     - Create generic game entity [] <-- crucial for world spawning ...
     - Make localplayer extend entity []
@@ -25,6 +26,8 @@
 - deep interclient comms []
     - make other players state entity and appear in the world, update [X]
     - print out in the player's corresponding bubble []
+    - update orientation [x]
+    - update animation state []
     - make a server limit, administrate locators so that the players are accessed directly []
 - Word triggers []
 - Pop up []

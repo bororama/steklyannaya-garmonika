@@ -17,8 +17,8 @@ const hostAddress = `http://${import.meta.env.VITE_HOST_IP}:3000`;
 const metaSocket = initializeSocket(hostAddress, );
 const localPlayerData = 
 
-onMounted(() => {
-  const metaverseInstance : Metaverse = initializeMetaverse(metaSocket);
+onMounted(async () => {
+  const metaverseInstance : Metaverse = await initializeMetaverse(metaSocket);
   connectionManager(metaSocket, metaverseInstance);
 });
 

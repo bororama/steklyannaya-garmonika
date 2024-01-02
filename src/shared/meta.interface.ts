@@ -12,6 +12,7 @@ export interface Message {
 export interface Player {
   user: User;
   position: Array<number>;
+  rotation: Array<number>;
   state : number
 }
 
