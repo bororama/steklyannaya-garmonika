@@ -11,29 +11,25 @@ import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
 import { GameEntity } from "./gameEntity";
 import { routerKey } from "vue-router";
+import { type Message } from './shared/meta.interface'
 
 enum STATES { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
 
 class Metaverse {
 
-    playerData : PlayerData | null;
-    gameWorld : GameWorld | null;
+    playerData : PlayerData;
+    gameWorld : GameWorld;
 
     constructor () {
-        this.playerData = null;
-        this.gameWorld = null;
     }
 
-    async initPlayerData(locator : number, username : string) : Promise<void>{
-        return new Promise( (resolve, reject) => {
-            this.playerData = new PlayerData(locator, username);
-            resolve();
-        });
+    async initPlayerData(locator : number, username : string) {
+        this.playerData = new PlayerData(locator, username);
     }
 
     async initGameWorld(metaSocket: Socket) {
         this.gameWorld = new GameWorld(metaSocket, <PlayerData>this.playerData);
-        await this.gameWorld.initalizeAsynchronousTasks();
+        await this.gameWorld.ready();
     }
 }
 
@@ -76,7 +72,7 @@ class GameWorld {
 
     }
 
-    async initalizeAsynchronousTasks(){
+    async ready(){
         // run the main render loop
         await this._main();
     }
@@ -90,8 +86,6 @@ class GameWorld {
                 //const assets = this._loadCharacterAssets(this._scene);
                 //const importedMesh =  await SceneLoader.ImportMeshAsync(null, "/3d/", "player.glb", this._scene);
                 //importedMesh.meshes[0].isPickable = false;
-                let testBox = MeshBuilder.CreateBox("test", { width: 2, depth: 2, height: 3 });
-                testBox.isPickable = false;
                 let newPlayer: any;
                 newPlayer = new GameEntity({ animationGroups: [] }, this._scene, player.user.name);// this construction has synchronicity issues
                 this._livePlayers.push(newPlayer);
@@ -101,23 +95,24 @@ class GameWorld {
 
     applyRemotePlayerUpdate(p: PlayerData) {
 
-        let player = this._findLivePlayer(p);
+        let player = this._findLivePlayer(p.user.name);
         player?.updateMesh(
             new Vector3(p.position[0], p.position[1], p.position[2]),
             new Quaternion(p.rotation[0], p.rotation[1], p.rotation[2], p.rotation[3])
         );
     }
 
-    makeRemotePlayerSay() {
-        //let player = this._findLivePlayer()
+    makeRemotePlayerSay(m : Message) {
+        let player = this._findLivePlayer(m.user.name);
+        player.say(m.text);
     }
 
     isSceneReady(): boolean {
         return this._scene.isReady();
     }
 
-    private _findLivePlayer(target: PlayerData): GameEntity | undefined {
-        let player = this._livePlayers.find((p) => { return p.name == target.user.name }) // change this for a locator
+    private _findLivePlayer(targetPlayerName: string): GameEntity | undefined {
+        let player = this._livePlayers.find((p) => { return p.name == targetPlayerName }) // change this for a locator
 
         return player;
     }
@@ -274,16 +269,9 @@ class GameWorld {
     }
 }
 
-async function initializeMetaverse(metaSocket: Socket): Promise<Metaverse> {
-    return new Promise((resolve, reject) => {
-        try {
-           const metaverse = new Metaverse(); 
-           resolve(metaverse);
-        }
-        catch (error) {
-            reject(error);
-        }
-    });
+async function initializeMetaverse(metaSocket: Socket) {
+    const metaverse = new Metaverse();
+    return metaverse;
 }
 
 export { initializeMetaverse, Metaverse };

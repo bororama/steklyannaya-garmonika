@@ -6,6 +6,7 @@ import { clamp, getFadeOutAnimation } from "./utils";
 import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
 import { PlayerData } from "./playerData";
+import { type Message } from './shared/meta.interface';
 
 
 
@@ -108,7 +109,7 @@ export class LocalPlayer extends TransformNode {
         this._messageText.text = message;
         this._messageText.color = "black";
 
-        this._metaSocket.emit('chat', {user : this._playerData.user, message : message}, response => console.log('Server:', response));
+        this._metaSocket.emit('chat',  {user : this._playerData.user, text : message}, response => console.log('Server:', response));
         this._bubble.addControl(this._messageText);
         let context = this._bubbleTexture.getContext();
 

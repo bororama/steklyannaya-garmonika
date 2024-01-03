@@ -6,7 +6,7 @@ export interface User {
 
 export interface Message {
   user: User;
-  message: string;
+  text: string;
 }
 
 export interface Player {

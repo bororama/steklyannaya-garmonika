@@ -15,9 +15,9 @@
         - Assign locator from backend [X]
         - remotePlayers array that registers server reports about the other players in the world[X]
     - share socket event types interfaces between client and server side [X]
-- Conditionally start the metaverse after player data and assets are loaded (loading?) []
+- Conditionally start the metaverse after player data and assets are loaded (loading?) [X]
 - refactor game/*ts []
-    - proper asynchronicity []
+    - proper asynchronicity [X]
     - GENERAL REFCTRNG []
     - Create generic game entity [] <-- crucial for world spawning ...
     - Make localplayer extend entity []
@@ -25,10 +25,15 @@
     - Create playerData class for db interaction [X]
 - deep interclient comms []
     - make other players state entity and appear in the world, update [X]
-    - print out in the player's corresponding bubble []
+    - print out in the player's corresponding bubble [] <---
     - update orientation [x]
+    - load proper character asynchronously []
     - update animation state []
     - make a server limit, administrate locators so that the players are accessed directly []
-- Word triggers []
-- Pop up []
-- Fix when the first request is made from the connection manager in the frontend[] <---- SUPERIMPORTANT
+    - clean structures on disconnect[]
+    - remove extracube [X]
+- World triggers []
+- Pop up system[]
+- Fix when the first request is made from the connection manager in the frontend[X]
+- Apply ready() pattern for asynchronous resources []  <---- SUPERIMPORTANT
+- click ray identify player []

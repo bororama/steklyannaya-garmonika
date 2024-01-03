@@ -48,15 +48,45 @@ function getRandomUsername () : string {
         "bazuara",
         "e-ligero",
         "jvacaris",
+        "ahammoud",
+        "priezu-m",
+        "emadriga",
     );
     let pickedName : string = "anon"
 
     if (availableNames.length) {
         pickedName = availableNames[Math.floor(Math.random() * availableNames.length)];
-        availableNames.filter(name => name === pickedName);
     }
     
     return pickedName;
 }
 
-export {clamp, getFadeOutAnimation, getRandomUsername}
+function numberIsInRange(n : number, min: number, max: number) : boolean {
+    return (n >= min && n < max)
+}
+
+function extent(array : Array<any>, selectorCallback : ( c : any) => number) : Array<number> {
+    let d : number = 0;
+    let min : number = array[0];
+    let max : number = array[0];
+
+    for (let position of array ) {
+        d = selectorCallback(position);
+        if (d < min)
+            min = d;
+        if (d > max)
+            max = d;
+    }
+    return [min, max];
+}
+
+type  BoundingRect = {
+    width: number,
+    height: number,
+    left: number,
+    top: number,
+    right: number,
+    bottom: number,
+}
+
+export {clamp, getFadeOutAnimation, getRandomUsername, numberIsInRange, extent, type BoundingRect};

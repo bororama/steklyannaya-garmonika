@@ -21,9 +21,11 @@
 </style>
 
 <template>
-	<span>Username: </span><input type="text" id="username">&nbsp;&nbsp;
-	<button id="login" onclick="UI.login()">Log-in</button>
-    <h1>Sólo en el curroverso</h1>
+	<label for="name">name:</label>
+	<input  v-model="usernameRef" type="text" name="username" id="username" minlength="6" maxlenght="8" require>
+	<button id="meta-birth" @click="metaBirth">be born in جَيَّان</button>
+	<button id="random-name" @click="usernameRef = getRandomUsername()">name roll</button>
+	<h1>Sólo en el curroverso</h1>
 	<h2>Sólo en el curroverso</h2>
 	<h3>Sólo en el curroverso</h3>
 	<h4>Sólo en el curroverso</h4>
@@ -51,7 +53,7 @@
 	<h6>S ó l o</h6>
 	<h6>S . ó . l . o</h6>
 	<h6>Sólo curro</h6>
-	<Metaverse/>
+	<Metaverse v-if="playerIsBorn"/>
 </template>
 
 <script setup lang="ts">
@@ -59,6 +61,17 @@
 import { ref } from 'vue';
 import { Socket, io } from "socket.io-client";
 import Metaverse from './components/Metaverse.vue';
+import {getRandomUsername, numberIsInRange} from './components/metaverse/utils'
 
+const playerIsBorn = ref(false);
+const usernameRef = ref('');
+
+function metaBirth(e) {
+	e.preventDefault();
+	if (numberIsInRange(usernameRef.value.length, 6, 9)) {
+		globalThis.username = usernameRef.value;
+		playerIsBorn.value = true;
+	}
+}
 </script>
 
