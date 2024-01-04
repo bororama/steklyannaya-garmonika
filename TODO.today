@@ -11,7 +11,7 @@
     - share socket instance between vue components [X]
     - send chat messages from babylon game [X]
     - report new coordinates on movement [X]
-    - comm data structures  []
+    - comm data structures  [X]
         - Assign locator from backend [X]
         - remotePlayers array that registers server reports about the other players in the world[X]
     - share socket event types interfaces between client and server side [X]
@@ -25,9 +25,9 @@
     - Create playerData class for db interaction [X]
 - deep interclient comms []
     - make other players state entity and appear in the world, update [X]
-    - print out in the player's corresponding bubble [] <---
-    - update orientation [x]
-    - load proper character asynchronously []
+    - print out in the player's corresponding bubble [X] <---
+    - update orientation [X]
+    - load proper mesh [X]
     - update animation state []
     - make a server limit, administrate locators so that the players are accessed directly []
     - clean structures on disconnect[]
@@ -35,5 +35,5 @@
 - World triggers []
 - Pop up system[]
 - Fix the first request's timing [X]
-- Apply ready() pattern for asynchronous resources []  <---- SUPERIMPORTANT
+- Apply ready() pattern for asynchronous resources []  <---- MIGHT FIX BUGS YOU COULDNT EVEN IMAGINE
 - click ray identify player []

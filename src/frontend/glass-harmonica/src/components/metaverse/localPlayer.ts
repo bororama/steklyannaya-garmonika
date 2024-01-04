@@ -89,13 +89,8 @@ export class LocalPlayer extends TransformNode {
         this._messageText = new TextBlock();
         this._inputBox.onKeyboardEventProcessedObservable.add((eventData) => {
             if (eventData.key === "Enter" && this._bubbleState == bubbleStates.INVISIBLE) {
-                // Get the text from the input field
                 let message = this._inputBox.text;
-                
-                // Do something with the message
                 this._say(message);
-                
-                // Clear the input field
                 this._inputBox.text = "";
                 this._inputBox.isVisible = false;
             }
@@ -164,24 +159,31 @@ export class LocalPlayer extends TransformNode {
     }
 
     private _switchAnimations(): void {
+        let currentAnimationState : number;
+
         switch (this._state) {
             case (playerStates.RUNNING): {
-                this._currentAnim = this._animations[Animations.RUN];
+                currentAnimationState = Animations.RUN;
                 break;
             }
             case playerStates.JUMPING: {
-                this._currentAnim = this._animations[Animations.JUMP];
+                currentAnimationState = Animations.JUMP;
                 break;
             }
             default: {
-                this._currentAnim = this._animations[Animations.IDLE];
+                currentAnimationState = Animations.IDLE;
                 break;
             }
         }
+        this._currentAnim = this._animations[currentAnimationState];
         if (this._currentAnim !== this._prevAnim) {
             this._prevAnim.stop();
             this._currentAnim.play(this._currentAnim.loopAnimation);
-            this._prevAnim = this._currentAnim
+            this._prevAnim = this._currentAnim;
+            if (currentAnimationState === Animations.IDLE) {
+                this._playerData.setState(this._state);
+                this._metaSocket.emit('playerUpdate', this._playerData);
+            }
         }
     }
 
@@ -329,7 +331,7 @@ export class LocalPlayer extends TransformNode {
         if (this._state !== playerStates.IDLING) {
             this._playerData.setPosition(this.mesh.position);
             this._playerData.setRotation(<Quaternion>this.mesh.rotationQuaternion);
-            this._playerData.state = this._state;
+            this._playerData.setState(this._state);
             this._metaSocket.emit('playerUpdate', this._playerData);
         }
     }

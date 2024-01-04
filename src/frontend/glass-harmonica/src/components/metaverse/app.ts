@@ -80,14 +80,11 @@ class GameWorld {
 
     async spawnPlayers(playersToSpawn: Array<PlayerData>) {
         for (let player of playersToSpawn) {
-            async () => {}
             if (player.user.locator !== this._playerData?.user.locator) {
                 console.log(player.user.name, " spawned in the world");
-                //const assets = this._loadCharacterAssets(this._scene);
-                //const importedMesh =  await SceneLoader.ImportMeshAsync(null, "/3d/", "player.glb", this._scene);
-                //importedMesh.meshes[0].isPickable = false;
+                const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
                 let newPlayer: any;
-                newPlayer = new GameEntity({ animationGroups: [] }, this._scene, player.user.name);// this construction has synchronicity issues
+                newPlayer = new GameEntity(assets, this._scene, player.user.name);
                 this._livePlayers.push(newPlayer);
             }
         }
@@ -98,13 +95,16 @@ class GameWorld {
         let player = this._findLivePlayer(p.user.name);
         player?.updateMesh(
             new Vector3(p.position[0], p.position[1], p.position[2]),
-            new Quaternion(p.rotation[0], p.rotation[1], p.rotation[2], p.rotation[3])
+            new Quaternion(p.rotation[0], p.rotation[1], p.rotation[2], p.rotation[3]),
+            p.state
         );
     }
 
     makeRemotePlayerSay(m : Message) {
         let player = this._findLivePlayer(m.user.name);
-        player.say(m.text);
+        if (player) {
+            player.say(m.text);
+        }
     }
 
     isSceneReady(): boolean {
@@ -174,7 +174,7 @@ class GameWorld {
     private async _setUpGameSceneAssets(scene: Scene) {
         this._environment = new Environment(scene);
         await this._environment.load(); //environment
-        this.assets = await this._loadCharacterAssets(scene); //character
+        this.assets = await this._loadPlayerAssets(scene, true, 'player.glb'); //character
     }
 
 
@@ -223,11 +223,13 @@ class GameWorld {
     }
 
 
-    private async _loadPlayerModel(scene: Scene, collisionMesh: Mesh) {
+    private async _loadPlayerModel(scene: Scene, collisionMesh: Mesh | null, path : string) {
 
-        const importedMesh = await SceneLoader.ImportMeshAsync(null, "/3d/", "player.glb", scene);
+        const importedMesh = await SceneLoader.ImportMeshAsync(null, "/3d/", path, scene);
         const body = importedMesh.meshes[0];
-        body.parent = collisionMesh;
+        if (collisionMesh) {
+            body.parent = collisionMesh;
+        }
         body.isPickable = false;
         body.getChildMeshes().forEach(m => {
             m.isPickable = false;
@@ -237,12 +239,12 @@ class GameWorld {
         return importedMesh;
     }
 
-    private async _loadCharacterAssets(scene: Scene) {
+    private async _loadPlayerAssets(scene: Scene, checkCollisions : boolean, modelPath : string) {
         //collision mesh
         const outer = MeshBuilder.CreateBox("outer", { width: 1, depth: 1, height: 1 }, scene);
         outer.isVisible = false;
         outer.isPickable = false;
-        outer.checkCollisions = true;
+        outer.checkCollisions = checkCollisions;
         outer.bakeTransformIntoVertices(Matrix.Translation(0, 0, 0))
         outer.ellipsoid = new Vector3(1, 1, 1); // the ellipsoid is used for collisions by BAB
         outer.ellipsoidOffset = new Vector3(0, outer.ellipsoid._y / 2, 0);
@@ -251,7 +253,7 @@ class GameWorld {
         //    debugRay.parent = outer;
         //    debugRay.isPickable = false;
         //    debugRay.checkCollisions = false;
-        let importedMesh: any = await this._loadPlayerModel(scene, outer);
+        let importedMesh: any = await this._loadPlayerModel(scene, outer, modelPath);
 
         return {
             mesh: outer as Mesh,

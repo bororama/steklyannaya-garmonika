@@ -17,7 +17,9 @@ enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
 export class GameEntity extends TransformNode {
     public mesh: Mesh;
     public name : string;
-    private _animations : AnimationGroup;
+    private _animations : AnimationGroup[];
+    private _previousAnimation : AnimationGroup;
+    private _currentAnimation : AnimationGroup;
     private _nameLabel: Mesh;
 
     //Chat-related
@@ -29,11 +31,14 @@ export class GameEntity extends TransformNode {
     constructor (assets : any, scene: Scene, name : string) {
 
         super("GameEntity", scene);
-        //this.mesh = assets.mesh;
-        this.mesh = MeshBuilder.CreateBox("test", { width: 2, depth: 2, height: 3 });
+        this.mesh = assets.mesh;
         this.mesh.isPickable = false;
         this.name = name;
         this._animations = assets.animationGroups;
+        this._currentAnimation = this._animations[Animations.IDLE]
+        this._animations[Animations.RUN].loopAnimation = true;
+        this._animations[Animations.IDLE].loopAnimation = true;
+        this._currentAnimation.play();
         this._bubbleState = bubbleStates.INVISIBLE;
         this._bubbleTexture = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
         this._bubble = new Rectangle();
@@ -94,9 +99,35 @@ export class GameEntity extends TransformNode {
         this.mesh.rotationQuaternion = newRotation;
     }
 
-    updateMesh(newPosition : Vector3, newRotation : Quaternion) {
+    updateAnimation(newState : number) {
+        this._currentAnimation.stop();
+        console.log("updateAnimation :", newState)
+        switch (newState) {
+            case (playerStates.RUNNING): {
+
+                console.log("shold play RUN");
+                this._currentAnimation = this._animations[Animations.RUN];
+                break;
+            }
+            case (playerStates.JUMPING): {
+                console.log("shold play JUMP");
+                this._currentAnimation = this._animations[Animations.JUMP];
+                break;
+            }
+            default: {
+                console.log("sould play IDLE");
+                this._currentAnimation = this._animations[Animations.IDLE];
+                break;
+            }
+        }
+        
+        this._currentAnimation.play(this._currentAnimation.loopAnimation);
+    }
+
+    updateMesh(newPosition : Vector3, newRotation : Quaternion, newState : number) {
         this.updatePosition(newPosition);
         this.updateRotation(newRotation);
+        this.updateAnimation(newState);
     }
 
     say(message : string) {
@@ -109,8 +140,7 @@ export class GameEntity extends TransformNode {
         this._bubble.removeControl(this._messageText);
         this._bubble.addControl(this._messageText);
         let context = this._bubbleTexture.getContext();
-        console.group("text width : ", context.measureText(message).width);
-        this._bubble.width = (clamp((context.measureText(message).width + 128), 64, 1024).toString() + "px");
+        this._bubble.width = (clamp((context.measureText(message).width + (this._messageText.fontSizeInPixels * 3)), 64, 1024).toString() + "px");
         this._bubble.height = (this._messageText.fontSizeInPixels * 2).toString() + "px";
         let fadeOut = new AnimationGroup("fadeOut");
         this._bubbleState = bubbleStates.VISIBLE;
@@ -126,7 +156,7 @@ export class GameEntity extends TransformNode {
     private _determineBubblePosition(r : BoundingRect) {
         const canvas = super.getScene().getEngine().getRenderingCanvas();
 
-        this._bubble.top = ((Math.random() * (5) + ((r.top / canvas!.clientHeight) * 100)).toString() + "%");
+        this._bubble.top = ((Math.random() * (6) + ((r.top / canvas!.clientHeight) * 100) - 16).toString() + "%");
         this._bubble.left = ((Math.random() * (5) + ((r.left / canvas!.clientWidth) * 100)).toString() + "%");
     }
 
@@ -135,7 +165,7 @@ export class GameEntity extends TransformNode {
         const boundingRectArea : number = r.width * r.height;
         const canvasArea : number = canvas!.clientWidth * canvas!.clientHeight;
         const proportion : number = boundingRectArea / canvasArea;
-        const fontSize : number = clamp(1024 * ((proportion) - Math.pow(proportion / 2, 2)), 9, 22);
+        const fontSize : number = clamp(8192 * ((proportion) - Math.pow(proportion / 2, 2)), 9, 22);
         this._messageText.fontSize = fontSize;
     }
 
@@ -145,19 +175,14 @@ export class GameEntity extends TransformNode {
         const worldMatrix = this.mesh.getWorldMatrix()
         const transformMatrix = super.getScene().getTransformMatrix()
         const viewport = super.getScene().activeCamera!.viewport
-    
-        // loop though all the vectors and project them against the current camera viewport to get a set of coordinates
         const coordinates = meshVectors.map(v => {
           const proj = Vector3.Project(v, worldMatrix, transformMatrix, viewport)
           proj.x = proj.x * canvas!.clientWidth;
           proj.y = proj.y * canvas!.clientHeight;
           return proj
         })
-
         const [minX, maxX] = extent(coordinates, c => c.x);
         const [minY, maxY] = extent(coordinates, c => c.y);
-    
-        // return a ClientRect from this
         const rect: BoundingRect = {
           width: maxX - minX,
           height: maxY - minY,
@@ -166,9 +191,6 @@ export class GameEntity extends TransformNode {
           right: maxX,
           bottom: maxY,
         }
-    
-        // console.timeEnd('rectfrommesh') // on average 0.05m
-
         console.table(rect);
         return rect;
       }

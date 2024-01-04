@@ -34,4 +34,8 @@ export class PlayerData implements Player {
         this.rotation[2] = q.z;
         this.rotation[3] = q.w;
     }
+
+    setState(s: number ) {
+        this.state = s;
+    }
 }
