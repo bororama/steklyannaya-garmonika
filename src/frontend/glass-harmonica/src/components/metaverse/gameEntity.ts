@@ -53,8 +53,10 @@ export class GameEntity extends TransformNode {
         this._bubble.top = "30%";
         this._bubble.left = "-5%";
         this._bubble.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this._bubble.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         this._bubble.alpha = 0;
         this._bubbleTexture.addControl(this._bubble);
+        this._bubble.addControl(this._messageText);
     }
 
     private _setUpLabel() {
@@ -99,13 +101,17 @@ export class GameEntity extends TransformNode {
 
     say(message : string) {
         this._bubble.alpha = 1.0;
-        this._determineBubblePosition();
+        const r : BoundingRect = this._getClientRectFromMesh();
+        this._determineBubblePosition(r);
+        this._determineBubbleFontSize(r);
         this._messageText.text = message;
         this._messageText.color = "black";
+        this._bubble.removeControl(this._messageText);
         this._bubble.addControl(this._messageText);
         let context = this._bubbleTexture.getContext();
-
-        this._bubble.width = (clamp((context.measureText(message).width + 24), 64, 256).toString() + "px");
+        console.group("text width : ", context.measureText(message).width);
+        this._bubble.width = (clamp((context.measureText(message).width + 128), 64, 1024).toString() + "px");
+        this._bubble.height = (this._messageText.fontSizeInPixels * 2).toString() + "px";
         let fadeOut = new AnimationGroup("fadeOut");
         this._bubbleState = bubbleStates.VISIBLE;
         fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._bubble);
@@ -114,17 +120,23 @@ export class GameEntity extends TransformNode {
         });
         setTimeout(async () => {
             fadeOut.play(false);
-        }, 1000);
+        }, 750);
     }
 
-    private _determineBubblePosition() {
+    private _determineBubblePosition(r : BoundingRect) {
         const canvas = super.getScene().getEngine().getRenderingCanvas();
-        const r : BoundingRect = this._getClientRectFromMesh();
 
-        console.log("top :", r.top, "height: ", canvas!.clientHeight)
-        console.log("what is this : ", ((r.top / canvas!.clientHeight) * 100));
-        this._bubble.top = ((Math.random() * (1)) + ((r.top / canvas!.clientHeight) * 100).toString() + "%");
-        this._bubble.left = ((Math.random() * (5 -(-5))) - r.left).toString() + "%";
+        this._bubble.top = ((Math.random() * (5) + ((r.top / canvas!.clientHeight) * 100)).toString() + "%");
+        this._bubble.left = ((Math.random() * (5) + ((r.left / canvas!.clientWidth) * 100)).toString() + "%");
+    }
+
+    private _determineBubbleFontSize(r : BoundingRect) {
+        const canvas  = super.getScene().getEngine().getRenderingCanvas();
+        const boundingRectArea : number = r.width * r.height;
+        const canvasArea : number = canvas!.clientWidth * canvas!.clientHeight;
+        const proportion : number = boundingRectArea / canvasArea;
+        const fontSize : number = clamp(1024 * ((proportion) - Math.pow(proportion / 2, 2)), 9, 22);
+        this._messageText.fontSize = fontSize;
     }
 
     private _getClientRectFromMesh(): BoundingRect {
@@ -155,8 +167,9 @@ export class GameEntity extends TransformNode {
           bottom: maxY,
         }
     
-        // console.timeEnd('rectfrommesh') // on average 0.05ms
-    
+        // console.timeEnd('rectfrommesh') // on average 0.05m
+
+        console.table(rect);
         return rect;
       }
     

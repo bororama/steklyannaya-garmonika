@@ -32,21 +32,22 @@ function getFadeOutAnimation(durationMs: number, initialOpacity : number, finalO
 
 function getRandomUsername () : string {
     const availableNames : Array<string> = Array<string>(
+        "e-ligero",
         "fgata-va", 
         "javgonza",
         "pdiaz-pa", 
         "mmateo-t", 
         "guilmira", 
         "rcabezas",
-        "npinto-g",
+        "ycarro",
         "vicgarci",
         "crisfern",
         "agallipo",
         "tomartin",
+        "npinto-g",
         "vcodrean",
         "vflorez",
         "bazuara",
-        "e-ligero",
         "jvacaris",
         "ahammoud",
         "priezu-m",
@@ -67,11 +68,12 @@ function numberIsInRange(n : number, min: number, max: number) : boolean {
 
 function extent(array : Array<any>, selectorCallback : ( c : any) => number) : Array<number> {
     let d : number = 0;
-    let min : number = array[0];
-    let max : number = array[0];
+    let min : number = selectorCallback(array[0]);
+    let max : number = selectorCallback(array[0]);
 
     for (let position of array ) {
         d = selectorCallback(position);
+
         if (d < min)
             min = d;
         if (d > max)

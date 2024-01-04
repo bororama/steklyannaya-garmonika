@@ -24,7 +24,6 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse) {
  
 	metaSocket.on('chat', (payload : Messsage) => {
 		console.table(payload);
-		console.log('chat>>', `${payload.user.name}:`, payload.message);
 		metaverse.gameWorld.makeRemotePlayerSay(payload);
 	});
 	
