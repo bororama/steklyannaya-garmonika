@@ -37,3 +37,4 @@
 - Fix the first request's timing [X]
 - Apply ready() pattern for asynchronous resources []  <---- MIGHT FIX BUGS YOU COULDNT EVEN IMAGINE
 - click ray identify player []
+- evaluate wether to fix input when focus is lost or not []

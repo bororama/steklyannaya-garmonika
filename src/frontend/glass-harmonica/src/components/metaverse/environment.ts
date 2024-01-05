@@ -13,6 +13,7 @@ export class Environment {
         assets.allMeshes.forEach((m) => {
             m.receiveShadows = true;
             m.checkCollisions = true;
+            m.metadata = {tag : 'terrain', name: 'Jaén'};
         });
         
     }

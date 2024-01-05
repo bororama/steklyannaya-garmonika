@@ -6,8 +6,10 @@
 
 import { onMounted } from "@vue/runtime-core";
 import { initializeMetaverse } from "./metaverse/app.ts";
-import { io, Socket } from 'socket.io-client'
-import { connectionManager} from "./metaverse/connection"
+import { io, Socket } from 'socket.io-client';
+import { connectionManager} from "./metaverse/connection";
+
+
 
 function initializeSocket(hostAddress : string) : Socket {
   return io<ServerToClientEvents, ClientToServerEvents>(hostAddress);
@@ -15,10 +17,11 @@ function initializeSocket(hostAddress : string) : Socket {
 
 const hostAddress = `http://${import.meta.env.VITE_HOST_IP}:3000`;
 const metaSocket = initializeSocket(hostAddress, );
-const localPlayerData = 
+const vueEmitter = defineEmits(['profileRequest']);
 
 onMounted(async () => {
-  const metaverseInstance : Metaverse = await initializeMetaverse(metaSocket);
+  console.log("og emitter ", vueEmitter);
+  const metaverseInstance : Metaverse = await initializeMetaverse(metaSocket, vueEmitter);
   connectionManager(metaSocket, metaverseInstance);
 });
 

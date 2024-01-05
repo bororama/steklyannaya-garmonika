@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color4, Matrix, Quaternion, StandardMaterial, SceneLoader } from "@babylonjs/core";
+import { Engine, Scene, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color4, Matrix, Quaternion, StandardMaterial, SceneLoader, PickingInfo } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui"
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
@@ -12,8 +12,11 @@ import { Socket } from "socket.io-client";
 import { GameEntity } from "./gameEntity";
 import { routerKey } from "vue-router";
 import { type Message } from './shared/meta.interface'
+import { pointCloudVertex } from "@babylonjs/core/Shaders/ShadersInclude/pointCloudVertex";
 
 enum STATES { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
+
+let vueEmitter : (event : string, metadata : any) => void;
 
 class Metaverse {
 
@@ -38,7 +41,7 @@ class GameWorld {
     private _canvas: HTMLCanvasElement;
     private _engine: Engine;
     private _metaSocket: Socket;
-    public assets: any;
+    public  assets: any;
     private _environment: Environment | null;
     private _playerData: PlayerData | null;
     private _player: LocalPlayer | null;
@@ -122,6 +125,17 @@ class GameWorld {
         canvas.style.width = "100%";
         canvas.style.height = "50%";
         canvas.id = "canvas";
+        canvas.addEventListener('click', (e) => {
+            const ray = this._scene.createPickingRay(this._scene.pointerX, this._scene.pointerY, Matrix.Identity(), this._scene.activeCamera);
+            const pickInfo = this._scene.pickWithRay(ray, (m) => {
+                return (m.metadata !== null && m.metadata.tag === 'GameEntity');
+            });
+            console.table(pickInfo);
+            if (pickInfo!.hit) {
+                console.log("if ", vueEmitter);
+                vueEmitter('profileRequest', {name : pickInfo!.pickedMesh!.metadata.name});
+            }
+        });
         document.body.appendChild(canvas);
 
         return canvas;
@@ -227,12 +241,14 @@ class GameWorld {
 
         const importedMesh = await SceneLoader.ImportMeshAsync(null, "/3d/", path, scene);
         const body = importedMesh.meshes[0];
+        body.metadata = { tag: 'GameEntity', name: 'test'};
         if (collisionMesh) {
             body.parent = collisionMesh;
         }
         body.isPickable = false;
         body.getChildMeshes().forEach(m => {
             m.isPickable = false;
+            m.metadata = { tag: 'GameEntity', name: 'test'};
         })
         body.translate(Vector3.Up(), -0.6);
 
@@ -271,8 +287,10 @@ class GameWorld {
     }
 }
 
-async function initializeMetaverse(metaSocket: Socket) {
+async function initializeMetaverse(metaSocket: Socket, vueEmitterCallback : (event : string, metadata : any) => void) {
     const metaverse = new Metaverse();
+    console.log("passed emitter ", vueEmitterCallback);
+    vueEmitter = vueEmitterCallback;
     return metaverse;
 }
 

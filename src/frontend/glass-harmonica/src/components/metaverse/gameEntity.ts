@@ -31,14 +31,15 @@ export class GameEntity extends TransformNode {
     constructor (assets : any, scene: Scene, name : string) {
 
         super("GameEntity", scene);
-        this.mesh = assets.mesh;
-        this.mesh.isPickable = false;
         this.name = name;
+        this.mesh = assets.mesh;
+        this._setUpMesh();
         this._animations = assets.animationGroups;
-        this._currentAnimation = this._animations[Animations.IDLE]
+        this._previousAnimation  = this._animations[Animations.LAND];
+        this._currentAnimation = this._animations[Animations.IDLE];
         this._animations[Animations.RUN].loopAnimation = true;
         this._animations[Animations.IDLE].loopAnimation = true;
-        this._currentAnimation.play();
+        this._currentAnimation.play(true);
         this._bubbleState = bubbleStates.INVISIBLE;
         this._bubbleTexture = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
         this._bubble = new Rectangle();
@@ -47,6 +48,11 @@ export class GameEntity extends TransformNode {
         this._nameLabel = MeshBuilder.CreatePlane("label", {width: 5, height : 1}, scene);
         this._setUpLabel();
 
+    }
+
+
+    private _setUpMesh() {
+        this.mesh.metadata = {tag : 'GameEntity', name : this.name};
     }
 
     private _setUpBubble() {
@@ -100,28 +106,28 @@ export class GameEntity extends TransformNode {
     }
 
     updateAnimation(newState : number) {
-        this._currentAnimation.stop();
-        console.log("updateAnimation :", newState)
+
+        let currentAnimationState;
+
         switch (newState) {
             case (playerStates.RUNNING): {
-
-                console.log("shold play RUN");
-                this._currentAnimation = this._animations[Animations.RUN];
+                currentAnimationState = Animations.RUN;
                 break;
             }
-            case (playerStates.JUMPING): {
-                console.log("shold play JUMP");
-                this._currentAnimation = this._animations[Animations.JUMP];
+            case playerStates.JUMPING: {
+                currentAnimationState = Animations.JUMP;
                 break;
             }
             default: {
-                console.log("sould play IDLE");
-                this._currentAnimation = this._animations[Animations.IDLE];
+                currentAnimationState = Animations.IDLE;
                 break;
             }
         }
-        
-        this._currentAnimation.play(this._currentAnimation.loopAnimation);
+        this._currentAnimation =  this._animations[currentAnimationState];
+        if ( this._currentAnimation !== this._previousAnimation) {
+            this._currentAnimation.stop();
+            this._currentAnimation.play(this._currentAnimation.loopAnimation);
+        }
     }
 
     updateMesh(newPosition : Vector3, newRotation : Quaternion, newState : number) {

@@ -53,7 +53,7 @@
 	<h6>S ó l o</h6>
 	<h6>S . ó . l . o</h6>
 	<h6>Sólo curro</h6>
-	<Metaverse v-if="playerIsBorn"/>
+	<Metaverse v-if="playerIsBorn" @profileRequest="metaProfileHandler"/>
 </template>
 
 <script setup lang="ts">
@@ -73,5 +73,10 @@ function metaBirth(e) {
 		playerIsBorn.value = true;
 	}
 }
+
+function metaProfileHandler(metadata) {
+	console.log("received >>>", metadata);
+}
+
 </script>
 
