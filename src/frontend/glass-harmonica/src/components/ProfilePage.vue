@@ -8,6 +8,4 @@
 
 const props = defineProps(['userId']);
 
-
-
-<script/>
+</script>

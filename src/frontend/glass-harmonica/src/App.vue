@@ -53,7 +53,8 @@
 	<h6>S ó l o</h6>
 	<h6>S . ó . l . o</h6>
 	<h6>Sólo curro</h6>
-	<Metaverse v-if="playerIsBorn" @profileRequest="metaProfileHandler"/>
+	<Metaverse v-if="playerIsBorn" @profileRequest="metaProfileHandler" />
+	<ProfilePage v-if="profile.display" :userId="profile.userId"  />
 </template>
 
 <script setup lang="ts">
@@ -61,10 +62,12 @@
 import { ref } from 'vue';
 import { Socket, io } from "socket.io-client";
 import Metaverse from './components/Metaverse.vue';
-import {getRandomUsername, numberIsInRange} from './components/metaverse/utils'
+import ProfilePage from './components/ProfilePage.vue';
+import {getRandomUsername, numberIsInRange} from './components/metaverse/utils';
 
 const playerIsBorn = ref(false);
 const usernameRef = ref('');
+const profile = ref({display : false, userId : ''});
 
 function metaBirth(e) {
 	e.preventDefault();
@@ -75,7 +78,8 @@ function metaBirth(e) {
 }
 
 function metaProfileHandler(metadata) {
-	console.log("received >>>", metadata);
+	profile.value.userId = metadata.name;
+	profile.value.display = !profile.value.display;
 }
 
 </script>

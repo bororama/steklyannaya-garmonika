@@ -15,6 +15,7 @@ enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
 ** It represents every living being in the metaverse.
 */
 export class GameEntity extends TransformNode {
+
     public mesh: Mesh;
     public name : string;
     private _animations : AnimationGroup[];
@@ -27,6 +28,7 @@ export class GameEntity extends TransformNode {
     private _bubble : Rectangle;
     private _messageText : TextBlock;
     private _bubbleState : number;
+    private _bubbleDuration : number;
 
     constructor (assets : any, scene: Scene, name : string) {
 
@@ -47,12 +49,14 @@ export class GameEntity extends TransformNode {
         this._setUpBubble();
         this._nameLabel = MeshBuilder.CreatePlane("label", {width: 5, height : 1}, scene);
         this._setUpLabel();
-
     }
 
-
     private _setUpMesh() {
-        this.mesh.metadata = {tag : 'GameEntity', name : this.name};
+        const metadata = {tag : 'GameEntity', name : this.name};
+        this.mesh.metadata = metadata;
+        this.mesh.getChildMeshes().forEach( (m) => {
+            m.metadata = metadata;
+        });
     }
 
     private _setUpBubble() {
@@ -73,9 +77,8 @@ export class GameEntity extends TransformNode {
     private _setUpLabel() {
         this._nameLabel.billboardMode = 7; //BILLBOARD_MODE_ALL, always facing the camera
         this._nameLabel.translate(Vector3.Up(), 4);
+        this._nameLabel.isPickable = false;
         this._nameLabel.parent = this.mesh;
-
-        
         const labelTexture = new DynamicTexture("label-texture", { width: 32 * (5), height : 32}, this._scene);
         const textureContext = labelTexture.getContext();
         const material = new StandardMaterial("mat", this._scene);
@@ -105,6 +108,10 @@ export class GameEntity extends TransformNode {
         this.mesh.rotationQuaternion = newRotation;
     }
 
+
+    /* this is terribly inefficient,
+    only the identifying state numbers should be compared, and then
+    the corresponding animation should be loaded from the this._animations array */
     updateAnimation(newState : number) {
 
         let currentAnimationState;
@@ -123,9 +130,10 @@ export class GameEntity extends TransformNode {
                 break;
             }
         }
+        this._previousAnimation = this._currentAnimation;
         this._currentAnimation =  this._animations[currentAnimationState];
         if ( this._currentAnimation !== this._previousAnimation) {
-            this._currentAnimation.stop();
+            this._previousAnimation.stop();
             this._currentAnimation.play(this._currentAnimation.loopAnimation);
         }
     }
@@ -171,7 +179,7 @@ export class GameEntity extends TransformNode {
         const boundingRectArea : number = r.width * r.height;
         const canvasArea : number = canvas!.clientWidth * canvas!.clientHeight;
         const proportion : number = boundingRectArea / canvasArea;
-        const fontSize : number = clamp(8192 * ((proportion) - Math.pow(proportion / 2, 2)), 9, 22);
+        const fontSize : number = clamp(8192 * ((proportion) - Math.pow(proportion / 2, 2)), 6, 22);
         this._messageText.fontSize = fontSize;
     }
 

@@ -19,16 +19,16 @@
 - refactor game/*ts []
     - proper asynchronicity [X]
     - GENERAL REFCTRNG []
-    - Create generic game entity [] <-- crucial for world spawning ...
+    - Create generic game entity [X] <-- IMPORTANT
     - Make localplayer extend entity []
-    - Make remoteplayer extend entity []
+    - Make remoteplayer extend entity [X]
     - Create playerData class for db interaction [X]
 - deep interclient comms []
     - make other players state entity and appear in the world, update [X]
-    - print out in the player's corresponding bubble [X] <---
+    - print out in the player's corresponding bubble [X]
     - update orientation [X]
     - load proper mesh [X]
-    - update animation state []
+    - update animation state [X]
     - make a server limit, administrate locators so that the players are accessed directly []
     - clean structures on disconnect[]
     - remove extracube [X]
@@ -36,5 +36,9 @@
 - Pop up system[]
 - Fix the first request's timing [X]
 - Apply ready() pattern for asynchronous resources []  <---- MIGHT FIX BUGS YOU COULDNT EVEN IMAGINE
-- click ray identify player []
+- click ray tracing player [X]
+- Show profile page on click [X]
 - evaluate wether to fix input when focus is lost or not []
+- FIX THE ANIMATIONS AGAIN [X]
+    - make it more efficient []
+- USE ROUTER [] <--- subject-critical

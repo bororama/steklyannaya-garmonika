@@ -14,6 +14,9 @@ enum Animations { IDLE = 1, JUMP = 2, LAND = 3, RUN = 4 };
 enum playerStates { SPEAKING = 0, IDLING = 1, JUMPING = 2, RUNNING = 3 };
 enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
 
+
+
+/* This should rather extend GameEntity and specialize the bubble associated routines */
 export class LocalPlayer extends TransformNode {
 
     public camera;
@@ -44,7 +47,7 @@ export class LocalPlayer extends TransformNode {
     private static readonly GRAVITY: number = -2.8;
 
     //Player
-    public mesh: Mesh;
+    public  mesh: Mesh;
     private _nameLabel: Mesh;
     private _playerData: PlayerData;
 
@@ -65,14 +68,22 @@ export class LocalPlayer extends TransformNode {
         this._metaSocket = metaSocket;
         this._setupPlayerCamera();
         this._playerData = playerData;
-
         this.mesh = assets.mesh;
+        this._setUpMesh();
         this.mesh.parent = this;
         this._input = input;
         this._animations = assets.animationGroups;
         this._setUpAnimations();
         this._setUpPlayerLabel();
         this._setUpChatBox();
+    }
+
+    private _setUpMesh() {
+        const metadata = {tag : 'LocalPlayer', name : this.name};
+        this.mesh.metadata = metadata;
+        this.mesh.getChildMeshes().forEach( (m) => {
+            m.metadata = metadata;
+        });
     }
 
     private _setUpChatBox() {
@@ -94,6 +105,14 @@ export class LocalPlayer extends TransformNode {
                 this._inputBox.text = "";
                 this._inputBox.isVisible = false;
             }
+            if (eventData.key === "Escape") {
+                    this._inputBox.text = "";
+                    this._inputBox.isVisible = false;
+                    this._inputBox.blur();
+            }
+        });
+        this._inputBox.onKeyboardEventProcessedObservable.add((eventData) => {
+
         });
     }
 
@@ -125,6 +144,7 @@ export class LocalPlayer extends TransformNode {
         this._nameLabel = MeshBuilder.CreatePlane("label", {width: 5, height : 1}, this.scene);
         this._nameLabel.billboardMode = 7; //BILLBOARD_MODE_ALL, always facing the camera
         this._nameLabel.translate(Vector3.Up(), 4);
+        this._nameLabel.isPickable = false;
         this._nameLabel.parent = this.mesh;
 
         const labelTexture = new DynamicTexture("label-texture", { width: 32 * (5), height : 32}, this.scene);
@@ -146,7 +166,6 @@ export class LocalPlayer extends TransformNode {
             true, 
             true
         );
-
     }
 
     private _setUpAnimations(): void {
@@ -190,7 +209,7 @@ export class LocalPlayer extends TransformNode {
     private _setupPlayerCamera(): UniversalCamera {
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 0, 0);
-        this.camera = new ArcRotateCamera("cam", (2 * Math.PI) - (Math.PI / 2), 1.2, 35, this._camRoot.position, this.scene);
+        this.camera = new ArcRotateCamera("cam", (2 * Math.PI) - (Math.PI / 2), 1.2, 32, this._camRoot.position, this.scene);
         this.camera.fov = 0.4;
         this.camera.parent = this._camRoot;
         this.scene.activeCamera = this.camera;
@@ -224,8 +243,6 @@ export class LocalPlayer extends TransformNode {
     }
 
     private _processInput() {
-
-        //console.log("toggle?: ", this._input.toggleChatBox);
 
         if (this._input.toggleChatBox && this._state == playerStates.IDLING) {
             this._inputBox.isVisible = !this._inputBox.isVisible;

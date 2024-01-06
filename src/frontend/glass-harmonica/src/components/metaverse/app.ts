@@ -10,6 +10,7 @@ import { LocalPlayer } from "./localPlayer";
 import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
 import { GameEntity } from "./gameEntity";
+import { RemotePlayer } from "./remotePlayer";
 import { routerKey } from "vue-router";
 import { type Message } from './shared/meta.interface'
 import { pointCloudVertex } from "@babylonjs/core/Shaders/ShadersInclude/pointCloudVertex";
@@ -46,7 +47,7 @@ class GameWorld {
     private _playerData: PlayerData | null;
     private _player: LocalPlayer | null;
     private _input: PlayerInput | null;
-    private _livePlayers: Array<GameEntity>;
+    private _livePlayers: Array<RemotePlayer>;
 
     constructor(metaSocket: Socket, playerData : PlayerData) {
         this._canvas = this._createCanvas();
@@ -84,10 +85,9 @@ class GameWorld {
     async spawnPlayers(playersToSpawn: Array<PlayerData>) {
         for (let player of playersToSpawn) {
             if (player.user.locator !== this._playerData?.user.locator) {
-                console.log(player.user.name, " spawned in the world");
                 const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
                 let newPlayer: any;
-                newPlayer = new GameEntity(assets, this._scene, player.user.name);
+                newPlayer = new RemotePlayer(assets, this._scene, player.user.name);
                 this._livePlayers.push(newPlayer);
             }
         }
@@ -130,9 +130,7 @@ class GameWorld {
             const pickInfo = this._scene.pickWithRay(ray, (m) => {
                 return (m.metadata !== null && m.metadata.tag === 'GameEntity');
             });
-            console.table(pickInfo);
             if (pickInfo!.hit) {
-                console.log("if ", vueEmitter);
                 vueEmitter('profileRequest', {name : pickInfo!.pickedMesh!.metadata.name});
             }
         });
@@ -241,14 +239,12 @@ class GameWorld {
 
         const importedMesh = await SceneLoader.ImportMeshAsync(null, "/3d/", path, scene);
         const body = importedMesh.meshes[0];
-        body.metadata = { tag: 'GameEntity', name: 'test'};
         if (collisionMesh) {
             body.parent = collisionMesh;
         }
         body.isPickable = false;
         body.getChildMeshes().forEach(m => {
             m.isPickable = false;
-            m.metadata = { tag: 'GameEntity', name: 'test'};
         })
         body.translate(Vector3.Up(), -0.6);
 
@@ -289,7 +285,6 @@ class GameWorld {
 
 async function initializeMetaverse(metaSocket: Socket, vueEmitterCallback : (event : string, metadata : any) => void) {
     const metaverse = new Metaverse();
-    console.log("passed emitter ", vueEmitterCallback);
     vueEmitter = vueEmitterCallback;
     return metaverse;
 }
