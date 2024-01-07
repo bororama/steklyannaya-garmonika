@@ -42,9 +42,11 @@ export class PlayerInput {
         if (this.inputMap["q"]) {
             this.camera = -1;
         }
+        
         else if (this.inputMap["e"]) {
             this.camera = 1;
         }
+
         else {
             this.camera = 0;
         }
@@ -52,9 +54,11 @@ export class PlayerInput {
         if (this.inputMap["ArrowUp"] || this.inputMap["w"]) {
             this.vertical = Scalar.Lerp(this.vertical, 1, 0.15);
         }
+
         else if (this.inputMap["ArrowDown"] || this.inputMap["s"]) {
             this.vertical = Scalar.Lerp(this.vertical, -1, 0.15);
         }
+
         else 
         {
             this.vertical = 0;
@@ -64,9 +68,11 @@ export class PlayerInput {
             this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.15);
 
         }
+
         else if (this.inputMap["ArrowRight"] || this.inputMap["d"]) {
             this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.15);
         }
+
         else {
             this.horizontal = 0;
         }
@@ -81,12 +87,11 @@ export class PlayerInput {
                 this._switch = true;
             }
         }
+        
         else {
             this.toggleChatBox = false;
             this._switch = false;
         }
-
-
     }
 
 }

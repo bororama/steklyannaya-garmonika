@@ -16,6 +16,11 @@ export interface Player {
   state : number
 }
 
+export interface LiveClient { 
+  socket : any; //Socket
+  player : Player | null;
+};
+
 export interface ServerToClientEvents {
   chat: (message : Message) => void;
   newPlayer: (player : Player) => void;
