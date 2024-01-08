@@ -220,6 +220,7 @@ export class LocalPlayer extends TransformNode {
     private _updateCamera(): void {
         this._camRoot.position =  new Vector3(this.mesh.position.x, this.mesh.position.y + 2, this.mesh.position.z);
         if (this._input.camera !== 0) {
+            console.log("cam isnt zero?¿", this._input.camera);
             this._camRoot.rotation = new Vector3(this._camRoot.rotation.x, this._camRoot.rotation.y + ((0.6 * this._input.camera) * this._deltaTime));
         }
     }
@@ -246,6 +247,7 @@ export class LocalPlayer extends TransformNode {
 
         if (this._input.toggleChatBox && this._state == playerStates.IDLING) {
             this._inputBox.isVisible = !this._inputBox.isVisible;
+
         }
         if (!this._inputBox.isVisible) {
             let correctedVertical = this._camRoot.forward.scaleInPlace(this._input.vertical);
@@ -255,6 +257,8 @@ export class LocalPlayer extends TransformNode {
             this._inputMagnitude = clamp(Math.abs(this._input.horizontal) + Math.abs(this._input.vertical), 0, 1);
         }
         else {
+            this._input.inputMap["q"] = 0;
+            this._input.inputMap["e"] = 0;
             this._inputBox.focus();
         }
     }

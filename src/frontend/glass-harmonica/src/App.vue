@@ -55,19 +55,23 @@
 	<h6>Sólo curro</h6>
 	<Metaverse v-if="playerIsBorn" @profileRequest="metaProfileHandler" />
 	<ProfilePage v-if="profile.display" :userId="profile.userId"  />
+	<router-link to="profile-page">TEST</router-link>
+  	<router-view></router-view>
 </template>
 
 <script setup lang="ts">
 
-import { ref } from 'vue';
+import { ref, VueRouter } from 'vue';
 import { Socket, io } from "socket.io-client";
 import Metaverse from './components/Metaverse.vue';
 import ProfilePage from './components/ProfilePage.vue';
 import {getRandomUsername, numberIsInRange} from './components/metaverse/utils';
+import { useRouter } from 'vue-router';
 
 const playerIsBorn = ref(false);
 const usernameRef = ref('');
 const profile = ref({display : false, userId : ''});
+
 
 function metaBirth(e) {
 	e.preventDefault();

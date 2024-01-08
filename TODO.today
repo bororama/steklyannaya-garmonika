@@ -4,7 +4,7 @@
     - hiding routine [X]
     - fix input bugs [X]
     - block input until current bubble disappears [X]
-        - block camera input []
+        - block camera input [X]
 - refactor Vue components (script setup) [X]
 - Vue components ts-style typing [X]
 - basic interclient server comms :
@@ -19,7 +19,7 @@
 - refactor game/*ts []
     - proper asynchronicity [X]
     - GENERAL REFCTRNG []
-    - Create generic game entity [X] <-- IMPORTANT
+    - Create generic game entity [X] 
     - Make localplayer extend entity []
     - Make remoteplayer extend entity [X]
     - Create playerData class for db interaction [X]
@@ -30,15 +30,19 @@
     - load proper mesh [X]
     - update animation state [X]
     - make a server limit, administrate locators so that the players are accessed directly []
-    - clean structures on disconnect[]
+    - clean structures on disconnect[X]
+        - remove mesh of disconnected player [X]
+        - avoid duplicated player mesh on reconnect[] <------ (when changes are applied to the server)
     - remove extracube [X]
 - World triggers []
 - Pop up system[]
 - Fix the first request's timing [X]
-- Apply ready() pattern for asynchronous resources []  <---- MIGHT FIX BUGS YOU COULDNT EVEN IMAGINE
+- Apply ready() pattern for asynchronous resources []
 - click ray tracing player [X]
 - Show profile page on click [X]
-- evaluate wether to fix input when focus is lost or not []
+- evaluate wether to fix input when focus is lost or not [X]
+    - don't fix it [X]
+    - fix it [0]
 - FIX THE ANIMATIONS AGAIN [X]
     - make it more efficient []
 - USE ROUTER [] <--- subject-critical

@@ -93,6 +93,17 @@ class GameWorld {
         }
     }
 
+    removePlayer(playerToRemove : PlayerData) {
+        const playerIndex = this._livePlayers.findIndex( (p) => {
+            return playerToRemove.user.name === p.name;
+        })
+        if (playerIndex != -1) {
+            this._livePlayers[playerIndex].dispose();
+            this._livePlayers[playerIndex].mesh.dispose();
+            this._livePlayers = this._livePlayers.splice(playerIndex, 1);
+        }
+    }
+
     applyRemotePlayerUpdate(p: PlayerData) {
 
         let player = this._findLivePlayer(p.user.name);

@@ -35,7 +35,7 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse) {
 
 	metaSocket.on('playerLeft', (payload : Player) => { 
 		console.log('Player left ....>>', `${payload.user.name}`);
-		//metaverse.gameWorld.removePlayer(payload);
+		metaverse.gameWorld.removePlayer(payload);
 	});
 
 	metaSocket.on('playerUpdate', (payload : Player) => {

@@ -3,7 +3,7 @@ import { Scene, ActionManager, ExecuteCodeAction, Scalar } from "@babylonjs/core
 
 export class PlayerInput {
 
-    public inputMap;
+    public inputMap : {};
     public vertical: number = 0;
     public horizontal: number = 0;
     public camera: number = 0;
@@ -39,14 +39,13 @@ export class PlayerInput {
             this.jumping = false;
         }
 
+        
         if (this.inputMap["q"]) {
             this.camera = -1;
         }
-        
         else if (this.inputMap["e"]) {
             this.camera = 1;
         }
-
         else {
             this.camera = 0;
         }
