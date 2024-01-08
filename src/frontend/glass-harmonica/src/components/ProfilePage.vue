@@ -5,7 +5,8 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
 
-const props = defineProps(['userId']);
-
+const route = useRoute();
+const userId = route.params.userId;
 </script>

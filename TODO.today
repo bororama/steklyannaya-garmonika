@@ -32,7 +32,7 @@
     - make a server limit, administrate locators so that the players are accessed directly []
     - clean structures on disconnect[X]
         - remove mesh of disconnected player [X]
-        - avoid duplicated player mesh on reconnect[] <------ (when changes are applied to the server)
+        - avoid duplicated player mesh on reconnect[] <------ (when changes are applied to the server, not on disconnection)
     - remove extracube [X]
 - World triggers []
 - Pop up system[]
@@ -45,4 +45,4 @@
     - fix it [0]
 - FIX THE ANIMATIONS AGAIN [X]
     - make it more efficient []
-- USE ROUTER [] <--- subject-critical
+- USE ROUTER [X] <--- subject-critical
