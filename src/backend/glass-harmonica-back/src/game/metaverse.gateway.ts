@@ -35,6 +35,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   handleConnection(client: any) {
     let newLiveClient : LiveClient = { socket : client, player : null };
+    console.log(" New connecting client id  : ", client.id);
     liveClients.push(newLiveClient);
   }
     
@@ -46,38 +47,68 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.server.emit('playerLeft', disconnectedPlayer);
   }
 
+  @SubscribeMessage('reconnect')
+  async onReconnect(): Promise<String> {
+    console.log("recconecting fired");
+    return `reconnecting`;
+  }
+
+
   @SubscribeMessage('userData')
   async onUserDataMessage(@MessageBody() payload: string, @ConnectedSocket() socket : Socket): Promise<String> {
     
     const clientIndex = liveClients.findIndex((p) => {
        return p.socket === socket;
     });
+
     const newUser : User = { locator: clientLocator, name : payload };
     clientLocator++;
     const newPlayer : Player = { user : newUser, position : [0,0,0], rotation : [0,0,0,1.0], state : 0};
     liveClients[clientIndex].player = newPlayer;
+    let i = 0;
+    console.log("--------");
     for (let p of liveClients) {
-      console.log("p of liveplayers : ", p.player);
+      console.log(i, "] p of livePlayers : ", p.player, " id : ", p.socket.id);
+      i++;
     }
+    console.log("--------");
+
     const livePlayers = liveClients.map((c: LiveClient) => {
       return c.player;
 		});
     socket.emit('welcomePack', {newPlayer, livePlayers});
-    socket.broadcast.emit('newPlayer', newPlayer);
+    socket.broadcast.emit('newPlayer', {retries : 0, Player : newPlayer});
     return `You sent : userData ${ payload }`;
   }
   
   @SubscribeMessage('chat')
-  async onChatMessage(@MessageBody() payload: Message, @ConnectedSocket() Socket : Socket): Promise<String> {
+  async onChatMessage(@MessageBody() payload: Message, @ConnectedSocket() socket : Socket): Promise<String> {
 
-    Socket.broadcast.emit('chat', payload);
+    socket.broadcast.emit('chat', payload);
     return `You sent : chat ${ payload }`;
   }
 
   @SubscribeMessage('playerUpdate')
-  async onPlayerUpdateMessage(@MessageBody() payload: Player, @ConnectedSocket() Socket : Socket): Promise<String> {
+  async onPlayerUpdateMessage(@MessageBody() payload: Player, @ConnectedSocket() socket : Socket): Promise<String> {
 
-    Socket.broadcast.emit('playerUpdate', payload);
+    socket.broadcast.emit('playerUpdate', payload);
     return `You sent : playerUpdate ${ payload }`;
+  }
+
+  @SubscribeMessage('spawnFailed')
+  async onSpawnFailed(@MessageBody() payload : {retries : number, problemPlayer : null | Player}, @ConnectedSocket() socket : Socket): Promise<String> {
+    console.log(`spawnFailed :  No. of retries :  ${ payload.retries }`);
+    setTimeout(() => { 
+      console.log("I would try again here....");
+      if (payload.problemPlayer) {
+        socket.broadcast.emit('newPlayer', payload.problemPlayer);
+      }
+      else {        
+        liveClients.forEach((c) => {
+          socket.broadcast.emit('newPlayer', c);
+        });
+      }
+    }, 100 + (Math.pow(payload.retries, 2) * 100));
+    return `No. of retries :  ${ payload.retries }`;
   }
 }

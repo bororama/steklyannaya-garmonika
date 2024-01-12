@@ -44,5 +44,21 @@
     - don't fix it [X]
     - fix it [0]
 - FIX THE ANIMATIONS AGAIN [X]
-    - make it more efficient []
+    - make it more efficient [] <--- JavGonza
 - USE ROUTER [X] <--- subject-critical
+    - fit it in with the rest of the project. []
+- Respawn [X]
+- fix Respawn on limit cases [X]
+    - server reload [X]
+    - frontend simultaneous reload [O]
+    - symultaneous socket connnection start [] <--- JavGonza
+                                                On connection, some of the users in the array
+                                                sent on welcomePack might be null, these 'nulled' players
+                                                should be spawned whenever the data becomes available.
+-sometimes the player doesn't update in its own metaverse instance???? []
+
+**AGILE quadrants**
+    high-importance & low-effort : Respawn[x], << QUICK WINS >> do now
+    high-importance & high-effort : Connection protection[], Retransmission[] << GREAT PROJECTS >> do next
+    low-importance & low-effort : music[], << FILL INS >> do later
+    low-importance & high-effort : triggers (for curro's store)[], << THANKLESS TASKS >> delegate

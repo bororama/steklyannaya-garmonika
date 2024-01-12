@@ -23,8 +23,9 @@ class Metaverse {
 
     playerData : PlayerData;
     gameWorld : GameWorld;
-
+    gameWorldIsReady : boolean;
     constructor () {
+        this.gameWorldIsReady = false;
     }
 
     async initPlayerData(locator : number, username : string) {
@@ -34,6 +35,7 @@ class Metaverse {
     async initGameWorld(metaSocket: Socket) {
         this.gameWorld = new GameWorld(metaSocket, <PlayerData>this.playerData);
         await this.gameWorld.ready();
+        this.gameWorldIsReady = true;
     }
 }
 
@@ -84,7 +86,7 @@ class GameWorld {
 
     async spawnPlayers(playersToSpawn: Array<PlayerData>) {
         for (let player of playersToSpawn) {
-            if (player.user.locator !== this._playerData?.user.locator) {
+            if ( player && player.user.locator !== this._playerData?.user.locator) {
                 const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
                 let newPlayer: any;
                 newPlayer = new RemotePlayer(assets, this._scene, player.user.name);
@@ -164,35 +166,6 @@ class GameWorld {
         });
     }
 
-    private async _goToLose(): Promise<void> {
-        this._engine.displayLoadingUI();
-
-        //--SCENE SETUP--
-        this._scene.detachControl();
-        let scene = new Scene(this._engine);
-        scene.clearColor = new Color4(0.3, 0.3, 0.3, 1);
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
-        camera.setTarget(Vector3.Zero());
-
-        //--GUI--
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        const mainBtn = Button.CreateSimpleButton("mainmenu", "MAIN MENU");
-        mainBtn.width = 0.2;
-        mainBtn.height = "40px";
-        mainBtn.color = "white";
-        guiMenu.addControl(mainBtn);
-        //this handles interactions with the start button attached to the scene
-        mainBtn.onPointerUpObservable.add(() => {
-            this._goToGame();
-        });
-
-        //--SCENE FINISHED LOADING--
-        await scene.whenReadyAsync();
-        this._engine.hideLoadingUI(); //when the scene is ready, hide loading
-        //lastly set the current state to the lose state and set the scene to the lose scene
-        this._scene.dispose();
-        this._scene = scene;
-    }
 
     private async _setUpGameSceneAssets(scene: Scene) {
         this._environment = new Environment(scene);
@@ -200,30 +173,6 @@ class GameWorld {
         this.assets = await this._loadPlayerAssets(scene, true, 'player.glb'); //character
     }
 
-
-    private _goToGameGUIHelper(scene: Scene) {
-
-        //--GUI--
-        const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        //dont detect any inputs from this ui while the game is loading
-
-        //create a simple button
-        const loseBtn = Button.CreateSimpleButton("lose", "LOSE");
-        loseBtn.width = 0.2
-        loseBtn.height = "40px";
-        loseBtn.color = "white";
-        loseBtn.top = "-14px";
-        loseBtn.thickness = 0;
-        loseBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        playerUI.addControl(loseBtn);
-
-
-        //this handles interactions with the start button attached to the scene
-        loseBtn.onPointerDownObservable.add(() => {
-            this._goToLose();
-            scene.detachControl(); //observables disabled
-        });
-    }
 
 
     private async _goToGame() {
@@ -233,7 +182,6 @@ class GameWorld {
         let scene = new Scene(this._engine);
         scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098);
         scene.detachControl();
-        this._goToGameGUIHelper(scene);
         const light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
         this._input = new PlayerInput(scene);
         await this._setUpGameSceneAssets(scene);

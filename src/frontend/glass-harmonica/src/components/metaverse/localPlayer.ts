@@ -220,7 +220,6 @@ export class LocalPlayer extends TransformNode {
     private _updateCamera(): void {
         this._camRoot.position =  new Vector3(this.mesh.position.x, this.mesh.position.y + 2, this.mesh.position.z);
         if (this._input.camera !== 0) {
-            console.log("cam isnt zero?¿", this._input.camera);
             this._camRoot.rotation = new Vector3(this._camRoot.rotation.x, this._camRoot.rotation.y + ((0.6 * this._input.camera) * this._deltaTime));
         }
     }
@@ -310,7 +309,11 @@ export class LocalPlayer extends TransformNode {
         if (this._input.jumping) {
             this._state = playerStates.JUMPING;
         }
-
+        if (this.mesh.position.y < -50) {
+            this.mesh.position.x = 0;
+            this.mesh.position.y = 50;
+            this.mesh.position.z = 0;
+        }
     }
 
     private _addGravity() {

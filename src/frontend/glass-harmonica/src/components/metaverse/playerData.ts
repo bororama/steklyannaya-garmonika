@@ -17,8 +17,6 @@ export class PlayerData implements Player {
         this.position = Array(3);
         this.rotation = Array(4);
         this.state = 0;
-
-        console.log(this.user, this.position, this.state);
     }
 
     setPosition (u : Vector3) {
