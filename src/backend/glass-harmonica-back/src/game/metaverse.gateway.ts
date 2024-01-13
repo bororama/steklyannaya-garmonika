@@ -35,7 +35,6 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   handleConnection(client: any) {
     let newLiveClient : LiveClient = { socket : client, player : null };
-    console.log(" New connecting client id  : ", client.id);
     liveClients.push(newLiveClient);
   }
     
@@ -72,12 +71,11 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
       i++;
     }
     console.log("--------");
-
     const livePlayers = liveClients.map((c: LiveClient) => {
       return c.player;
 		});
     socket.emit('welcomePack', {newPlayer, livePlayers});
-    socket.broadcast.emit('newPlayer', {retries : 0, Player : newPlayer});
+    socket.broadcast.emit('newPlayer', {retries : 0, player : newPlayer});
     return `You sent : userData ${ payload }`;
   }
   
@@ -95,20 +93,32 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     return `You sent : playerUpdate ${ payload }`;
   }
 
-  @SubscribeMessage('spawnFailed')
-  async onSpawnFailed(@MessageBody() payload : {retries : number, problemPlayer : null | Player}, @ConnectedSocket() socket : Socket): Promise<String> {
-    console.log(`spawnFailed :  No. of retries :  ${ payload.retries }`);
+
+  /*
+  ** Should the 'newPlayer' spawning fail, this call will re-attempt
+  ** after an exponentially increasing time out.
+  */
+ 
+  @SubscribeMessage('spawnNewPlayerFailed')
+  async onSpawnNewPlayerFailed(@MessageBody() payload : {retries : number, player : null | Player}, @ConnectedSocket() socket : Socket): Promise<String> {
+    console.log(`SPAWN FAILED : No. of retries :  ${ payload.retries + 1} time : ${300 + (Math.pow(payload.retries, 2) * 100)}`);
     setTimeout(() => { 
-      console.log("I would try again here....");
-      if (payload.problemPlayer) {
-        socket.broadcast.emit('newPlayer', payload.problemPlayer);
+      console.log("trying again........");
+      if (payload.player) {
+        socket.emit('newPlayer',{retries : payload.retries + 1, player : payload.player});
       }
-      else {        
-        liveClients.forEach((c) => {
-          socket.broadcast.emit('newPlayer', c);
-        });
-      }
-    }, 100 + (Math.pow(payload.retries, 2) * 100));
+    }, 300 + (Math.pow(payload.retries, 2) * 100));
     return `No. of retries :  ${ payload.retries }`;
   }
+
+  @SubscribeMessage('spawnExistingPlayersFailed')
+    async onSpawnExistingPlayersFailed(@MessageBody() payload : string ,@ConnectedSocket() socket : Socket) {
+      const livePlayers = liveClients.map((c: LiveClient) => {
+        return c.player;
+      });
+      console.log(payload);
+      console.table(livePlayers);
+      return livePlayers;
+    }
 }
+

@@ -3,8 +3,38 @@ import { type User, type Messsage, type ServerToClientEvents, type ClientToServe
 import { Metaverse } from "./app";
 import { PlayerData } from "./playerData";
 
-async function spawnPlayers(livePlayers: Array<PlayerData>, metaverse : Metaverse) {
-	metaverse.gameWorld.spawnPlayers(livePlayers);
+
+async function spawnPlayers(liveClients: Array<PlayerData>, metaverse : Metaverse) {
+	liveClients.forEach(async (c) => {
+		await metaverse.gameWorld.spawnPlayer(c);
+	});
+}
+
+async function spawningRoutine(metaSocket : Socket, metaverse: Metaverse, livePlayers : Array<PlayerData>, retries : number) {
+	
+	console.log("spawnExistingPlayers()", " retries() : ", retries);
+	let completeLivePlayers : boolean = true;
+	if (retries > 0) {
+		metaverse.gameWorld.resetLivePlayers();
+	}
+	setTimeout(async () => {
+		livePlayers.forEach( (p) => {
+			if (p == null) {
+				completeLivePlayers = false;
+				return ;
+			}
+		});
+		if (completeLivePlayers) {
+			spawnPlayers(livePlayers, metaverse);
+		}
+		else {
+			const payload = "NULL PLAYER FOUND";
+			metaSocket.emit('spawnExistingPlayersFailed', payload, (newLivePlayers : any) => {
+				console.table(newLivePlayers);
+				spawningRoutine(metaSocket, metaverse, newLivePlayers, retries + 1);
+			});
+		}
+	}, 300 + (Math.pow(retries, 2) * 100));
 }
 
 function connectionManager (metaSocket : Socket, metaverse : Metaverse) {		
@@ -16,41 +46,29 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse) {
 		//}, 1)
 	});
 	
-	metaSocket.on('welcomePack', async (payload : { newPlayer : Player, livePlayers : Array<LiveClient>}) => {
+	metaSocket.on('welcomePack', async (payload : { newPlayer : Player, livePlayers : Array<PlayerData>}) => {
 		console.log('WelcomePack >>');
-		let completeLivePlayers : boolean = true;
 		await metaverse.initPlayerData(
 			payload.newPlayer.user.locator,
 			payload.newPlayer.user.name
 		);
 		await metaverse.initGameWorld(metaSocket);
 		console.table(payload.livePlayers);
-		payload.livePlayers.forEach( (p) => {
-			if (p == null) {
-				console.log("NULL PLAYER");
-				metaSocket.emit('spawnFailed', {retries : 0, problemPlayer : null});
-				completeLivePlayers = false;
-				return ;
-			}
-		});
-		if (completeLivePlayers) {
-			spawnPlayers(payload.livePlayers, metaverse);
-		}
+		spawningRoutine(metaSocket, metaverse, payload.livePlayers, 0);
 	});
 	
 	metaSocket.on('chat', (payload : Messsage) => {
 		metaverse.gameWorld.makeRemotePlayerSay(payload);
 	});
 	
-	metaSocket.on('newPlayer', (payload : { retries : number, player : Player }) => { 
-		console.log('newPLayer joined ....>>', `${payload}:`);
-		console.log("newPlayer] metaverse is game world ready ? ", metaverse.gameWorldIsReady);
-		console.log(">>", metaverse.gameWorld, "<<");
-		if (metaverse.gameWorldIsReady) {
-			spawnPlayers([payload.player], metaverse); // gameworld sometimes undefined??
+	metaSocket.on('newPlayer', async (payload : { retries : number, player : Player }) => { 
+		console.log('newPLayer joined >', `${ (payload.player) ?  payload.player.user.name: 'undefined player' }`);
+		if (metaverse.gameWorld.isReady()) {
+			console.log("Spawning....")
+			await spawnPlayers([payload.player], metaverse); // gameworld sometimes undefined??
 		}
 		else {
-			metaSocket.emit('spawnFailed', {retries : payload.retries, problemPlayer : payload.player});
+			metaSocket.emit('spawnNewPlayerFailed', {retries : payload.retries, player : payload.player});
 		}
 	});
 
@@ -70,7 +88,7 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse) {
 
 	metaSocket.on('disconnect', () => {
 		console.log('Disconnected');
-		//metaverse.gameWorld.
+		metaverse.gameWorld.resetLivePlayers();
 	});
 }
 

@@ -11,7 +11,6 @@ export class PlayerData implements Player {
     public rotation : Array<number>;
     public state : number;
 
-
     constructor(locator : number, name : string) {
         this.user  = { locator : locator,  name : name};
         this.position = Array(3);
@@ -20,7 +19,6 @@ export class PlayerData implements Player {
     }
 
     setPosition (u : Vector3) {
-
        this.position[0] = u.x;
        this.position[1] = u.y;
        this.position[2] = u.z;

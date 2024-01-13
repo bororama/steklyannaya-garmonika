@@ -23,9 +23,8 @@ class Metaverse {
 
     playerData : PlayerData;
     gameWorld : GameWorld;
-    gameWorldIsReady : boolean;
+
     constructor () {
-        this.gameWorldIsReady = false;
     }
 
     async initPlayerData(locator : number, username : string) {
@@ -33,10 +32,13 @@ class Metaverse {
     }
 
     async initGameWorld(metaSocket: Socket) {
-        this.gameWorld = new GameWorld(metaSocket, <PlayerData>this.playerData);
-        await this.gameWorld.ready();
-        this.gameWorldIsReady = true;
+        if (!this.gameWorld) {
+            this.gameWorld = new GameWorld(metaSocket, <PlayerData>this.playerData);
+            await this.gameWorld.ready();
+        }
     }
+    
+    
 }
 
 class GameWorld {
@@ -78,22 +80,76 @@ class GameWorld {
 
     }
 
+    isReady() {
+        return this._scene.isReady();
+    }
+
     async ready(){
         // run the main render loop
         await this._main();
     }
     //SOCKETS
 
-    async spawnPlayers(playersToSpawn: Array<PlayerData>) {
-        for (let player of playersToSpawn) {
-            if ( player && player.user.locator !== this._playerData?.user.locator) {
+
+    getLivePlayers() {
+        return this._livePlayers;
+    }
+
+    setLivePlayers(u : any) {
+        this._livePlayers = u;
+    }
+
+    resetLivePlayers() {
+        this._livePlayers.forEach((p) => {
+            p.mesh.dispose();
+        });
+        this._livePlayers = Array<RemotePlayer>();
+    }
+
+    /*async spawnPlayer(player: PlayerData) {
+
+        if (this._findLivePlayer(player.user.name) !== undefined) {
+            console.log(`   Player : ${player.user.name} already joined`);
+            return;
+        }
+        if ( player && player.user.name !== this._playerData?.user.name) {
+            console.log("Instancing mesh for ", player.user.name);
+            const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
+            let newPlayer: any;
+            newPlayer = new RemotePlayer(assets, this._scene, player.user.name);
+            this._livePlayers.push(newPlayer);
+        }
+    }*/
+
+    async spawnPlayer(player: PlayerData) {
+        if (this._findLivePlayer(player.user.name) !== undefined) {
+            console.log(`Player: ${player.user.name} already joined`);
+            return;
+        }
+    
+        if (player && player.user.name !== this._playerData?.user.name) {
+            console.log("Instancing mesh for ", player.user.name);
+    
+            try {
                 const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
-                let newPlayer: any;
-                newPlayer = new RemotePlayer(assets, this._scene, player.user.name);
+                if (!assets) {
+                    console.error('Failed to load player assets.');
+                    return;
+                }
+    
+                let newPlayer: any = new RemotePlayer(assets, this._scene, player.user.name);
+                if (!newPlayer) {
+                    console.error('Failed to instantiate RemotePlayer.');
+                    return;
+                }
+    
                 this._livePlayers.push(newPlayer);
+            } catch (error) {
+                console.error('Error during player spawning:', error);
             }
         }
     }
+    
 
     removePlayer(playerToRemove : PlayerData) {
         const playerIndex = this._livePlayers.findIndex( (p) => {

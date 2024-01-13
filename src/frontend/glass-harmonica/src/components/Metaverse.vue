@@ -20,7 +20,6 @@ const metaSocket = initializeSocket(hostAddress, );
 const vueEmitter = defineEmits(['profileRequest']);
 
 onMounted(async () => {
-  console.log("MOUNTING METAVERSE COMPONENT AGAIN??????");
   const metaverseInstance : Metaverse = await initializeMetaverse(metaSocket, vueEmitter);
   connectionManager(metaSocket, metaverseInstance);
 });

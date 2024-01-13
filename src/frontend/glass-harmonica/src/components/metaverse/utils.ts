@@ -40,6 +40,7 @@ function getRandomUsername () : string {
         "guilmira", 
         "rcabezas",
         "ycarro",
+        "m-zomeno",
         "vicgarci",
         "crisfern",
         "agallipo",
