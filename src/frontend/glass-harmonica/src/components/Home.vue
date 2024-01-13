@@ -1,4 +1,4 @@
-<style>
+<style scoped>
   canvas {
     position: absolute;
     left: 0;
@@ -53,6 +53,7 @@
 	<h6>S ó l o</h6>
 	<h6>S . ó . l . o</h6>
 	<h6>Sólo curro</h6>
+	<DummyGame/>
 	<Metaverse v-if="playerIsBorn" @profileRequest="metaProfileHandler" />
   	<router-view></router-view>
 </template>
@@ -63,6 +64,7 @@ import { ref } from 'vue';
 import { Socket, io } from "socket.io-client";
 import Metaverse from './Metaverse.vue';
 import ProfilePage from './ProfilePage.vue';
+import DummyGame from './DummyGame.vue';
 import {getRandomUsername, numberIsInRange} from './metaverse/utils';
 import { useRouter } from 'vue-router';
 

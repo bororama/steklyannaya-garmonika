@@ -112,7 +112,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   @SubscribeMessage('spawnExistingPlayersFailed')
-    async onSpawnExistingPlayersFailed(@MessageBody() payload : string ,@ConnectedSocket() socket : Socket) {
+    async onSpawnExistingPlayersFailed(@MessageBody() payload : string , @ConnectedSocket() socket : Socket) {
       const livePlayers = liveClients.map((c: LiveClient) => {
         return c.player;
       });
