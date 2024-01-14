@@ -2,6 +2,7 @@ import { io, Socket } from "socket.io-client";
 import { type User, type Messsage, type ServerToClientEvents, type ClientToServerEvents, type Player, type LiveClient} from "./shared/meta.interface";
 import { Metaverse } from "./app";
 import { PlayerData } from "./playerData";
+import { ref } from 'vue'
 
 
 async function spawnPlayers(liveClients: Array<PlayerData>, metaverse : Metaverse) {
@@ -37,7 +38,7 @@ async function spawningRoutine(metaSocket : Socket, metaverse: Metaverse, livePl
 	}, 300 + (Math.pow(retries, 2) * 100));
 }
 
-function connectionManager (metaSocket : Socket, metaverse : Metaverse) {		
+function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef : any) {		
 
 	metaSocket.on('connect', () => {
 		//setTimeout( () => {
@@ -80,6 +81,24 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse) {
 	metaSocket.on('playerUpdate', async ( payload : Player) => {
 		//console.log('playerUpdate>>', `${payload.user.name} position: `, payload.position[0], payload.position[1], payload.position[2], " state : ", payload.state);
 		metaverse.gameWorld.applyRemotePlayerUpdate(payload); // <--promise is failing
+	});
+
+
+	metaSocket.on('gameStart', async () => {
+		matchRef.value = true;
+	});
+	
+	metaSocket.on('apotheosis', (payload : string) => {
+		metaverse.gameWorld.apotheosis(payload);
+	});
+
+	metaSocket.on('gameEnd', async () => {
+		matchRef.value = false;
+		metaverse.gameWorld.setLocalPlayerState(1);
+	});
+
+	metaSocket.on('stopApotheosis', (payload : string) => {
+		metaverse.gameWorld.stopApotheosis(payload);
 	});
 
 	metaSocket.on('exception', (data) => {

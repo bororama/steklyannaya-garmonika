@@ -11,7 +11,7 @@ import { type Message } from './shared/meta.interface';
 
 
 enum Animations { IDLE = 1, JUMP = 2, LAND = 3, RUN = 4 };
-enum playerStates { SPEAKING = 0, IDLING = 1, JUMPING = 2, RUNNING = 3 };
+enum playerStates { SPEAKING = 0, IDLING = 1, JUMPING = 2, RUNNING = 3, PLAYING = 4 };
 enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
 
 
@@ -78,6 +78,10 @@ export class LocalPlayer extends TransformNode {
         this._setUpChatBox();
     }
 
+    setState(state : number) {
+        this._state = state;
+    }
+
     private _setUpMesh() {
         const metadata = {tag : 'LocalPlayer', name : this.name};
         this.mesh.metadata = metadata;
@@ -123,7 +127,7 @@ export class LocalPlayer extends TransformNode {
         this._messageText.text = message;
         this._messageText.color = "black";
 
-        this._metaSocket.emit('chat',  {user : this._playerData.user, text : message}, response => console.log('Server:', response));
+        this._metaSocket.emit('chat',  {user : this._playerData.user, text : message}, response  => console.log('Server:', response));
         this._bubble.addControl(this._messageText);
         let context = this._bubbleTexture.getContext();
 
@@ -137,8 +141,13 @@ export class LocalPlayer extends TransformNode {
         setTimeout(async () => {
             fadeOut.play(false);
         }, 1000);
-    }
 
+        message = message.trim();
+        if (message === "PING" || message === "PONG") {
+            this._metaSocket.emit(`PingPong`, this._playerData.user.name);
+            this._state = playerStates.PLAYING;
+        }
+    }
 
     private _setUpPlayerLabel() {
         this._nameLabel = MeshBuilder.CreatePlane("label", {width: 5, height : 1}, this.scene);
@@ -157,12 +166,12 @@ export class LocalPlayer extends TransformNode {
 
         const font = "bold 16px monospace";
         labelTexture.drawText(
-            this._playerData.user.name, 
-            (32 * 5) / 2 - textureContext.measureText(this._playerData.user.name).width, 
-            16, 
-            font, 
-            "white", 
-            "transparent", 
+            this._playerData.user.name,
+            (32 * 5) / 2 - textureContext.measureText(this._playerData.user.name).width,
+            16,
+            font,
+            "white",
+            "transparent",
             true, 
             true
         );
@@ -194,6 +203,7 @@ export class LocalPlayer extends TransformNode {
                 break;
             }
         }
+
         this._currentAnim = this._animations[currentAnimationState];
         if (this._currentAnim !== this._prevAnim) {
             this._prevAnim.stop();
@@ -244,11 +254,12 @@ export class LocalPlayer extends TransformNode {
 
     private _processInput() {
 
+        console.log("state ", this._state);
         if (this._input.toggleChatBox && this._state == playerStates.IDLING) {
             this._inputBox.isVisible = !this._inputBox.isVisible;
 
         }
-        if (!this._inputBox.isVisible) {
+        if (!this._inputBox.isVisible && this._state !== playerStates.PLAYING) {
             let correctedVertical = this._camRoot.forward.scaleInPlace(this._input.vertical);
             let correctedHorizontal = this._camRoot.right.scaleInPlace(this._input.horizontal);
     
@@ -258,7 +269,9 @@ export class LocalPlayer extends TransformNode {
         else {
             this._input.inputMap["q"] = 0;
             this._input.inputMap["e"] = 0;
-            this._inputBox.focus();
+            if (this._inputBox.isVisible) {
+                this._inputBox.focus();
+            }
         }
     }
 
@@ -294,6 +307,9 @@ export class LocalPlayer extends TransformNode {
     private _setMeshTransformations() {
         this._moveDirection = this._moveDirection.scaleInPlace(this._inputMagnitude * LocalPlayer.PLAYER_SPEED);
 
+        if (this._state === playerStates.PLAYING) {
+            return ;
+        }
         if (this._inputMagnitude > 0) {
             let angle = Math.atan2(this._input.horizontal, this._input.vertical);
             angle += this._camRoot.rotation.y;
@@ -329,7 +345,7 @@ export class LocalPlayer extends TransformNode {
     }
 
     private _groundCharacter() {
-        if (this._state !== playerStates.RUNNING)
+        if (this._state !== playerStates.RUNNING && this._state !== playerStates.PLAYING)
             this._state = playerStates.IDLING;
         this._gravity.y = 0;
         this._grounded = true;
@@ -361,9 +377,6 @@ export class LocalPlayer extends TransformNode {
     }
 }
       
-
-
-
 
 //temporary helpers, should be refactored into the generic Player class
 function createLocalPlayerInputBox() : InputText {

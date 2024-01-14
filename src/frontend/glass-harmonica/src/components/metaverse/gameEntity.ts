@@ -30,18 +30,21 @@ export class GameEntity extends TransformNode {
     private _bubbleState : number;
     private _bubbleDuration : number;
 
-    constructor (assets : any, scene: Scene, name : string) {
+    constructor (assets : any, scene: Scene, name : string, type : string) {
 
         super("GameEntity", scene);
         this.name = name;
         this.mesh = assets.mesh;
-        this._setUpMesh();
+        this._setUpMesh(type);
         this._animations = assets.animationGroups;
-        this._previousAnimation  = this._animations[Animations.LAND];
-        this._currentAnimation = this._animations[Animations.IDLE];
-        this._animations[Animations.RUN].loopAnimation = true;
-        this._animations[Animations.IDLE].loopAnimation = true;
-        this._currentAnimation.play(true);
+        if (this._animations.length) {
+            this._previousAnimation  = this._animations[Animations.LAND];
+            this._currentAnimation = this._animations[Animations.IDLE];
+            console.log("animatiions ", this._animations);
+            this._animations[Animations.RUN].loopAnimation = true;
+            this._animations[Animations.IDLE].loopAnimation = true;
+            this._currentAnimation.play(true);
+        }
         this._bubbleState = bubbleStates.INVISIBLE;
         this._bubbleTexture = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
         this._bubble = new Rectangle();
@@ -51,8 +54,8 @@ export class GameEntity extends TransformNode {
         this._setUpLabel();
     }
 
-    private _setUpMesh() {
-        const metadata = {tag : 'GameEntity', name : this.name};
+    private _setUpMesh(type : string) {
+        const metadata = {tag : 'GameEntity', name : this.name, type : type};
         this.mesh.metadata = metadata;
         this.mesh.getChildMeshes().forEach( (m) => {
             m.metadata = metadata;

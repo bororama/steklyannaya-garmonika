@@ -54,7 +54,7 @@
 
 
 **AGILE quadrants**
-    high-importance & low-effort : Respawn[X], NonPlayerEntity[] << QUICK WINS >> do now
-    high-importance & high-effort : Connection protection[X], Match up routine with dummy component[] << GREAT PROJECTS >> do next
+    high-importance & low-effort : Respawn[X], Pop up system [X], disconnect [], NonPlayerEntity[] << QUICK WINS >> do now
+    high-importance & high-effort : Connection protection[X], Match up routine with dummy component[X] << GREAT PROJECTS >> do next
     low-importance & low-effort : music[], << FILL INS >> do later
-    low-importance & high-effort :  , << THANKLESS TASKS >> delegate
+    low-importance & high-effort :  playable on mobile [], << THANKLESS TASKS >> delegate

@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color4, Matrix, Quaternion, StandardMaterial, SceneLoader, PickingInfo } from "@babylonjs/core";
+import { Engine, Scene, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color3, Color4, Matrix, Quaternion, StandardMaterial, SceneLoader, PickingInfo, GlowLayer } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui"
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
@@ -52,6 +52,7 @@ class GameWorld {
     private _player: LocalPlayer | null;
     private _input: PlayerInput | null;
     private _livePlayers: Array<RemotePlayer>;
+    private _yellowDevilName : string;
 
     constructor(metaSocket: Socket, playerData : PlayerData) {
         this._canvas = this._createCanvas();
@@ -64,7 +65,7 @@ class GameWorld {
         this._input = null;
         this._livePlayers = new Array();
         this._environment = null;
-
+        this._yellowDevilName = 'فرانسيسكو خيسوس دي جاتا وفالديس';
         // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
             // Shift+ctrl+I
@@ -76,9 +77,11 @@ class GameWorld {
                 }
             }
         });
-
-
     }
+
+/*
+**  check the state of usability of the scene
+*/
 
     isReady() {
         return this._scene.isReady();
@@ -88,9 +91,67 @@ class GameWorld {
         // run the main render loop
         await this._main();
     }
-    //SOCKETS
+
+    isSceneReady(): boolean {
+        return this._scene.isReady();
+    }
+/*
+**  Methods and properties of the pop up system
+*/
+
+    private _popUpTexture : AdvancedDynamicTexture;
+    private _popUpStack : StackPanel;
+    private _popUpLabel : TextBlock;
+    private _popUpCloseButton : Button;
 
 
+
+    showPopUp(message : string, enableButton: boolean = true) {
+
+        this._popUpStack.isVisible = true;
+        this._popUpCloseButton.isEnabled = enableButton;
+        this._popUpLabel.text = message;
+    }
+
+    closePopUp() {
+        this._popUpStack.isVisible = false;
+    }
+
+    private setUpPopUpSystem() {
+        this._popUpTexture = AdvancedDynamicTexture.CreateFullscreenUI('pop-up');
+
+        this._popUpStack = new StackPanel();
+        this._popUpStack.width = '300px';
+        this._popUpStack.height = '200px';
+        this._popUpStack.background = 'white';
+        this._popUpStack.alpha = 0.8;
+        this._popUpStack.paddingBottom = '20px';        
+        
+        this._popUpCloseButton = Button.CreateImageWithCenterTextButton('closeButton', 'Close', '');
+        this._popUpCloseButton.width = '100px';
+        this._popUpCloseButton.height = '40px';
+        this._popUpCloseButton.color = 'white';
+        this._popUpCloseButton.background = 'blue';
+        this._popUpCloseButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        this._popUpCloseButton.onPointerUpObservable.add(() => {
+            this._popUpStack.isVisible = false;
+        });
+        this._popUpLabel = new TextBlock();
+        this._popUpLabel.text = 'This is a pop-up!';
+        this._popUpLabel.fontSize = 20;
+        this._popUpLabel.height = '100px';
+        this._popUpLabel.width = '300px';
+        this._popUpLabel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        
+        this._popUpStack.addControl(this._popUpLabel);
+        this._popUpTexture.addControl(this._popUpStack);
+        this._popUpStack.addControl(this._popUpCloseButton);
+        this._popUpStack.isVisible = false;
+    }
+
+/*
+**  Routines that interact with the livePLayers array and the local player
+*/
     getLivePlayers() {
         return this._livePlayers;
     }
@@ -173,20 +234,59 @@ class GameWorld {
     }
 
     makeRemotePlayerSay(m : Message) {
+        
         let player = this._findLivePlayer(m.user.name);
         if (player) {
             player.say(m.text);
         }
     }
 
-    isSceneReady(): boolean {
-        return this._scene.isReady();
-    }
-
-    private _findLivePlayer(targetPlayerName: string): GameEntity | undefined {
+    private _findLivePlayer(targetPlayerName: string): RemotePlayer | undefined {
         let player = this._livePlayers.find((p) => { return p.name == targetPlayerName }) // change this for a locator
 
         return player;
+    }
+
+    setLocalPlayerState(state : number) {
+        this._player?.setState(state);
+    }
+
+    apotheosis(name : string) {
+        const player = this._findLivePlayer(name);
+
+        if (player) {
+            player.showFlamingSoul();
+        }
+    }
+
+    stopApotheosis(name : string) {
+        const player = this._findLivePlayer(name);
+        
+        if (player) {
+            player.hideFlamingSoul();
+        }
+    }
+
+    /*
+    ** BabylonJs set-up and main render loop
+    */
+
+
+    private _setUpMaterials() {
+
+        const soulMaterial = new StandardMaterial("Flaming Soul", this._scene);
+        soulMaterial.diffuseColor = new Color3(1, 0, 0);
+        soulMaterial.specularColor = new Color3(0, 0, 0);
+        soulMaterial.emissiveColor = new Color3(1, 1, 1);
+
+        const SoulGlow = new GlowLayer("Glowing Souls", this._scene);
+        SoulGlow.customEmissiveColorSelector = function (mesh, subMesh, material, result) {
+            if (mesh.material?.name === "Flaming Soul") {
+              result.set(1, 1, 1, 0.6);
+            } else {
+              result.set(0, 0, 0, 0);
+            }
+        }
     }
 
     private _createCanvas(): HTMLCanvasElement {
@@ -200,7 +300,12 @@ class GameWorld {
                 return (m.metadata !== null && m.metadata.tag === 'GameEntity');
             });
             if (pickInfo!.hit) {
-                vueEmitter('profileRequest', {name : pickInfo!.pickedMesh!.metadata.name});
+                if (pickInfo?.pickedMesh?.metadata.type === 'Devil') {
+                    vueEmitter('storeRequest', {username : this._playerData!.user.name});
+                }
+                else {
+                    vueEmitter('profileRequest', {name : pickInfo!.pickedMesh!.metadata.name});
+                }
             }
         });
         document.body.appendChild(canvas);
@@ -217,6 +322,7 @@ class GameWorld {
         });
 
         //resize if the screen is resized/rotated
+        this.setUpPopUpSystem();
         window.addEventListener('resize', () => {
             this._engine.resize();
         });
@@ -238,7 +344,8 @@ class GameWorld {
         let scene = new Scene(this._engine);
         scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098);
         scene.detachControl();
-        const light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+        const globalLight = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+        globalLight.intensity = 1;
         this._input = new PlayerInput(scene);
         await this._setUpGameSceneAssets(scene);
         await this._initializeGameAsync(scene);
@@ -247,8 +354,29 @@ class GameWorld {
         this._scene = scene;
         this._engine.hideLoadingUI();
         this._scene.attachControl();
+        this._setUpMaterials();
+        this._instanceNPCs();
     }
 
+    private async _initializeGameAsync(scene: Scene): Promise<void> {
+        //temporary light to light the entire scene
+
+        //Create the player
+        this._player = new LocalPlayer(this.assets, scene, <PlayerInput>this._input, this._metaSocket, <PlayerData>this._playerData);
+        const camera = this._player.activatePlayerCamera();
+    }
+
+    private async _instanceNPCs() {
+        /*curro*/
+        const assets = await this._loadPlayerAssets(this._scene, false, 'humanoid.glb');
+        const curro = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
+        curro.updatePosition(new Vector3(0, -13, 0));
+    }
+
+
+    /*
+    ** Mesh loading
+    */
 
     private async _loadPlayerModel(scene: Scene, collisionMesh: Mesh | null, path : string) {
 
@@ -286,15 +414,6 @@ class GameWorld {
             mesh: outer as Mesh,
             animationGroups: importedMesh.animationGroups,
         }
-    }
-
-
-    private async _initializeGameAsync(scene: Scene): Promise<void> {
-        //temporary light to light the entire scene
-
-        //Create the player
-        this._player = new LocalPlayer(this.assets, scene, <PlayerInput>this._input, this._metaSocket, <PlayerData>this._playerData);
-        const camera = this._player.activatePlayerCamera();
     }
 }
 

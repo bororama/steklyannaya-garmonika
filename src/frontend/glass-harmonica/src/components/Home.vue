@@ -1,4 +1,4 @@
-<style scoped>
+<style>
   canvas {
     position: absolute;
     left: 0;
@@ -28,6 +28,8 @@
 	<h1>Sólo en el curroverso</h1>
 	<h2>Sólo en el curroverso</h2>
 	<h3>Sólo en el curroverso</h3>
+	<DummyStore v-if="store" />
+	<Metaverse v-if="playerIsBorn" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
 	<h4>Sólo en el curroverso</h4>
 	<h5>Sólo en el curroverso</h5>
 	<h6>Sólo en el curroverso</h6>
@@ -53,8 +55,6 @@
 	<h6>S ó l o</h6>
 	<h6>S . ó . l . o</h6>
 	<h6>Sólo curro</h6>
-	<DummyGame/>
-	<Metaverse v-if="playerIsBorn" @profileRequest="metaProfileHandler" />
   	<router-view></router-view>
 </template>
 
@@ -65,10 +65,12 @@ import { Socket, io } from "socket.io-client";
 import Metaverse from './Metaverse.vue';
 import ProfilePage from './ProfilePage.vue';
 import DummyGame from './DummyGame.vue';
+import DummyStore from './DummyStore.vue';
 import {getRandomUsername, numberIsInRange} from './metaverse/utils';
 import { useRouter } from 'vue-router';
 
 const playerIsBorn = ref(false);
+const store = ref(false)
 const usernameRef = ref('');
 const profile = ref({display : false, userId : ''});
 const router = useRouter();
@@ -87,6 +89,10 @@ function metaProfileHandler(metadata) {
         name : 'profile',
         params : { userId : metadata.name },
     });
+}
+
+function storeHandler(metadata) {
+	store.value = true;
 }
 
 </script>

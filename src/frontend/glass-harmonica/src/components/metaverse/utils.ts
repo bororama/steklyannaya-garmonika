@@ -32,15 +32,14 @@ function getFadeOutAnimation(durationMs: number, initialOpacity : number, finalO
 
 function getRandomUsername () : string {
     const availableNames : Array<string> = Array<string>(
-        "e-ligero",
+        "eligero",
         "fgata-va", 
         "javgonza",
         "pdiaz-pa", 
-        "mmateo-t", 
         "guilmira", 
         "rcabezas",
         "ycarro",
-        "m-zomeno",
+        "mzomeno",
         "vicgarci",
         "crisfern",
         "agallipo",
@@ -49,6 +48,7 @@ function getRandomUsername () : string {
         "vcodrean",
         "vflorez",
         "bazuara",
+        "godcondo",
         "jvacaris",
         "ahammoud",
         "priezu-m",

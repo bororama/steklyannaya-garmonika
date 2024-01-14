@@ -1,5 +1,5 @@
 <template>
-    <div style="width:100%;text-align:center;position:absolute;top:10vh;">
+    <div style="width:100%;text-align:center;position:absolute;top:10vh;z-index:1;">
         <canvas ref="dummyGameCanvas" width="900" height="900" style="height:auto; width: 50%;margin: 0 auto;"></canvas>
     </div>
 </template>
@@ -7,8 +7,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import {Socket} from 'socket.io-client'
 
 const dummyGameCanvas = ref();
+const props = defineProps({'metaSocket' : Socket})
 
 function animate() {
     const canvas = dummyGameCanvas.value;
@@ -18,6 +20,7 @@ function animate() {
     let velocityX = 2;
     let velocityY = 0;
     const gravity = 0.1;
+    let complete = false;
 
     const drawBox = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -38,12 +41,17 @@ function animate() {
       if (x > canvas.width - 10 || x < 0) {
         velocityX = -velocityX;
       }
+      if (Math.abs(velocityY) < 0.5 && y > 889) {
+        props.metaSocket.emit('endDummyGame', globalThis.username);
+        complete = true;
+      }
     };
 
     const animateFrame = () => {
       updateBox();
       drawBox();
-      requestAnimationFrame(animateFrame);
+      if (!complete)
+        requestAnimationFrame(animateFrame);
     };
 
     animateFrame();

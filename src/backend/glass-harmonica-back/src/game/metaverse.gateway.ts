@@ -93,17 +93,9 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     return `You sent : playerUpdate ${ payload }`;
   }
 
-
-  /*
-  ** Should the 'newPlayer' spawning fail, this call will re-attempt
-  ** after an exponentially increasing time out.
-  */
- 
   @SubscribeMessage('spawnNewPlayerFailed')
   async onSpawnNewPlayerFailed(@MessageBody() payload : {retries : number, player : null | Player}, @ConnectedSocket() socket : Socket): Promise<String> {
-    console.log(`SPAWN FAILED : No. of retries :  ${ payload.retries + 1} time : ${300 + (Math.pow(payload.retries, 2) * 100)}`);
     setTimeout(() => { 
-      console.log("trying again........");
       if (payload.player) {
         socket.emit('newPlayer',{retries : payload.retries + 1, player : payload.player});
       }
@@ -112,13 +104,28 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   @SubscribeMessage('spawnExistingPlayersFailed')
-    async onSpawnExistingPlayersFailed(@MessageBody() payload : string , @ConnectedSocket() socket : Socket) {
-      const livePlayers = liveClients.map((c: LiveClient) => {
-        return c.player;
-      });
-      console.log(payload);
-      console.table(livePlayers);
-      return livePlayers;
-    }
+  async onSpawnExistingPlayersFailed(@MessageBody() payload : string , @ConnectedSocket() socket : Socket) {
+    const livePlayers = liveClients.map((c: LiveClient) => {
+      return c.player;
+    });
+    console.log(payload);
+    console.table(livePlayers);
+    return livePlayers;
+  }
+
+  @SubscribeMessage('PingPong')
+  async onPingPong(@MessageBody() payload : string , @ConnectedSocket() socket : Socket) {
+    console.log("PingPong received ", payload);
+    socket.emit('gameStart');
+    socket.broadcast.emit('apotheosis', payload);
+  }
+
+  @SubscribeMessage('endDummyGame')
+  async onEndDummyGame(@MessageBody() payload : string , @ConnectedSocket() socket : Socket) {
+    socket.emit('gameEnd');
+    socket.broadcast.emit('stopApotheosis', payload);
+  }
+
+
 }
 
