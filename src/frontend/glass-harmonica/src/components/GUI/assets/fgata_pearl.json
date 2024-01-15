@@ -1,0 +1,13 @@
+{
+	"item_type": "pearl",
+	"image": "pearl.png",
+	"options": [
+		{"text": "Send message", "action": "send_message"},
+		{"text": "View messages", "action": "view_messages"},
+		{"text": "Ban user", "action": "ban_user"},
+		{"text": "Close", "action": "close_drop"}
+	],
+	"target": "fgata-va",
+	"sender": "javgonza",
+	"glow": true
+}

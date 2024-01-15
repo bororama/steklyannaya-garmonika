@@ -54,7 +54,17 @@
 
 
 **AGILE quadrants**
-    high-importance & low-effort : Respawn[X], Pop up system [X], disconnect [], NonPlayerEntity[] << QUICK WINS >> do now
-    high-importance & high-effort : Connection protection[X], Match up routine with dummy component[X] << GREAT PROJECTS >> do next
+    high-importance & low-effort : Respawn[X], Pop up system [X], disconnect [X] << QUICK WINS >> do now
+    high-importance & high-effort : Connection protection[X], Match up routine with dummy component[X], LE GRAND MERGE []<< GREAT PROJECTS >> do next
     low-importance & low-effort : music[], << FILL INS >> do later
-    low-importance & high-effort :  playable on mobile [], << THANKLESS TASKS >> delegate
+    low-importance & high-effort :  << THANKLESS TASKS >> delegate
+
+
+
+Merge plan :
+
+-> Conquer repo [X]
+-> Enrutar componente home desde sign-in (vue-router) []
+-> Una vez mi componente home se renderize, reajustar paths de dependencias en el frontend (profile page, store, other gui elements) []
+-> cuando el frontend esté completo, desplegar servidor de metaSockets (es decir, conexiones en el metaverso) []
+-> Comprobar funcionalidad []

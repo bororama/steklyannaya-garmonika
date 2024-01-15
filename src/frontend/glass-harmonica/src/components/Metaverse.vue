@@ -18,7 +18,7 @@ function initializeSocket(hostAddress : string) : Socket {
   return io<ServerToClientEvents, ClientToServerEvents>(hostAddress);
 }
 
-const hostAddress = `http://${import.meta.env.VITE_HOST_IP}:3000`;
+const hostAddress = `http://${import.meta.env.VITE_HOST_IP}:777`;
 const metaSocket = initializeSocket(hostAddress, );
 const vueEmitter = defineEmits(['profileRequest', 'storeRequest']);
 const match = ref(false);

@@ -6,16 +6,26 @@ services:
     container_name: backend
     tty: true
     restart: always
+    environment:
+      - "PORT=${PORT}"
+      - "POSTGRES_DB=${DATABASE_NAME}"
+      - "POSTGRES_USER=${POSTGRES_USER}"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+      - "CALIPH_USER=${CALIPH_USER}"
     volumes:
       - type: bind
-        source: ./src/backend
-        target: /app
+        source: ./src/backend/db-api/src
+        target: /app/src
       - type: bind
         source: ./src/shared
-        target: /app/glass-harmonica-back/src/components/shared
+        target: /app/src/meta/shared
+    networks:
+      - database_network
+      - fullstack_network
     ports:
       - 3000:3000
       - 4000:4000
+      - 777:777
   frontend:
     build:
       context: ./src/frontend
@@ -32,5 +42,56 @@ services:
       - type: bind
         source: ./src/shared
         target: /app/glass-harmonica/src/components/metaverse/shared
+    networks:
+      - fullstack_network
     ports:
       - 5173:5173
+  db:
+      image: postgres:12-bullseye
+      container_name: postgres
+      restart: always
+      environment:
+        - "POSTGRES_DB=${DATABASE_NAME}"
+        - "POSTGRES_USER=${POSTGRES_USER}"
+        - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+      networks:
+        - database_network
+
+  pgadmin:
+      image: dpage/pgadmin4:7.7
+      restart: always
+      container_name: pgadmin4
+      environment:
+        - "PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}"
+        - "PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}"
+      ports:
+        - '5050:80'
+      depends_on:
+        - db
+      networks:
+        - database_network
+      volumes:
+        - pgadmin:/var/lib/pgadmin
+
+  pixelizer:
+    build:
+      context: ./src/pixelizer
+      dockerfile: Dockerfile
+    image: ft_transcendence/meta_face_demaker
+    container_name: meta_face_demaker
+    ports:
+      - "6000:6000"
+    networks:
+      - fullstack_network
+volumes:
+    pgadmin:
+        driver: local
+    pgdata:
+        driver: local
+networks:
+  database_network:
+  fullstack_network:
+
+    

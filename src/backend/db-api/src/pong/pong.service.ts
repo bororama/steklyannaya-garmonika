@@ -1,0 +1,111 @@
+import { Injectable } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+import { Match } from './components/Match';
+import { MatchesService } from '../matches/matches.service'
+import { Constants } from './components/Match';
+
+@Injectable()
+export class PongService {
+
+    private matches: Match[] = [];
+    private connectedUsers: { [socketId: string]: { match: Match; paddleIndex: number } } = {};
+  
+  constructor(private matchesService: MatchesService) {}
+  private connectionConditions(existingMatch, data: any){
+    if (data.pongRoomId === -2){
+      console.log("public match");
+      return(              
+        existingMatch.paddles.length === 1 &&
+        existingMatch.isGameInProgress !== Constants.MATCH_FAILED &&
+        existingMatch.isGameInProgress !== Constants.MATCH_ENDED &&
+        existingMatch.collisionController.mode === data.mode);
+    }
+    else{
+      console.log("private match");
+      return(
+        existingMatch.isGameInProgress !== Constants.MATCH_FAILED &&
+        existingMatch.isGameInProgress !== Constants.MATCH_ENDED &&
+        existingMatch.pongRoomId === data.pongRoomId &&
+        existingMatch.collisionController.mode === data.mode
+      );
+    }
+  }
+  public initSocket(io: Server): void {
+    io.on('connection', (socket: Socket) => {
+      const playerId = socket.id;
+      socket.on('beginGame', (data) => {
+          let match: Match | undefined;
+          console.log(data.pongRoomId + " received pongRoomId");
+          for (const existingMatch of this.matches) {
+            if (this.connectionConditions(existingMatch, data)) {
+              console.log('Existing match found.');
+              match = existingMatch;
+              socket.join(existingMatch.matchIndex.toString());
+              break;
+            }
+          }
+          if (!match) {
+            console.log('Incomplete match not found. Creating a new match...');
+            match = new Match(1000, 1000 / 2, data.mode, this.matchesService); // 0 = modo normal, 1 = modo sin paredes
+            this.matches.push(match);
+            match.matchIndex = this.matches.indexOf(match); 
+            socket.join(match.matchIndex.toString());
+            match.pongRoomId = data.pongRoomId;
+          }
+          const paddleIndex = match.paddles.length;
+          this.connectedUsers[playerId] = { match, paddleIndex };
+          socket.emit('matchInfo', {
+            matchIndex: this.matches.indexOf(match),
+            pongRoomId: match.pongRoomId,
+            paddleIndex,
+          });       
+          match.assignPaddleToPlayer(playerId);        
+          io.to(match.matchIndex.toString()).emit('updateGameState', match);        
+          if (match.paddles.length >= 2 && match.isGameInProgress === Constants.MATCH_NOT_IN_PROGRESS) {
+            console.log('Starting a new match between ', match.paddles[0].playerId, ' and ', match.paddles[1].playerId);
+            match.isGameInProgress = Constants.MATCH_IN_PROGRESS;
+            setTimeout(() => {
+              match.startGameLoop(io);
+            }, 2000);
+          }
+      });
+
+      socket.on('movePaddle', (data) => {
+        const user = this.connectedUsers[playerId];
+        if (user) {
+          const paddle = user.match.paddles[user.paddleIndex];
+          if (paddle) {
+            paddle.direction = data.direction === 'stop' ? 999 : data.direction === 'up' ? -user.match.config.paddleSpeed: user.match.config.paddleSpeed;
+          }
+          io.to(user.match.matchIndex.toString()).emit('updateGameState', user.match);
+        }
+      });
+
+      socket.on('disconnect', () => {
+        const user = this.connectedUsers[playerId];
+        if (user) {
+          const { match, paddleIndex } = user;
+          delete this.connectedUsers[playerId];
+          socket.leave(match.matchIndex.toString());
+          const paddle = match.paddles[paddleIndex];
+          if (paddle) {
+            const paddleIndex = match.paddles.findIndex((p) => p.playerId === playerId);
+            match.paddles.splice(paddleIndex, 1);
+          }
+          if (match.paddles.length === 0) {
+            const matchIndex = this.matches.indexOf(match);
+            if (matchIndex !== -1) {
+              this.matches.splice(matchIndex, 1);
+              console.log('Match removed from matches array.');
+            }
+          }
+          if (match.isGameInProgress === Constants.MATCH_IN_PROGRESS && match.paddles.length < 2) {
+            console.log('Less than two players connected. Stopping the game ', match.matchIndex);
+            match.isGameInProgress = Constants.MATCH_FAILED;
+            io.to(match.matchIndex.toString()).emit('updateGameState', match);
+          }
+        }
+      });
+    });
+  }
+}

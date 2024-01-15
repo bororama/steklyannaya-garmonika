@@ -4,17 +4,26 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import ProfilePage from './components/ProfilePage.vue';
 import Home from './components/Home.vue';
-import NotFound from './components/NotFound.vue'
+import NotFound from './components/NotFound.vue';
+import GUI from './components/GUI/components/GUI.vue';
 
 
 declare global {
-    var id : string;
-    var username : string;
-};
+  var logToken: string
+  var id: string
+  var username: string;
+  var has2FA : boolean
+  var my_data : any
+}
 
 const routes = [
 	{
 		path: '/',
+		name: 'GUI',
+		component: GUI,
+	},
+	{
+		path: '/home/',
 		name: 'Home',
 		component : Home,
 		children : [{
@@ -36,6 +45,9 @@ const router = createRouter(
 		routes : routes,
 	}
 );
+
+globalThis.has2FA = false
+
 
 const app = createApp(App);
 

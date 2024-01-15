@@ -13,4 +13,4 @@ else
 fi
 
 # docker exec -w /app/glass-harmonica -it frontend bash
-docker exec -w /app/glass-harmonica-back -it backend bash
+# docker exec -w /app/glass-harmonica-back -it backend bash
