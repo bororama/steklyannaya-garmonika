@@ -127,6 +127,17 @@ export class MatchesService {
         });
     }
 
+    delete(matchId: number): Promise<void> {
+        return this.matchModel.destroy({
+            where: {
+                [Op.or]: [
+                    { id: matchId },
+                    { roomId: matchId }
+                ]
+            }
+        }).then();
+    }
+
     getByRoomId(roomId: number): Promise<Match> {
         return this.matchModel.findOne({
             where: {

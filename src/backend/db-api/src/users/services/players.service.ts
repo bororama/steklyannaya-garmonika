@@ -158,6 +158,22 @@ export class PlayersService {
             throw new BadRequestException("Targeted player doesn\'t exist");
         }
         
+        const friendship = await this.friendshipModel.findOne({
+            where: {
+                [Op.or]: [
+                    {
+                       userId: player,
+                       friendId: friend
+                    },
+                    {
+                        userId: friend,
+                        friendId: player
+                    }
+                ]
+            }
+        });
+        if (friendship !== null && friendship !== undefined)
+            throw new BadRequestException("Already friends");
         try {
             await this.friendshipModel.create({
                 userId: player,
@@ -218,6 +234,8 @@ export class PlayersService {
         }
 
         if (accept && !petition.accepted) {
+            if (petition.accepted)
+                throw new BadRequestException("Already friends");
             const privateChat = await this.chatService.createFriendshipChat(player.user, friend.user, petition);
             petition.chatId = privateChat.id;
             petition.accepted = true;
@@ -257,10 +275,6 @@ export class PlayersService {
                 ]
             }
         });
-
-        /*if (friendship) {
-            this.chatService.deleteById(friendship.chatId);
-        }*/
 
         await friendship.destroy();
     }

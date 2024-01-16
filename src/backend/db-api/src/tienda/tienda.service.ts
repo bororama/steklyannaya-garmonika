@@ -4,6 +4,9 @@ import { InjectModel } from '@nestjs/sequelize'
 
 @Injectable()
 export class TiendaService {
+  private readonly pearlPrice : number = 10;
+  private readonly necklacePrice : number = 30;
+
   constructor (
     private userService : UsersService
   ) {
@@ -11,9 +14,8 @@ export class TiendaService {
   }
 
   async buyPearl(user: string) : Promise<string> {
-    const pearlPrice : number = 10;
 
-    const result :string = await this.userService.subtractCoins(user, pearlPrice);
+    const result :string = await this.userService.subtractCoins(user, this.pearlPrice);
 
     if (result == 'ok') {
         this.userService.addPearls(user, 1)
@@ -22,8 +24,17 @@ export class TiendaService {
     return (result);
   }
 
+  async buyNecklace(user: string) : Promise<string> {
+    const result :string = await this.userService.subtractCoins(user, this.necklacePrice);
+
+    if (result == 'ok') {
+        this.userService.addNecklace(user, 1)
+    }
+
+    return (result);
+  }
+
   async giveCoins(user: string, amount: number) : Promise<string> {
-    console.log(user)
-    return this.userService.addCoins(user, amount)
+    return this.userService.addCoins(user, amount);
   }
 }

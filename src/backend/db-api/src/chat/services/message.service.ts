@@ -39,7 +39,10 @@ export class MessageService {
 				},
 				[Op.not]: {
 					senderId: chat.userId
-				}
+				},
+				order: [
+					['sentDate', 'ASC']
+				]
 			}
 		})
 	}

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from '../models/user.model';
 import { NewUser } from '../dto/new-user.dto';
@@ -303,6 +303,30 @@ export class UsersService {
             return ('not_enough_pearls')
         else {
             user.pearls -= quantity;
+            user.save();
+            return ('ok');
+        }
+    }
+
+    async addNecklace(userId: string, quantity: number) : Promise<string> {
+        let user = await this.findOne(userId);
+        if (!user) {
+            throw new BadRequestException('User doesn\'t exist')
+        }
+        user.necklaces += quantity
+        user.save()
+        return ('ok')
+    }
+
+    async subtractNecklace(userId: string, quantity: number) : Promise<string> {
+        let user = await this.findOne(userId);
+        if (!user) {
+            throw new BadRequestException('User doesn\'t exist')
+        }
+        if (user.necklaces < quantity)
+            return ('not_enough_necklaces')
+        else {
+            user.necklaces -= quantity;
             user.save();
             return ('ok');
         }
