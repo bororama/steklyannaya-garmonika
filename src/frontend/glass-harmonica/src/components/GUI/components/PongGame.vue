@@ -1,6 +1,6 @@
 <template>
   <div>
-    <canvas ref="pongCanvas"></canvas>
+    <canvas ref="pongCanvas" style="z-index:10;"></canvas>
   </div>
 </template>
 
@@ -15,7 +15,8 @@ export default defineComponent({
   props: {
     modo: Number, // Define el prop "modo" que recibirá el componente
     pongRoomId: Number,
-    isGameInProgress: Number
+    isGameInProgress: Number, //deprecated
+    metaSocket: Socket,
   },
   data() {
     return {

@@ -1,5 +1,5 @@
 <template>
-	<DummyGame :meta-socket="metaSocket" v-if="match" />
+	<PongGame :meta-socket="metaSocket" :modo="0" :pong-room-id="-2" v-if="match" />
   QR^20-berserk
 </template>
 
@@ -11,6 +11,7 @@ import { initializeMetaverse } from "./metaverse/app.ts";
 import { io, Socket } from 'socket.io-client';
 import { connectionManager} from "./metaverse/connection";
 import DummyGame  from "./DummyGame.vue";
+import PongGame from "./GUI/components/PongGame.vue";
 
 
 
