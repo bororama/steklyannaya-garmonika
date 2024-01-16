@@ -96,6 +96,9 @@ export default defineComponent({
         if(this.socket)
           this.socket.disconnect();
         setInterval(() => this.writeInCanvas("Your Peng opponent fled before finishing the game."), 100);
+        setTimeout(() => {
+          this.metaSocket.emit('endDummyGame', globalThis.username);
+      }, 1000);
       }
       if (match.isGameInProgress === 0){
         this.writeInCanvas("Waiting for your Peng opponent...");
@@ -104,7 +107,11 @@ export default defineComponent({
         if(this.socket)
           this.socket.disconnect();
         setInterval(() => this.writeInCanvas("Match ended."), 100);
-        setTimeout(() => {this.$emit('match_finish')}, 1000)
+        setTimeout(() => {
+          this.$emit('match_finish');
+          this.metaSocket.emit('endDummyGame', globalThis.username);
+      }, 1000);
+
       }
   },
     handleWindowResize() {

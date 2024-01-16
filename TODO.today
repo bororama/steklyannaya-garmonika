@@ -54,8 +54,14 @@
 
 
 **AGILE quadrants**
-    high-importance & low-effort : Respawn[X], Pop up system [X], disconnect [X] << QUICK WINS >> do now
-    high-importance & high-effort : Connection protection[X], Match up routine with dummy component[X], LE GRAND MERGE []<< GREAT PROJECTS >> do next
+    high-importance & low-effort : 
+        - Correct Player Model behaviour after game :
+            a) second match queue[]
+            b) flaming soul on disconnection []
+        - LeaderBoard []
+        - Kick from metaverse []
+        << QUICK WINS >> do now
+    high-importance & high-effort : Connection protection[X], Match up routine with dummy component[X], LE GRAND MERGE [X], ROUTING []<< GREAT PROJECTS >> do next
     low-importance & low-effort : music[], << FILL INS >> do later
     low-importance & high-effort :  << THANKLESS TASKS >> delegate
 
