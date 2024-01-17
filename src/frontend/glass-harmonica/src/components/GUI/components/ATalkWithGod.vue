@@ -32,7 +32,6 @@ export default defineComponent({
       this.$emit('god_finished_speaking')
     }
   }
-
 })
 
 </script>

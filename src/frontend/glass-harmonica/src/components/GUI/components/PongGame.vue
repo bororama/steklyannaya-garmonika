@@ -114,6 +114,7 @@ export default defineComponent({
           this.metaSocket.emit('endDummyGame', globalThis.username);
       }, 1000);
 
+
       }
   },
     handleWindowResize() {
