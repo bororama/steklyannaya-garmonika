@@ -4,7 +4,7 @@ import { UsersService } from '../../users/services/users.service';
 import { Chat } from '../models/chat.model';
 import { Message } from '../models/message.model';
 import { Op } from 'sequelize';
-import { ChatUsers } from 'src/chat-user/models/chatUsers.model';
+import { ChatUsers } from '../../chat-user/models/chatUsers.model';
 
 @Injectable()
 export class MessageService {

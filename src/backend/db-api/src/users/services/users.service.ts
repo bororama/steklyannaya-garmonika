@@ -331,4 +331,14 @@ export class UsersService {
             return ('ok');
         }
     }
+
+    async subtractNecklaceFromUser(user: User, quantity: number) : Promise<boolean> {
+        if (user.necklaces < quantity)
+            return false;
+        else {
+            user.necklaces -= quantity;
+            await user.save();
+            return true;
+        }
+    }
 }

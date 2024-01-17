@@ -8,7 +8,7 @@ import { ChatUserDto } from '../users/dto/chat-user.dto';
 import { MessageService } from './services/message.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { Message } from './models/message.model';
-import { PublicUserDto } from 'src/users/dto/public-user.dto';
+import { PublicUserDto } from '../users/dto/public-user.dto';
 
 @Controller('chats')
 @ApiTags("Chats")

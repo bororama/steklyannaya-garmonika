@@ -9,7 +9,7 @@ import { ChatDto } from '../dto/chat.dto';
 import { Friendship } from '../../users/models/friendship.model';
 import { MessageService } from './message.service';
 import { Message } from '../models/message.model';
-import { ChatBans } from 'src/chat-user/models/chatBan.model';
+import { ChatBans } from '../../chat-user/models/chatBan.model';
 
 @Injectable()
 export class ChatService {
@@ -43,6 +43,12 @@ export class ChatService {
         const creator: User = await this.userService.findOne(creatorId);
         if (!creator) {
             throw new BadRequestException('User doesn\'t exists');
+        }
+
+        const necklaceSpend: boolean = await this.userService.subtractNecklaceFromUser(creator, 1);
+
+        if (!necklaceSpend) {
+            throw new ForbiddenException('Not enought necklaces');
         }
 
         const chat: Chat = await this.chatModel.create({

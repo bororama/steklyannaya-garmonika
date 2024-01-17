@@ -173,7 +173,7 @@ export class PlayersService {
             }
         });
         if (friendship !== null && friendship !== undefined)
-            throw new BadRequestException("Already friends");
+            throw new BadRequestException("Already sent");
         try {
             await this.friendshipModel.create({
                 userId: player,
@@ -233,7 +233,7 @@ export class PlayersService {
             throw new BadRequestException("Request not found");
         }
 
-        if (accept && !petition.accepted) {
+        if (accept) {
             if (petition.accepted)
                 throw new BadRequestException("Already friends");
             const privateChat = await this.chatService.createFriendshipChat(player.user, friend.user, petition);
@@ -244,8 +244,8 @@ export class PlayersService {
         else {
             await this.friendshipModel.destroy({
                 where: {
-                    userId: friend,
-                    friendId: player,
+                    userId: friend.id,
+                    friendId: player.id,
                 }
             });
         }

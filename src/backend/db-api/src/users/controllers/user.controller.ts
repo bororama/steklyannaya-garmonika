@@ -7,7 +7,6 @@ import { PublicUserDto } from "../dto/public-user.dto";
 import { UserDto } from "../dto/user.dto";
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Message } from "src/chat/models/message.model";
 
 @Controller()
 @ApiTags("User General Data")

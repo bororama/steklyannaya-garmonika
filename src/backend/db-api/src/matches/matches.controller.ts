@@ -96,7 +96,7 @@ export class MatchesController {
     }
 
     @Delete('/:idOrRoomId')
-    deleteMatch(@Param('idOrRoomId') matchId: null): Promise<void> {
+    deleteMatch(@Param('idOrRoomId', ParseIntPipe) matchId: number): Promise<void> {
         return this.matchService.delete(matchId);
     }
 }

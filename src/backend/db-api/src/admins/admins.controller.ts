@@ -12,7 +12,7 @@ import { ChatDto } from "../chat/dto/chat.dto";
 import { ChatService } from "../chat/services/chat.service";
 import { ChatUserDto } from "../users/dto/chat-user.dto";
 import { ChatWithUsernamesDto } from "../chat/dto/chat-usernames.dto";
-import { PublicUserDto } from "src/users/dto/public-user.dto";
+import { PublicUserDto } from "../users/dto/public-user.dto";
 
 @Controller('admins')
 @ApiTags('Admins')
