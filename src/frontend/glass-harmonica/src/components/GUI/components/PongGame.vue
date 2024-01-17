@@ -59,9 +59,11 @@ export default defineComponent({
         if (this.socket) {
           this.socket.on("connect", () => {
             console.log("Connected to the server.");
+            console.log("log Token", globalThis.logToken)
             this.socket?.emit("beginGame", {
               mode: this.modo,
-              pongRoomId: this.pongRoomId
+              pongRoomId: this.pongRoomId,
+              token: globalThis.logToken,
             });
           });
           this.socket.on('matchInfo', (info: any) => {
