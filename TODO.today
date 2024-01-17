@@ -1,59 +1,4 @@
-- toggle chat interface [X]
-- bubbles :
-    - text to a singleton [X]
-    - hiding routine [X]
-    - fix input bugs [X]
-    - block input until current bubble disappears [X]
-        - block camera input [X]
-- refactor Vue components (script setup) [X]
-- Vue components ts-style typing [X]
-- basic interclient server comms :
-    - share socket instance between vue components [X]
-    - send chat messages from babylon game [X]
-    - report new coordinates on movement [X]
-    - comm data structures  [X]
-        - Assign locator from backend [X]
-        - remotePlayers array that registers server reports about the other players in the world[X]
-    - share socket event types interfaces between client and server side [X]
-- Conditionally start the metaverse after player data and assets are loaded (loading?) [X]
-- refactor game/*ts []
-    - proper asynchronicity [X]
-    - GENERAL REFCTRNG []
-    - Create generic game entity [X] 
-    - Make localplayer extend entity []
-    - Make remoteplayer extend entity [X]
-    - Create playerData class for db interaction [X]
-- deep interclient comms []
-    - make other players state entity and appear in the world, update [X]
-    - print out in the player's corresponding bubble [X]
-    - update orientation [X]
-    - load proper mesh [X]
-    - update animation state [X]
-    - make a server limit, administrate locators so that the players are accessed directly []
-    - clean structures on disconnect[X]
-        - remove mesh of disconnected player [X]
-        - avoid duplicated player mesh on reconnect[] <------ (when changes are applied to the server, not on disconnection)
-    - remove extracube [X]
-- World triggers []
-- Pop up system[]
-- Fix the first request's timing [X]
-- Apply ready() pattern for asynchronous resources []
-- click ray tracing player [X]
-- Show profile page on click [X]
-- evaluate wether to fix input when focus is lost or not [X]
-    - don't fix it [X]
-    - fix it [0]
-- FIX THE ANIMATIONS AGAIN [X]
-    - make it more efficient [] <--- JavGonza
-- USE ROUTER [X] <--- subject-critical
-    - fit it in with the rest of the project. []
-- Respawn [X]
-- fix Respawn on limit cases [X]
-    - server reload [X]
-    - frontend simultaneous reload [O]
-
-
-**AGILE quadrants**
+**AGILE quadrants for N I C O L á S**
     high-importance & low-effort : 
         - Correct Player Model behaviour after game :
             a) second match queue[]
@@ -65,12 +10,3 @@
     low-importance & low-effort : music[], << FILL INS >> do later
     low-importance & high-effort :  << THANKLESS TASKS >> delegate
 
-
-
-Merge plan :
-
--> Conquer repo [X]
--> Enrutar componente home desde sign-in (vue-router) []
--> Una vez mi componente home se renderize, reajustar paths de dependencias en el frontend (profile page, store, other gui elements) []
--> cuando el frontend esté completo, desplegar servidor de metaSockets (es decir, conexiones en el metaverso) []
--> Comprobar funcionalidad []

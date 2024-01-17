@@ -254,7 +254,6 @@ export class LocalPlayer extends TransformNode {
 
     private _processInput() {
 
-        console.log("state ", this._state);
         if (this._input.toggleChatBox && this._state == playerStates.IDLING) {
             this._inputBox.isVisible = !this._inputBox.isVisible;
 

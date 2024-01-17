@@ -4,4 +4,5 @@ RUN npm i -g n
 RUN n 16
 
 WORKDIR /app/glass-harmonica
+COPY ./glass-harmonica/package*.json ./
 RUN npm i
