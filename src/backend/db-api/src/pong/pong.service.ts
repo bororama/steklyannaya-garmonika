@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { Match } from './components/Match';
+import { Match as MatchModel } from 'src/matches/models/match.model';
 import { MatchesService } from '../matches/matches.service'
 import { Constants } from './components/Match';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class PongService {
@@ -30,10 +32,36 @@ export class PongService {
       );
     }
   }
+
+  private async verifyPlayer(playerId: string, roomId: string): Promise<boolean> {
+    const numericRoomId: number = +roomId;
+    const numericPlayerId: number = +playerId;
+    if (numericRoomId == -2)
+      return true;
+    const match: MatchModel = await this.matchesService.getByRoomId(numericRoomId);
+    return numericPlayerId == match.idPlayer1 || numericPlayerId == match.idPlayer2;
+  }
+
   public initSocket(io: Server): void {
     io.on('connection', (socket: Socket) => {
       const playerId = socket.id;
       socket.on('beginGame', (data) => {
+          let payload : any;
+          console.log(data)
+          console.log(data.token)
+
+          try {
+            payload = jwt.verify(data.token, 'TODO the REAL secret');
+          } catch (e) {
+            socket.disconnect(false);
+          }
+
+          console.log(payload);
+
+          if (!this.verifyPlayer(payload.username, data.pongRoomId)) {
+            socket.disconnect(false);
+          }
+
           let match: Match | undefined;
           console.log(data.pongRoomId + " received pongRoomId");
           for (const existingMatch of this.matches) {

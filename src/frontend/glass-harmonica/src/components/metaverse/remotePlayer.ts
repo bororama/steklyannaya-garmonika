@@ -12,40 +12,36 @@ export class RemotePlayer extends GameEntity {
             if (m.name === "Flaming Soul")
             return true;
         })!;
-        this._getGlowingMesh(assets.mesh);
+        this._setGlowingMesh(assets.mesh);
+        toggleMeshVisibility(this._glowingMesh, false);
     }
 
+    showFlamingSoul() {
+        console.log("APOTHEOSIS : ", this._glowingMesh);
+        this._glowingMesh.position = this.mesh.position;
+        toggleMeshVisibility(this.mesh, false);
+        toggleMeshVisibility(this._glowingMesh, true);
+    }
 
-    /*these could be abtracted into a generic show hide mesh function */
-showFlamingSoul() {
-    console.log("APOTHEOSIS : ", this._glowingMesh);
-    this._glowingMesh.position = this.mesh.position;
-    this.mesh.isVisible = false;
-    this.mesh.getChildMeshes().forEach( (m) => {
-        m.isVisible = false;
-    });
+    hideFlamingSoul() {
+        console.log("HIDE FLAMING SOUL");
+        toggleMeshVisibility(this._glowingMesh, false);
+        toggleMeshVisibility(this.mesh, true);
+     }
+
+    private _setGlowingMesh(mesh : any) {
+        this._glowingMesh = mesh.clone("FlamingSoul");
+        this._glowingMesh.material = this._soulMaterial;
+        const meshes = this._glowingMesh.getChildMeshes()
+        meshes.forEach( (m : any)=> {
+            m.material = this._soulMaterial;
+        });
+    }
 }
 
- hideFlamingSoul() {
-     console.log("HIDE FLAMING SOUL");
-     this._glowingMesh.isVisible = false;
-     this._glowingMesh.getChildMeshes().forEach( (m : any) => {
-        m.isVisible = false;
+function toggleMeshVisibility(mesh : any, isVisible : boolean) {
+    mesh.isVisible = false;
+    mesh.getChildMeshes().forEach((m : any) => {
+        m.isVisible = isVisible;
     });
-    this.mesh.getChildMeshes().forEach( (m : any) => {
-        m.isVisible = true;
-    });
- }
-
-private _getGlowingMesh(mesh : any) {
-    this._glowingMesh = mesh.clone("FlamingSoul");
-    this._glowingMesh.material = this._soulMaterial;
-    console.log("glowing mesh0", this._glowingMesh);
-    const meshes = this._glowingMesh.getChildMeshes()
-    meshes.forEach( (m : any)=> {
-        m.material = this._soulMaterial;
-    });
-    console.log("glowing mesh1", this._glowingMesh);
-}
-
 }
