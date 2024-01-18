@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color3, Color4, Matrix, Quaternion, StandardMaterial, SceneLoader, PickingInfo, GlowLayer } from "@babylonjs/core";
+import { Engine, Scene, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color3, Color4, Matrix, Quaternion, StandardMaterial, SceneLoader, PickingInfo, GlowLayer, Sound } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui"
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
@@ -17,17 +17,17 @@ import { pointCloudVertex } from "@babylonjs/core/Shaders/ShadersInclude/pointCl
 
 enum STATES { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
 
-let vueEmitter : (event : string, metadata : any) => void;
+let vueEmitter: (event: string, metadata: any) => void;
 
 class Metaverse {
 
-    playerData : PlayerData;
-    gameWorld : GameWorld;
+    playerData: PlayerData;
+    gameWorld: GameWorld;
 
-    constructor () {
+    constructor() {
     }
 
-    async initPlayerData(locator : number, username : string) {
+    async initPlayerData(locator: number, username: string) {
         this.playerData = new PlayerData(locator, username);
     }
 
@@ -37,24 +37,29 @@ class Metaverse {
             await this.gameWorld.ready();
         }
     }
-    
-    
+
+
 }
+
+
+const shopEvent = new Event("openShop");
+
 
 class GameWorld {
     private _scene: Scene;
     private _canvas: HTMLCanvasElement;
     private _engine: Engine;
     private _metaSocket: Socket;
-    public  assets: any;
+    public assets: any;
     private _environment: Environment | null;
     private _playerData: PlayerData | null;
     private _player: LocalPlayer | null;
     private _input: PlayerInput | null;
     private _livePlayers: Array<RemotePlayer>;
-    private _yellowDevilName : string;
+    private _yellowDevilName: string;
+    private _yellowDevil : any;
 
-    constructor(metaSocket: Socket, playerData : PlayerData) {
+    constructor(metaSocket: Socket, playerData: PlayerData) {
         this._canvas = this._createCanvas();
         this._metaSocket = metaSocket;
         // initialize babylon scene and engine
@@ -62,12 +67,11 @@ class GameWorld {
         this._engine.setHardwareScalingLevel(6);
         this._scene = new Scene(this._engine);
         this._playerData = playerData,
-        this._player = null;
+            this._player = null;
         this._input = null;
         this._livePlayers = new Array();
         this._environment = null;
         this._yellowDevilName = 'فرانسيسكو خيسوس دي جاتا وفالديس';
-        // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
             // Shift+ctrl+I
             if (ev.shiftKey && ev.ctrlKey && ev.keyCode === 73) {
@@ -80,15 +84,15 @@ class GameWorld {
         });
     }
 
-/*
-**  check the state of usability of the scene
-*/
+    /*
+    **  check the state of usability of the scene
+    */
 
     isReady() {
         return this._scene.isReady();
     }
 
-    async ready(){
+    async ready() {
         // run the main render loop
         await this._main();
     }
@@ -96,18 +100,20 @@ class GameWorld {
     isSceneReady(): boolean {
         return this._scene.isReady();
     }
-/*
-**  Methods and properties of the pop up system
-*/
-
-    private _popUpTexture : AdvancedDynamicTexture;
-    private _popUpStack : StackPanel;
-    private _popUpLabel : TextBlock;
-    private _popUpCloseButton : Button;
 
 
+    /*
+    **  Methods and properties of the pop up system
+    */
 
-    showPopUp(message : string, enableButton: boolean = true) {
+    private _popUpTexture: AdvancedDynamicTexture;
+    private _popUpStack: StackPanel;
+    private _popUpLabel: TextBlock;
+    private _popUpCloseButton: Button;
+
+
+
+    showPopUp(message: string, enableButton: boolean = true) {
 
         this._popUpStack.isVisible = true;
         this._popUpCloseButton.isEnabled = enableButton;
@@ -126,8 +132,8 @@ class GameWorld {
         this._popUpStack.height = '200px';
         this._popUpStack.background = 'white';
         this._popUpStack.alpha = 0.8;
-        this._popUpStack.paddingBottom = '20px';        
-        
+        this._popUpStack.paddingBottom = '20px';
+
         this._popUpCloseButton = Button.CreateImageWithCenterTextButton('closeButton', 'Close', '');
         this._popUpCloseButton.width = '100px';
         this._popUpCloseButton.height = '40px';
@@ -143,21 +149,21 @@ class GameWorld {
         this._popUpLabel.height = '100px';
         this._popUpLabel.width = '300px';
         this._popUpLabel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        
+
         this._popUpStack.addControl(this._popUpLabel);
         this._popUpTexture.addControl(this._popUpStack);
         this._popUpStack.addControl(this._popUpCloseButton);
         this._popUpStack.isVisible = false;
     }
 
-/*
-**  Routines that interact with the livePLayers array and the local player
-*/
+    /*
+    **  Routines that interact with the livePLayers array and the local player
+    */
     getLivePlayers() {
         return this._livePlayers;
     }
 
-    setLivePlayers(u : any) {
+    setLivePlayers(u: any) {
         this._livePlayers = u;
     }
 
@@ -188,33 +194,33 @@ class GameWorld {
             console.log(`Player: ${player.user.name} already joined`);
             return;
         }
-    
+
         if (player && player.user.name !== this._playerData?.user.name) {
             console.log("Instancing mesh for ", player.user.name);
-    
+
             try {
                 const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
                 if (!assets) {
                     console.error('Failed to load player assets.');
                     return;
                 }
-    
+
                 let newPlayer: any = new RemotePlayer(assets, this._scene, player.user.name);
                 if (!newPlayer) {
                     console.error('Failed to instantiate RemotePlayer.');
                     return;
                 }
-    
+
                 this._livePlayers.push(newPlayer);
             } catch (error) {
                 console.error('Error during player spawning:', error);
             }
         }
     }
-    
 
-    removePlayer(playerToRemove : PlayerData) {
-        const playerIndex = this._livePlayers.findIndex( (p) => {
+
+    removePlayer(playerToRemove: PlayerData) {
+        const playerIndex = this._livePlayers.findIndex((p) => {
             return playerToRemove.user.name === p.name;
         })
         if (playerIndex != -1) {
@@ -234,8 +240,8 @@ class GameWorld {
         );
     }
 
-    makeRemotePlayerSay(m : Message) {
-        
+    makeRemotePlayerSay(m: Message) {
+
         let player = this._findLivePlayer(m.user.name);
         if (player) {
             player.say(m.text);
@@ -248,11 +254,11 @@ class GameWorld {
         return player;
     }
 
-    setLocalPlayerState(state : number) {
+    setLocalPlayerState(state: number) {
         this._player?.setState(state);
     }
 
-    apotheosis(name : string) {
+    apotheosis(name: string) {
         const player = this._findLivePlayer(name);
 
         if (player) {
@@ -260,9 +266,9 @@ class GameWorld {
         }
     }
 
-    stopApotheosis(name : string) {
+    stopApotheosis(name: string) {
         const player = this._findLivePlayer(name);
-        
+
         if (player) {
             player.hideFlamingSoul();
         }
@@ -283,9 +289,9 @@ class GameWorld {
         const SoulGlow = new GlowLayer("Glowing Souls", this._scene);
         SoulGlow.customEmissiveColorSelector = function (mesh, subMesh, material, result) {
             if (mesh.material?.name === "Flaming Soul") {
-              result.set(1, 1, 1, 0.6);
+                result.set(1, 1, 1, 0.6);
             } else {
-              result.set(0, 0, 0, 0);
+                result.set(0, 0, 0, 0);
             }
         }
     }
@@ -300,10 +306,11 @@ class GameWorld {
             });
             if (pickInfo!.hit) {
                 if (pickInfo?.pickedMesh?.metadata.type === 'Devil') {
-                    vueEmitter('storeRequest', {username : this._playerData!.user.name});
+                    document.dispatchEvent(shopEvent);
+                    vueEmitter('storeRequest', { username: this._playerData!.user.name });
                 }
                 else {
-                    vueEmitter('profileRequest', {name : pickInfo!.pickedMesh!.metadata.name});
+                    vueEmitter('profileRequest', { name: pickInfo!.pickedMesh!.metadata.name });
                 }
             }
         });
@@ -354,7 +361,8 @@ class GameWorld {
         this._engine.hideLoadingUI();
         this._scene.attachControl();
         this._setUpMaterials();
-        this._instanceNPCs();
+        await this._instanceNPCs();
+        this._setUpMusic();
     }
 
     private async _initializeGameAsync(scene: Scene): Promise<void> {
@@ -368,8 +376,29 @@ class GameWorld {
     private async _instanceNPCs() {
         /*curro*/
         const assets = await this._loadPlayerAssets(this._scene, false, 'humanoid.glb');
-        const curro = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
-        curro.updatePosition(new Vector3(0, -13, 0));
+        this._yellowDevil = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
+        this._yellowDevil.updatePosition(new Vector3(0, -13, 5));
+    }
+
+
+    private _setUpMusic() {
+        Engine.audioEngine!.useCustomUnlockedButton = true;
+        window.addEventListener('click', () => {
+            if (Engine.audioEngine!.unlocked) {
+                Engine.audioEngine!.unlock();
+            }
+        }, { once: true });
+
+        const overWorldTheme = new Sound("overworld theme", "/sounds/glassHarmonica.mp3", this._scene, null, {
+            loop: true,
+            autoplay: true,
+        });
+        const evilTheme = new Sound("Evil theme", "/sounds/shopMusic.mp3", this._scene, null, {
+            loop: true,
+            autoplay: true,
+        });
+
+        evilTheme.attachToMesh(this._yellowDevil);
     }
 
 
@@ -377,7 +406,7 @@ class GameWorld {
     ** Mesh loading
     */
 
-    private async _loadPlayerModel(scene: Scene, collisionMesh: Mesh | null, path : string) {
+    private async _loadPlayerModel(scene: Scene, collisionMesh: Mesh | null, path: string) {
 
         const importedMesh = await SceneLoader.ImportMeshAsync(null, "/3d/", path, scene);
         const body = importedMesh.meshes[0];
@@ -393,7 +422,7 @@ class GameWorld {
         return importedMesh;
     }
 
-    private async _loadPlayerAssets(scene: Scene, checkCollisions : boolean, modelPath : string) {
+    private async _loadPlayerAssets(scene: Scene, checkCollisions: boolean, modelPath: string) {
         //collision mesh
         const outer = MeshBuilder.CreateBox("outer", { width: 1, depth: 1, height: 1 }, scene);
         outer.isVisible = false;
@@ -416,7 +445,7 @@ class GameWorld {
     }
 }
 
-async function initializeMetaverse(metaSocket: Socket, vueEmitterCallback : (event : string, metadata : any) => void) {
+async function initializeMetaverse(metaSocket: Socket, vueEmitterCallback: (event: string, metadata: any) => void) {
     const metaverse = new Metaverse();
     vueEmitter = vueEmitterCallback;
     return metaverse;
