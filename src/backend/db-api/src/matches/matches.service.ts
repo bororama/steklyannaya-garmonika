@@ -12,6 +12,8 @@ import { MatchPointsDto } from './dtos/matchPoints.dto';
 
 @Injectable()
 export class MatchesService {
+    private readonly price = 50;
+
     constructor(
         @InjectModel(Match)
         private matchModel: typeof Match,
@@ -125,6 +127,17 @@ export class MatchesService {
                 }
             ]
         });
+    }
+
+    delete(matchId: number): Promise<void> {
+        return this.matchModel.destroy({
+            where: {
+                [Op.or]: [
+                    { id: matchId },
+                    { roomId: matchId }
+                ]
+            }
+        }).then();
     }
 
     getByRoomId(roomId: number): Promise<Match> {
@@ -313,7 +326,6 @@ export class MatchesService {
                 {
                     model: Player,
                     as: 'player1',
-                    attributes: ['id'],
                     include: [
                         {
                             model: User
@@ -323,7 +335,6 @@ export class MatchesService {
                 {
                     model: Player,
                     as: 'player2',
-                    attributes: ['id'],
                     include: [
                         {
                             model: User
@@ -369,8 +380,10 @@ export class MatchesService {
             match.winnerId = winnerId;
         }
         match.player1.user.status = UserStatus[UserStatus.online];
+        await match.player1.save();
         await match.player1.user.save();
         match.player2.user.status = UserStatus[UserStatus.online];
+        await match.player2.save();
         await match.player2.user.save();
         match.pointsPlayer1 = matchInfo.pointsPlayer1;
         match.pointsPlayer2 = matchInfo.pointsPlayer2;
@@ -449,11 +462,13 @@ export class MatchesService {
                 match.winnerId = match.idPlayer1;
                 match.player1.wins += 1;
                 match.player2.defeats += 1;
+                match.player1.user.franciscoins += this.price;
             }
             else {
                 match.winnerId = match.idPlayer2;
                 match.player2.wins += 1;
                 match.player1.defeats += 1;
+                match.player2.user.franciscoins += this.price;
             }
         }
         match.pointsPlayer1 = matchInfo.pointsPlayer1;

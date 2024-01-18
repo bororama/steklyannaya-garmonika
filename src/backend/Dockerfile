@@ -21,4 +21,4 @@ RUN npm run build
 EXPOSE 3000
 
 # start the server in development mode
-CMD [ "npm", "run", "start:dev" ]
+CMD [ "nest", "start", "--watch" ]
