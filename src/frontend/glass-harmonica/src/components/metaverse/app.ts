@@ -58,7 +58,8 @@ class GameWorld {
         this._canvas = this._createCanvas();
         this._metaSocket = metaSocket;
         // initialize babylon scene and engine
-        this._engine = new Engine(this._canvas, true);
+        this._engine = new Engine(this._canvas, false);
+        this._engine.setHardwareScalingLevel(6);
         this._scene = new Scene(this._engine);
         this._playerData = playerData,
         this._player = null;
