@@ -4,8 +4,8 @@ import { InjectModel } from '@nestjs/sequelize'
 
 @Injectable()
 export class TiendaService {
-  private readonly pearlPrice : number = 10;
-  private readonly necklacePrice : number = 30;
+  private readonly pearlPrice : number = 1;
+  private readonly necklacePrice : number = 2;
 
   constructor (
     private userService : UsersService
