@@ -1,11 +1,12 @@
 <style>
-  canvas {
+  #metaverse {
     position: absolute;
     left: 0;
-    top: 100px;
-    height: calc(50% - 100px);
-    width: 100%;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
     background-color: rgba(0,0,0,0);
+	image-rendering: pixelated;
   }
   span, button {
     font: 12pt Arial;
