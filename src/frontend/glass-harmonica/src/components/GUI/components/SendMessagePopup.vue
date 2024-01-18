@@ -39,9 +39,24 @@ export default {
 	width: 100vw;
 	height: 100vh;
 	position:absolute;
-	background-color: #bbbbbbdd;
 	top: 0;
 	left:0;
+    z-index: 9;
+    background : url('/GUI_assets/pattern.png');
+    background-repeat: repeat;
+    background-size: 15%;
+    padding: 32px;
+}
+
+.overlay::before{
+    content: '';
+    background: radial-gradient(circle, rgba(246,246,0,0.27493004037552526) 4%, rgba(255,73,0,0.4429972672662815) 29%, rgba(255,214,0,0.43459390592174374) 73%, rgba(192,0,255,0.49341743533350846) 100%);
+    width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+    z-index: -1;
 }
 
 .send_popup_background {

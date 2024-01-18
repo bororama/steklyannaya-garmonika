@@ -291,9 +291,7 @@ class GameWorld {
 
     private _createCanvas(): HTMLCanvasElement {
         let canvas = document.createElement("canvas");
-        canvas.style.width = "100%";
-        canvas.style.height = "50%";
-        canvas.id = "canvas";
+        canvas.id = "metaverse";
         canvas.addEventListener('click', (e) => {
             const ray = this._scene.createPickingRay(this._scene.pointerX, this._scene.pointerY, Matrix.Identity(), this._scene.activeCamera);
             const pickInfo = this._scene.pickWithRay(ray, (m) => {
