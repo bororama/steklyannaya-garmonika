@@ -7,11 +7,11 @@ export class ChatUserDto extends PublicUserDto {
     isOwner: boolean;
     isBanned: boolean;
 
-    constructor (chatInfo: ChatUsers) {
+    constructor (chatInfo: ChatUsers, isBanned: boolean) {
         super(chatInfo.user);
         this.isAdmin = chatInfo.isAdmin;
         this.isMuted = chatInfo.isMuted;
         this.isOwner = chatInfo.isOwner;
-        this.isBanned = chatInfo.isBanned;
+        this.isBanned = isBanned;
     }
 }

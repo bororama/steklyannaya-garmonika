@@ -1,9 +1,9 @@
-import { BadRequestException, Body, Controller, Delete, Get, Logger, Param, ParseIntPipe, Post, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
 import { AdminsService } from "./admins.service";
 import { Admin } from "./admin.model";
 import { UserDto } from "../users/dto/user.dto";
 import { NewUser } from "../users/dto/new-user.dto";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiTags, ApiBody } from "@nestjs/swagger";
 import { BansService } from "../bans/bans.service";
 import { PlayersService } from "../users/services/players.service";
 import { PlayerBanStatusDto } from "../users/dto/player-banstatus.dto";
@@ -12,6 +12,7 @@ import { ChatDto } from "../chat/dto/chat.dto";
 import { ChatService } from "../chat/services/chat.service";
 import { ChatUserDto } from "../users/dto/chat-user.dto";
 import { ChatWithUsernamesDto } from "../chat/dto/chat-usernames.dto";
+import { PublicUserDto } from "../users/dto/public-user.dto";
 
 @Controller('admins')
 @ApiTags('Admins')
@@ -92,23 +93,23 @@ export class AdminsController {
 
     @Get('/getChatMembers/:chatId')
     async getChatMembers(@Param('chatId', ParseIntPipe) id: number): Promise<ChatUserDto[]> {
-        return this.chatService.getChatUsers(id)
-            .then(users => users
-                .map(u => new ChatUserDto(u)));
+        const users = await this.chatService.getChatUsers(id);
+        const bans = await this.chatService.getBansMembers(id, users);
+        return users.map(u => new ChatUserDto(u, bans.find(b => b.userId == u.userId) !== undefined));
     }
 
     @Get('/getChatAdmins/:chatId')
     async getChatAdmins(@Param('chatId', ParseIntPipe) id: number): Promise<ChatUserDto[]> {
         return this.chatService.getAdmins(id)
             .then(users => users
-                .map(u => new ChatUserDto(u)));
+                .map(u => new ChatUserDto(u, false)));
     }
 
     @Get('/getChatBans/:chatId')
-    async getChatBans(@Param('chatId', ParseIntPipe) id: number): Promise<ChatUserDto[]> {
+    async getChatBans(@Param('chatId', ParseIntPipe) id: number): Promise<PublicUserDto[]> {
         return this.chatService.getBans(id)
             .then(users => users
-                .map(u => new ChatUserDto(u)));
+                .map(u => new PublicUserDto(u.user)));
     }
 
     @Post('/chatOptions/:chatId/raiseToAdmin/:usernameOrId')
@@ -117,7 +118,7 @@ export class AdminsController {
         if (!chat) {
             throw new BadRequestException("Chat doesn't exist");
         }
-        await this.chatService.raiseRevokeChatAdmin(chat, user, true);
+        return this.chatService.raiseRevokeChatAdmin(chat, user, true);
     }
 
     @Post('/chatOptions/:chatId/revokeAdmin/:usernameOrId')
@@ -130,21 +131,22 @@ export class AdminsController {
     }
 
     @Post('/chatOptions/:chatId/ban/:usernameOrId')
-    async banUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
+    @ApiBody({ type: 'number', required: true })
+    async banUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string, @Body('time', ParseIntPipe) time: number): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
             throw new BadRequestException("Chat doesn't exist");
         }
-        await this.chatService.changeBanOrMuteStatus(chat, user, true, true);
+        return this.chatService.banUser(chat, user, time);
     }
 
     @Post('/chatOptions/:chatId/unban/:usernameOrId')
-    async unBanUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
+    async unBanUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId', ParseIntPipe) user: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
             throw new BadRequestException("Chat doesn't exist");
         }
-        await this.chatService.changeBanOrMuteStatus(chat, user, false, true);
+        return this.chatService.unBanUser(chat, user);
     }
 
     @Post('/chatOptions/:chatId/mute/:usernameOrId')
@@ -153,7 +155,7 @@ export class AdminsController {
         if (!chat) {
             throw new BadRequestException("Chat doesn't exist");
         }
-        await this.chatService.changeBanOrMuteStatus(chat, user, true, false);
+        return this.chatService.changeMuteStatus(chat, user, true);
     }
 
     @Post('/chatOptions/:chatId/unmute/:usernameOrId')
@@ -162,7 +164,7 @@ export class AdminsController {
         if (!chat) {
             throw new BadRequestException("Chat doesn't exist");
         }
-        await this.chatService.changeBanOrMuteStatus(chat, user, false, false);
+        return this.chatService.changeMuteStatus(chat, user, false);
     }
 
     // This must be the last function declared in the controller.

@@ -9,6 +9,7 @@ import { ChatDto } from '../dto/chat.dto';
 import { Friendship } from '../../users/models/friendship.model';
 import { MessageService } from './message.service';
 import { Message } from '../models/message.model';
+import { ChatBans } from '../../chat-user/models/chatBan.model';
 
 @Injectable()
 export class ChatService {
@@ -18,6 +19,8 @@ export class ChatService {
         private chatModel: typeof Chat,
         @InjectModel(ChatUsers)
         private chatUserModel: typeof ChatUsers,
+        @InjectModel(ChatBans)
+        private chatBansModel: typeof ChatBans,
         private readonly userService: UsersService,
         private readonly messageService: MessageService
     ) {}
@@ -42,6 +45,12 @@ export class ChatService {
             throw new BadRequestException('User doesn\'t exists');
         }
 
+        const necklaceSpend: boolean = await this.userService.subtractNecklaceFromUser(creator, 1);
+
+        if (!necklaceSpend) {
+            throw new ForbiddenException('Not enought necklaces');
+        }
+
         const chat: Chat = await this.chatModel.create({
             password: (password ? this.hashPassword(password) : null)
         });
@@ -54,7 +63,7 @@ export class ChatService {
         });
 
         chatUser.user = creator;
-        return new ChatDto(chat, [chatUser]);
+        return new ChatDto(chat, [chatUser], []);
     }
 
     async createFriendshipChat(user: User, friend: User, friendship: Friendship): Promise<Chat> {
@@ -201,14 +210,14 @@ export class ChatService {
             where: {
                 userId: userId,
                 chatId: chatId,
-            }
+            },
         });
         if (!userChatRelation)
         {
             throw new BadRequestException('Requester doesn\'t belong to chat');
         }
 
-        return (userChatRelation.isAdmin && !userChatRelation.isBanned);
+        return (userChatRelation.isAdmin && await this.isBannedId(userChatRelation.chatId, userChatRelation.userId));
     }
 
     async changePrivileges(id: number, chatAdmin: string, user: string, admin: boolean): Promise<void> {
@@ -256,7 +265,7 @@ export class ChatService {
         userChatRelation.save();
     }
 
-    async setBanOrMuteStatus(id: number, chatAdmin: string, user: string, status: boolean, ban: boolean): Promise<void> {
+    async setMuteStatus(id: number, chatAdmin: string, user: string, status: boolean): Promise<void> {
         const chat: Chat = await this.chatModel.findOne({
             attributes: ['id'],
             where: {
@@ -270,13 +279,45 @@ export class ChatService {
         if (!await this.isAdmin(chatAdmin, id)) {
             throw new BadRequestException('Requester is not a chat administrator');
         }
-        
-        if (ban) {
-            await this.changeBanOrMuteStatus(chat, user, status, ban);
-        }
+
+        await this.changeMuteStatus(chat, user, status);
     }
 
-    async changeBanOrMuteStatus(chat: Chat, user: string, status: boolean, ban: boolean)
+    async chatAdminBanUser(id: number, chatAdmin: string, user: string, minutes: number): Promise<void> {
+        const chat: Chat = await this.chatModel.findOne({
+            attributes: ['id'],
+            where: {
+                id: id
+            }
+        });
+        if (!chat) {
+            throw new BadRequestException('Chat doesn\'t exists');
+        }
+
+        if (!await this.isAdmin(chatAdmin, id)) {
+            throw new BadRequestException('Requester is not a chat administrator');
+        }
+        this.banUser(chat, user, minutes);
+    }
+
+    async chatAdminUnbanUser(id: number, chatAdmin: string, user: string): Promise<void> {
+        const chat: Chat = await this.chatModel.findOne({
+            attributes: ['id'],
+            where: {
+                id: id
+            }
+        });
+        if (!chat) {
+            throw new BadRequestException('Chat doesn\'t exists');
+        }
+
+        if (!await this.isAdmin(chatAdmin, id)) {
+            throw new BadRequestException('Requester is not a chat administrator');
+        }
+        this.unBanUser(chat, user);
+    }
+
+    async changeMuteStatus(chat: Chat, user: string, status: boolean)
     {
         const userId: number = await this.userService.userExists(user);
         if (!userId) {
@@ -293,23 +334,121 @@ export class ChatService {
             throw new ForbiddenException('User doesn\'t belong to chat');
         }
         else if (userChatRelation.isOwner) {
-            throw new BadRequestException('You can\'t ban the chat owner');
+            throw new BadRequestException('You can\'t mute the chat owner');
         }
 
         if (chat.isPrivateChat) {
-            throw new BadRequestException('You can\'t ban or mute a user in a private chat');
-        }
-
-        if (ban) {
-            userChatRelation.isBanned = status;
-        } else {
-            userChatRelation.isMuted = status;
+            throw new BadRequestException('You can\'t mute a user in a private chat');
         }
 
         if (userChatRelation.isAdmin && !status) {
             userChatRelation.isAdmin = false;
         }
+        userChatRelation.isMuted = status;
         userChatRelation.save();
+    }
+
+    async banUser(chat: Chat, user: string, minutes: number)
+    {
+        const userId: number = await this.userService.userExists(user);
+        if (!userId) {
+            throw new BadRequestException('User doesn\'t exists');
+        }
+
+        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
+            where: {
+                userId: userId,
+                chatId: chat.id,
+            }
+        });
+
+        if (userChatRelation && userChatRelation.isOwner) {
+            throw new BadRequestException('You can\'t ban the chat owner');
+        }
+
+        if (chat.isPrivateChat) {
+            throw new BadRequestException('You can\'t mute a user in a private chat');
+        }
+
+        if (userChatRelation && userChatRelation.isAdmin) {
+            userChatRelation.isAdmin = false;
+        }
+
+        const ban = await this.chatBansModel.findOne({
+            where: {
+                chatId: chat.id,
+                userId: userId
+            }
+        })
+
+        let banEnd = new Date(new Date().getTime() + minutes * 60000);
+
+        if (ban) {
+            ban.endDate = banEnd;
+            await ban.save();
+        }
+        else {
+            this.chatBansModel.create({
+                chatId: chat.id,
+                userId: userId,
+                endDate: banEnd
+            });
+        }
+    }
+
+    async unBanUser(chat: Chat, user: string)
+    {
+        const userId: number = await this.userService.userExists(user);
+        if (!userId) {
+            throw new BadRequestException('User doesn\'t exists');
+        }
+
+        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
+            where: {
+                userId: userId,
+                chatId: chat.id,
+            }
+        });
+
+        if (chat.isPrivateChat) {
+            throw new BadRequestException('You can\'t mute a user in a private chat');
+        }
+
+        this.chatBansModel.destroy({
+            where: {
+                chatId: chat.id,
+                userId: userId,
+            }
+        });
+    }
+
+    async isBanned(chat: Chat, user: string): Promise<boolean> {
+        const now = new Date();
+        const userId: number = await this.userService.userExists(user);
+        if (!userId) {
+            throw new BadRequestException('User doesn\'t exists');
+        }
+
+        const ban = await this.chatBansModel.findOne({
+            where: {
+                chatId: chat.id,
+                userId: userId
+            }
+        });
+        return (ban && ban.endDate > now);
+    }
+
+    async isBannedId(chatId: number, userId: number): Promise<boolean>
+    {
+        const now = new Date();
+
+        const ban = await this.chatBansModel.findOne({
+            where: {
+                chatId: chatId,
+                userId: userId
+            }
+        });
+        return (ban && ban.endDate > now);
     }
 
     async getAdmins(id: number): Promise<ChatUsers[]> {
@@ -324,14 +463,23 @@ export class ChatService {
         });
     }
 
-    async getBans(id: number): Promise<ChatUsers[]> {
-        return this.chatUserModel.findAll({
+    async getBans(id: number): Promise<ChatBans[]> {
+        return this.chatBansModel.findAll({
             where: {
                 chatId: id,
-                isBanned: true
             },
             include: {
                 model: User
+            }
+        });
+    }
+
+    async getBansMembers(id: number, users: ChatUsers[]): Promise<ChatBans[]> {
+        const userIds = users.map(u => u.userId);
+        return this.chatBansModel.findAll({
+            where: {
+                chatId: id,
+                usersId: users
             }
         });
     }
