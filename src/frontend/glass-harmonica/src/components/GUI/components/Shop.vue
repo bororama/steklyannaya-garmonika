@@ -14,7 +14,7 @@
           <img src="../../../../public/items/collar.png" class="mini">
         </div>
         <div class="button-container">
-          <button class="fa_button" @click="buyNecklace">4 FC</button>
+          <button class="fa_button" @click="buyNecklace">2 FC</button>
         </div>
       </div>
       <div class="collar">
@@ -22,7 +22,7 @@
           <img src="../../../../public/items/perla.png" class="mini">
         </div>
         <div class="button-container">
-          <button class="fa_button" @click="buyPearl">FC</button>
+          <button class="fa_button" @click="buyPearl">1 FC</button>
         </div>
       </div>
     </div>
@@ -38,8 +38,7 @@ import { backend, getRequestParams, postRequestParams } from './connect_params'
         return {
           data: true,
           coins: 0,
-          necklaces: 0,
-          pearls: 0,
+
           text: "Welcome",
           texts: [],
         };
@@ -58,6 +57,9 @@ import { backend, getRequestParams, postRequestParams } from './connect_params'
 
       },
       methods: {
+        notEnoughCoins(){
+          return ("Not enough franciscoins, manín");
+        },
         randomText(){
           this.text = this.texts[Math.floor(Math.random()* this.texts.length)];
         },
@@ -72,20 +74,34 @@ import { backend, getRequestParams, postRequestParams } from './connect_params'
         })
         },
         buyNecklace() {
-          fetch(backend + '/tienda/buyNecklace/' + globalThis.id, postRequestParams);
-          setTimeout(() => {
-            this.updateInfo();
-          }, 50);
-          this.randomText();
-          console.log("Buying a necklace");
+          fetch(backend + '/tienda/buyNecklace/' + globalThis.id, postRequestParams).then((answer) => {
+            answer.text().then((status) => {
+              if (status == 'ok'){
+                setTimeout(() => {
+                  this.updateInfo();
+                }, 50);
+                this.randomText();
+                console.log("Buying a necklace");        
+              }
+              else
+                this.text = this.notEnoughCoins();
+            })
+          });
         },
         buyPearl() {
-          fetch(backend + '/tienda/buyPearl/' + globalThis.id, postRequestParams);
-          setTimeout(() => {
-              this.updateInfo();
-          }, 50);
-          this.randomText();
-          console.log("Buying a pearl");
+          fetch(backend + '/tienda/buyPearl/' + globalThis.id, postRequestParams).then((answer) => {
+            answer.text().then((status) => {
+              if (status == 'ok'){
+                setTimeout(() => {
+                  this.updateInfo();
+                }, 50);
+                this.randomText();
+                console.log("Buying a pearl");        
+              }
+              else
+                this.text = this.notEnoughCoins();
+            })
+          });
         },
       },
     };
