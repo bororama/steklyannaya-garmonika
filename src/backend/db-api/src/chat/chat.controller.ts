@@ -8,6 +8,7 @@ import { ChatUserDto } from '../users/dto/chat-user.dto';
 import { MessageService } from './services/message.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { Message } from './models/message.model';
+import { PublicUserDto } from '../users/dto/public-user.dto';
 
 @Controller('chats')
 @ApiTags("Chats")
@@ -41,7 +42,9 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
         this.chatService.validatePassword(chat, credentials?.password)
-        return this.chatService.getChatUsers(id).then(users => users.map(u => new ChatUserDto(u)));
+        const users = await this.chatService.getChatUsers(id);
+        const bans = await this.chatService.getBansMembers(id, users);
+        return users.map(u => new ChatUserDto(u, bans.find(b => b.userId == u.userId) !== undefined));
     }
 
     @Post(':id/admins')
@@ -56,7 +59,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
         this.chatService.validatePassword(chat, credentials?.password)
-        return this.chatService.getAdmins(+id).then(users => users.map(u => new ChatUserDto(u)));
+        return this.chatService.getAdmins(+id).then(users => users.map(u => new ChatUserDto(u, false)));
     }
 
     @Post(':id/bans')
@@ -65,13 +68,13 @@ export class ChatController {
         summary: 'Get the banned users of this chat',
         description: 'This endpoint will send you a list of users are banned in this chat. Password may be required.'
     })
-    async getBanned(@Param('id', ParseIntPipe) id: number, @Body() credentials?: CreateChatDto): Promise<ChatUserDto[]> {
+    async getBanned(@Param('id', ParseIntPipe) id: number, @Body() credentials?: CreateChatDto): Promise<PublicUserDto[]> {
         const chat: Chat = await this.chatService.findOne(id);
         if (chat  == null) {
             throw new BadRequestException('Chat doesn\'t exists');
         }
         this.chatService.validatePassword(chat, credentials?.password)
-        return this.chatService.getBans(+id).then(users => users.map(u => new ChatUserDto(u)));
+        return this.chatService.getBans(+id).then(users => users.map(u => new PublicUserDto(u.user)));
     }
 
     @Post('new/:user')
@@ -169,8 +172,8 @@ This only can be done by an operator'
         summary: 'Ban a user of a chat',
         description: 'This endpoint will ban any user of a chat. If the user was an Admin that privileges will be revoked.'
     })
-    banUser(@Param('id', ParseIntPipe) id: number, @Param('admin') admin: string, @Param('user') user: string): Promise<void> {
-        return this.chatService.setBanOrMuteStatus(id, admin, user, true, true);
+    async banUser(@Param('id', ParseIntPipe) id: number, @Param('admin') admin: string, @Param('user') user: string, @Body('time', ParseIntPipe) time: number): Promise<void> {
+        return this.chatService.chatAdminBanUser(id, admin, user, time);
     }
 
     @Post(':id/admins/:admin/unban/:user')
@@ -180,7 +183,7 @@ This only can be done by an operator'
         description: 'This endpoint will unban a user of a chat.'
     })
     unBanUser(@Param('id', ParseIntPipe) id: number, @Param('admin') admin: string, @Param('user') user: string): Promise<void> {
-        return this.chatService.setBanOrMuteStatus(id, admin, user, false, true);
+        return this.chatService.chatAdminUnbanUser(id, admin, user);
     }
 
     @Post(':id/admins/:admin/mute/:user')
@@ -190,7 +193,7 @@ This only can be done by an operator'
         description: 'This endpoint will mute any user of a chat. If the user was an Admin that privileges will be revoked.'
     })
     muteUser(@Param('id', ParseIntPipe) id: number, @Param('admin') admin: string, @Param('user') user: string): Promise<void> {
-        return this.chatService.setBanOrMuteStatus(id, admin, user, true, false);
+        return this.chatService.setMuteStatus(id, admin, user, true);
     }
 
     @Post(':id/admins/:admin/unmute/:user')
@@ -200,7 +203,7 @@ This only can be done by an operator'
         description: 'This endpoint will unmute a user of a chat.'
     })
     unMuteUser(@Param('id', ParseIntPipe) id: number, @Param('admin') admin: string, @Param('user') user: string): Promise<void> {
-        return this.chatService.setBanOrMuteStatus(id, admin, user, false, false);
+        return this.chatService.setMuteStatus(id, admin, user, false);
     }
     
     @Delete(':id')

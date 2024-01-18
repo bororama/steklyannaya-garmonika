@@ -1,15 +1,23 @@
 import { Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { TiendaService } from "./tienda.service"
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags('Shop')
 @Controller('tienda')
 export class TiendaController {
     constructor (
       private readonly tiendaService : TiendaService
     ) {}
 
-  @Post("/buyPearls/:idOrUsername")
+  @Post("/buyPearl/:idOrUsername")
   async buyPearl(@Param('idOrUsername') user : string) : Promise<string> {
-    return this.tiendaService.buyPearl(user)
+    return this.tiendaService.buyPearl(user);
+  }
+
+  @Post("/buyNecklace/:idOrUsername")
+  async buyNecklace(@Param('idOrUsername') user : string) : Promise<string> {
+    return this.tiendaService.buyNecklace(user);
   }
 
   @Post("/giveCoins/:idOrUsername/:coins")

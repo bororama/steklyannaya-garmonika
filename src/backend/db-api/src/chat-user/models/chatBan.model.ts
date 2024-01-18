@@ -3,7 +3,7 @@ import { User } from "../../users/models/user.model";
 import { Chat } from "../../chat/models/chat.model";
 
 @Table
-export class ChatUsers extends Model {
+export class ChatBans extends Model {
     @PrimaryKey
     @ForeignKey(() => User)
     @Column
@@ -23,19 +23,6 @@ export class ChatUsers extends Model {
     @BelongsTo(() => Chat)
     chat: Chat
 
-    @Default(false)
     @Column
-    isAdmin: boolean;
-
-    @Default(false)
-    @Column
-    isOwner: boolean;
-
-    @Default(false)
-    @Column
-    isMuted: boolean;
-
-    @Default(Sequelize.literal('CURRENT_TIMESTAMP'))
-    @Column
-    lastMsgReadDate: Date;
+    endDate: Date;
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, ParseIntPipe, Body, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, ParseIntPipe, Body, ValidationPipe } from '@nestjs/common';
 import { Match } from './models/match.model';
 import { MatchesService } from './matches.service';
 import { MatchAndUsersDto } from './dtos/matchWithUsers.dto';
@@ -93,5 +93,10 @@ export class MatchesController {
     @Get('/room/:roomId')
     getMatchByRoomId(roomId: number): Promise<MatchAndUsersDto> {
         return this.matchService.getByRoomId(roomId).then(match => new MatchAndUsersDto(match));
+    }
+
+    @Delete('/:idOrRoomId')
+    deleteMatch(@Param('idOrRoomId', ParseIntPipe) matchId: number): Promise<void> {
+        return this.matchService.delete(matchId);
     }
 }
