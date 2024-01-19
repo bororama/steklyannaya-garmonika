@@ -359,12 +359,12 @@ export class PlayersService {
             attributes: ['wins', 'defeats'],
             include: {
                 model: User,
-                attributes: ['userName']
+                attributes: ['userName'],
+                order: [
+                    ['necklaces', 'ASC'],
+                    ['pearls', 'ASC'],
+                ]
             },
-            order: [
-                ['wins', 'DESC'],
-                ['defeats', 'ASC'],
-            ]
         });
     }
 
