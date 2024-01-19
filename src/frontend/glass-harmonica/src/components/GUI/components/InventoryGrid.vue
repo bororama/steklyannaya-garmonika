@@ -79,9 +79,8 @@ export default {
                       if (!is_blocked)
                       { 
                         let pearl = generate_pearl(globalThis.id, friends[friend].name)
+                        pearl.chat_id = friends[friend].chat
                         let glow = 'none'
-//                        if (matches.status == 200)
-  //                      {
                           for (const match in matches) {
                             const m = matches[match]
                             if (m.endDate == null && (m.player1.id == friends[friend].id || m.player2.id == friends[friend].id || m.player1.name == friends[friend].id|| m.player2.name == friends[friend].id)) {
@@ -95,7 +94,6 @@ export default {
                             pearl.options.unshift({"text": "PONG!", "action": "go_to_pong_match"})
                             pearl.description = pearl.match_description
                           }
-    //                    }
                         this.friends.push(pearl)
                       }
                     }

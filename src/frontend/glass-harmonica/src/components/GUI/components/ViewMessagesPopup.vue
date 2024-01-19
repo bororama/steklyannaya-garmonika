@@ -13,9 +13,19 @@
 </template>
 
 <script>
+
+import { backend, getRequestParams, postRequestParams } from './connect_params'
 export default {
 	name: "ViewMessagesPopup",
-	props: ['target', 'messages', 'user'],
+	props: ['chatId', 'user'],
+    data () {
+      return ({
+        messages: []
+      })
+    },
+    created () {
+      this.getMessages()
+    },
 	methods: {
 
 		beforeEnter: function (el) {
@@ -25,22 +35,14 @@ export default {
 			el.style.opacity = '100%';
 		},
 		getMessages() {
-			try {
-				fetch ("http://localhost:4242/receive_messages?"+ new URLSearchParams({
-						recipient:this.user
-				})).then((result) => {
-					result.text().then((t) => {
-						const json = JSON.parse(t);
-						let messages_array = [];
-						for (let row in json) {
-							messages_array.push(json[row].message);
-						}
-						this.view_messages = messages_array;
-					});
-				});
-			} catch (e) {
-				console.log(e)
-			}
+          fetch (backend + '/chats/' +  this.chatId + '/getMessages/' + this.user, postRequestParams).then((a) => {
+            a.json().then((messages) => {
+              console.log(messages)
+               for (const m in messages) {
+                 this.messages.push(messages[m].message)
+               }
+            })
+          }) 
 		}
 	}
 }

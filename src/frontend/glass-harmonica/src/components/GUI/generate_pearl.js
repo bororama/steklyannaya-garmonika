@@ -14,6 +14,7 @@ export default function generate_pearl(sender, target) {
 		"sender": sender,
 		"glow": 'none',
         "match_id": null,
+        "chat_id": 0,
 		"description": "A close remainder of the most important thing in life. It has a faint glow. You are able to distinguish a vaguely human form inside of it. Someone important to you. If you listen attentively a voice seems to be coming out of it.",
 		"match_description": "The pearl glows angrily",
 		"base_description": "A close remainder of the most important thing in life. It has a faint glow. You are able to distinguish a vaguely human form inside of it. Someone important to you. If you listen attentively a voice seems to be coming out of it."

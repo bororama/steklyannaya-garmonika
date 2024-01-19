@@ -11,22 +11,21 @@
 </template>
 
 <script>
+
+import { backend, postRequestParams } from './connect_params'
 export default {
-	props: ['target', 'sender'],
+	props: ['chat_id', 'sender'],
 	data: () => ({
 		message_text_component: ""
 	}),
 	methods:{
 		send_message() {
-			try {
-				fetch ("http://localhost:4242/send_message?" + new URLSearchParams({
-					sender: this.sender,
-					target: this.target,
-					text: this.message_text_component
-				}));
-			} catch (e) {
-				console.log(e);
-			}
+            let param = postRequestParams
+
+            param.body = JSON.stringify({
+              "message": this.message_text_component
+            })
+            fetch (backend + '/chats/' + this.chat_id + '/sendMessage/' + this.sender, param)
 			this.$emit('close_interaction');
 		}
 	}
@@ -35,30 +34,6 @@ export default {
 </script>
 
 <style>
-.overlay {
-	width: 100vw;
-	height: 100vh;
-	position:absolute;
-	top: 0;
-	left:0;
-    z-index: 9;
-    background : url('/GUI_assets/pattern.png');
-    background-repeat: repeat;
-    background-size: 15%;
-    padding: 32px;
-}
-
-.overlay::before{
-    content: '';
-    background: radial-gradient(circle, rgba(246,246,0,0.27493004037552526) 4%, rgba(255,73,0,0.4429972672662815) 29%, rgba(255,214,0,0.43459390592174374) 73%, rgba(192,0,255,0.49341743533350846) 100%);
-    width: 100vw;
-	height: 100vh;
-	position:absolute;
-	top: 0;
-	left:0;
-    z-index: -1;
-}
-
 .send_popup_background {
 	width: 45vw;
 	height: 15vh;

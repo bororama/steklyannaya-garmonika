@@ -11,6 +11,7 @@ import {
 import { Logger } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
 import { ServerToClientEvents, ClientToServerEvents, Message, Player, LiveClient, User } from "./shared/meta.interface"
+import { UsersService } from '../users/services/users.service';
 
 const liveClients : Array<LiveClient> = Array();
 let clientLocator : number = 0;
@@ -21,9 +22,12 @@ let clientLocator : number = 0;
   },
 })
 
+
 export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
   
   private logger : Logger = new Logger("MetaverseGateway");
+
+  constructor (private usersService : UsersService) {}
 
 
   @WebSocketServer()
@@ -42,6 +46,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     console.log("connection end");
     const i : number = liveClients.findIndex((c) => { return c.socket === client})
     const disconnectedPlayer : Player = liveClients[i].player;
+    this.usersService.setOnlineStatus(liveClients[i].player.user.name, false)
     liveClients.splice(i, 1);
     this.server.emit('playerLeft', disconnectedPlayer);
   }
@@ -76,6 +81,9 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
 		});
     socket.emit('welcomePack', {newPlayer, livePlayers});
     socket.broadcast.emit('newPlayer', {retries : 0, player : newPlayer});
+
+    this.usersService.setOnlineStatus(payload, true);
+
     return `You sent : userData ${ payload }`;
   }
   
