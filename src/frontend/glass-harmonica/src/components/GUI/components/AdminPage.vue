@@ -1,17 +1,19 @@
 <template>
 
-<h1>ADMIN PAGE</h1>
+<div class="overlay">
+  <h1>ADMIN PAGE</h1>
 
-<div class="admin_page_columns_container">
-    <div class="admin_page_column" id="user_ban">
-        <h3>Users</h3>
-        <User v-for="(user,index) in users" :key="index" :user="user"/>
-    </div>
+  <div class="admin_page_columns_container">
+      <div class="admin_page_column" id="user_ban">
+          <h3>Users</h3>
+          <User v-for="(user,index) in users" :key="index" :user="user"/>
+      </div>
 
-    <div class="admin_page_column" id="user_ban">
-        <h3>Channels</h3>
-        <Channel v-for="(channel,index) in channels" :key="index" :channel="channel"/>
-    </div>
+      <div class="admin_page_column" id="user_ban">
+          <h3>Channels</h3>
+          <Channel v-for="(channel,index) in channels" :key="index" :channel="channel"/>
+      </div>
+  </div>
 </div>
 </template>
 
