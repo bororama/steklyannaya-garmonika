@@ -1,6 +1,5 @@
 <template>
-    <Shop/>
-    <!--<ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
+    <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
     <button v-if='!in_metaverse && profile_state != "no" && profile_state != "registering"' @click="close_profile" class="fa_button">Close Profile</button>
     <button v-if='!in_metaverse && in_admin_page' @click="close_admin_page" class="fa_button">Close Admin</button>
     <ProfilePage v-if="profile_state != 'no'" :display_status="profile_state" :register_token="register_token" :auto_image="auto_image" @successful_register="go_to_metaverse"/>
@@ -10,7 +9,7 @@
     <AdminPage v-if="in_admin_page"/>
     <button class="fa_button float_right" v-if='in_metaverse && profile_state === "no"' @click="open_admin_page">AdminPage</button>
     <AlreadyConnected v-if="false"/>
-    <Home/>-->
+    <Home/>
 
 </template>
 

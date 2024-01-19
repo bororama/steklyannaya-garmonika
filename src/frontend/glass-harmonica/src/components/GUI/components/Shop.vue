@@ -1,29 +1,23 @@
 <template>
-  <div>
+  <div class="global">
     <h1>متجر فرانسيسكو خيسوس دي جاتا إي فالديس</h1>
     <div>
-      <img src="../../../../public/items/ShopPlaceholder.jpeg" class="image">
-      {{ text }}
+      <img src="../../../../public/items/ShopPlaceholder.jpg" class="image">
+      <br>{{ text }}
     </div>
     <div class="shop">
-      <div class="coins-container">
+      <div class="items">
+        <div class="pearl">
+            <img src="../../../../public/items/collar.png" class="mini">
+            <button class="fa_button" @click="buyNecklace">2 FC</button>
+        </div>
+        <div class="collar">
+            <img src="../../../../public/items/perla.png" class="mini">
+            <button class="fa_button" @click="buyPearl">1 FC</button>
+        </div>
+    </div>
+    <div class="coins-container">
         {{ coins }} x <img class="mini" src="../../../../public/items/franciscoin.png">
-      </div>
-      <div class="pearl">
-        <div class="item-container">
-          <img src="../../../../public/items/collar.png" class="mini">
-        </div>
-        <div class="button-container">
-          <button class="fa_button" @click="buyNecklace">2 FC</button>
-        </div>
-      </div>
-      <div class="collar">
-        <div class="item-container">
-          <img src="../../../../public/items/perla.png" class="mini">
-        </div>
-        <div class="button-container">
-          <button class="fa_button" @click="buyPearl">1 FC</button>
-        </div>
       </div>
     </div>
   </div>
@@ -39,26 +33,29 @@ import { backend, getRequestParams, postRequestParams } from './connect_params'
           data: true,
           coins: 0,
 
-          text: "Welcome",
+          text: "Welcome to my bazaar.",
           texts: [],
         };
       },
       created() {
         globalThis.id = 1; // QUITAR
         this.texts = [
-          '42:19 Allah is Subtle with His servants; He gives provisions to whom He wills. And He is the Powerful, the Exalted in Might.',
-          '45:15 Whoever does a good deed - it is for himself; and whoever does evil - it is against the self. Then to your Lord you will be returned.',
-          '67:10 And they will say, "If only we had been listening or reasoning, we would not be among the companions of the Blaze."',
+          'Give your friends your money and your blood, but don’t justify yourself. Your enemies won’t believe it and your friends won’t need it.',
+          'Everyone is critical of the flaws of others, but blind to their own',
+          'Good health is a crown worn by the healthy than only the ill can see.',
+          'The wisest is the one who can forgive.',
+          'Forgetting is the plague of knowledge.',
+          'In haste there is regret, but in patience and care there is peace and safety.',
+          'The envious were created just to be infuriated.',
           'Thanks for your purchase friend.',
           'Thanks hehe'
         ];
         this.updateInfo();
-        //this.playMusic();
 
       },
       methods: {
         notEnoughCoins(){
-          return ("Not enough franciscoins, manín");
+          return ("Not enough franciscoins...");
         },
         randomText(){
           this.text = this.texts[Math.floor(Math.random()* this.texts.length)];
@@ -108,11 +105,23 @@ import { backend, getRequestParams, postRequestParams } from './connect_params'
 </script>
 
 <style>
+.global {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  max-width: 20vh;
+  margin: 0 auto;
+}
 div {
   margin: 10%;
 }
 
 .image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 30vh;
   width: 100%;
   height: auto;
   border: solid;
@@ -121,6 +130,7 @@ div {
   border-radius: 2px;
   margin: 1em;
   image-rendering: pixelated;
+  justify-content: center;
 }
 
 .mini {
@@ -136,25 +146,15 @@ div {
 }
 
 /* Alineación horizontal de las imágenes y botones */
+.items,
 .item-container,
 .button-container {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
-.avatar_image {
-  min-width: 10em;
-  max-width: 24em;
-  width: 20vw;
-  min-height: 10em;
-  max-height: 24em;
-  width: 20vw;
-  border: solid;
-  border-width: 6px;
-  border-color: var(--border_color);
-  border-radius: 2px;
-  margin: 1em;
-  image-rendering: pixelated;
-}
+
+
+
 </style>
