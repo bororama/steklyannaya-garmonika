@@ -129,6 +129,7 @@ export class PongService {
           }
           if (match.isGameInProgress === Constants.MATCH_IN_PROGRESS && match.paddles.length < 2) {
             console.log('Less than two players connected. Stopping the game ', match.matchIndex);
+            this.matchesService.delete(match.pongRoomId);
             match.isGameInProgress = Constants.MATCH_FAILED;
             io.to(match.matchIndex.toString()).emit('updateGameState', match);
           }
