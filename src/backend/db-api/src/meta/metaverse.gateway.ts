@@ -43,11 +43,11 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
     
   handleDisconnect(client: Socket) {
-    console.log("connection end");
     const i : number = liveClients.findIndex((c) => { return c.socket === client})
     const disconnectedPlayer : Player = liveClients[i].player;
     this.usersService.setOnlineStatus(liveClients[i].player.user.name, false)
     liveClients.splice(i, 1);
+    console.log("connection end for", disconnectedPlayer.user.name);
     this.server.emit('playerLeft', disconnectedPlayer);
   }
 
@@ -56,7 +56,6 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     console.log("recconecting fired");
     return `reconnecting`;
   }
-
 
   @SubscribeMessage('userData')
   async onUserDataMessage(@MessageBody() payload: string, @ConnectedSocket() socket : Socket): Promise<String> {
@@ -134,6 +133,17 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     socket.broadcast.emit('stopApotheosis', payload);
   }
 
+
+  /*
+    kickFromMetaverse(id : string ) {
+      const bannedClient = liveClients.find( (c) => {
+        return c.id === id;
+      });
+      bannedClient.socket.emit('banned');
+      bannedClient.socket.disconnect();
+    }
+
+  */
 
 }
 

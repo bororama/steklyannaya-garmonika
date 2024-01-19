@@ -1,12 +1,14 @@
 **AGILE quadrants for N I C O L á S**
     high-importance & low-effort : 
         - Correct Player Model behaviour after game :
-            a) second match queue[]
-            b) flaming soul on disconnection []
+            a) second match queue[X]
+            b) flaming soul on disconnection [X]
         - LeaderBoard []
         - Kick from metaverse []
+        - reset flaming soul when disconnect [X]
+        - 3d models []
         << QUICK WINS >> do now
-    high-importance & high-effort : Connection protection[X], Match up routine with dummy component[X], LE GRAND MERGE [X], ROUTING []<< GREAT PROJECTS >> do next
-    low-importance & low-effort : music[], << FILL INS >> do later
+    high-importance & high-effort : include and work with user Id [], LE GRAND MERGE [X], ROUTING []<< GREAT PROJECTS >> do next
+    low-importance & low-effort : music[X], << FILL INS >> do later
     low-importance & high-effort :  << THANKLESS TASKS >> delegate
 

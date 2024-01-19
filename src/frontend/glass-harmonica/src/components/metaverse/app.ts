@@ -57,7 +57,7 @@ class GameWorld {
     private _input: PlayerInput | null;
     private _livePlayers: Array<RemotePlayer>;
     private _yellowDevilName: string;
-    private _yellowDevil : any;
+    private _yellowDevil : GameEntity | any;
 
     constructor(metaSocket: Socket, playerData: PlayerData) {
         this._canvas = this._createCanvas();
@@ -72,6 +72,7 @@ class GameWorld {
         this._livePlayers = new Array();
         this._environment = null;
         this._yellowDevilName = 'فرانسيسكو خيسوس دي جاتا وفالديس';
+        //Events for debugging only
         window.addEventListener("keydown", (ev) => {
             // Shift+ctrl+I
             if (ev.shiftKey && ev.ctrlKey && ev.keyCode === 73) {
@@ -80,6 +81,11 @@ class GameWorld {
                 } else {
                     this._scene.debugLayer.show();
                 }
+            }
+
+            else if( ev.key == "l") {
+                console.log("Player position : ",
+                `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
             }
         });
     }
@@ -222,11 +228,10 @@ class GameWorld {
     removePlayer(playerToRemove: PlayerData) {
         const playerIndex = this._livePlayers.findIndex((p) => {
             return playerToRemove.user.name === p.name;
-        })
+        });
         if (playerIndex != -1) {
-            this._livePlayers[playerIndex].dispose();
-            this._livePlayers[playerIndex].mesh.dispose();
-            this._livePlayers = this._livePlayers.splice(playerIndex, 1);
+            this._livePlayers[playerIndex].die();
+            this._livePlayers.splice(playerIndex, 1);
         }
     }
 
@@ -332,6 +337,9 @@ class GameWorld {
         window.addEventListener('resize', () => {
             this._engine.resize();
         });
+        window.addEventListener('keydown', () => {
+            this._setUpMusic();
+        }, { once : true })
     }
 
 
@@ -362,7 +370,6 @@ class GameWorld {
         this._scene.attachControl();
         this._setUpMaterials();
         await this._instanceNPCs();
-        this._setUpMusic();
     }
 
     private async _initializeGameAsync(scene: Scene): Promise<void> {
@@ -377,7 +384,7 @@ class GameWorld {
         /*curro*/
         const assets = await this._loadPlayerAssets(this._scene, false, 'humanoid.glb');
         this._yellowDevil = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
-        this._yellowDevil.updatePosition(new Vector3(0, -13, 5));
+        this._yellowDevil.updatePosition(new Vector3(-138, -73, 335));
     }
 
 
@@ -396,9 +403,12 @@ class GameWorld {
         const evilTheme = new Sound("Evil theme", "/sounds/shopMusic.mp3", this._scene, null, {
             loop: true,
             autoplay: true,
+            //distanceModel : "exponential",
         });
 
-        evilTheme.attachToMesh(this._yellowDevil);
+        evilTheme.attachToMesh(this._yellowDevil.mesh);
+
+        console.log("theme : ", evilTheme, "mesh position", this._yellowDevil.mesh.position);
     }
 
 

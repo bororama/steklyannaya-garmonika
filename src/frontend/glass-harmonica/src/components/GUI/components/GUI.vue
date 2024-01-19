@@ -108,4 +108,30 @@ body {
 	left:0;
     z-index: -1;
 }
+
+.overlay-2 {
+	width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: 9;
+  background : url('/GUI_assets/heaven.png');
+  background-size: contain;
+  background-position: center center;
+  image-rendering: pixelated;
+  background-repeat:repeat
+}
+
+.overlay-2::before{
+  content: '';
+  background: radial-gradient(circle, rgba(255,255,255,0) 47%, rgba(209,254,255,1) 77%, rgba(255,255,255,1) 94%);
+  width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: -1;
+}
+
 </style>
