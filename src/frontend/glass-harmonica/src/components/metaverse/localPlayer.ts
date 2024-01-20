@@ -88,6 +88,7 @@ export class LocalPlayer extends TransformNode {
         this.mesh.getChildMeshes().forEach( (m) => {
             m.metadata = metadata;
         });
+        this.mesh.position = new Vector3(-256, 120, -167);
     }
 
     private _setUpChatBox() {
@@ -324,9 +325,9 @@ export class LocalPlayer extends TransformNode {
         if (this._input.jumping) {
             this._state = playerStates.JUMPING;
         }
-        if (this.mesh.position.y < -50) {
+        if (this.mesh.position.y < -120) {
             this.mesh.position.x = 0;
-            this.mesh.position.y = 50;
+            this.mesh.position.y = 80;
             this.mesh.position.z = 0;
         }
     }

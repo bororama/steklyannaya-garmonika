@@ -27,7 +27,13 @@ export class RemotePlayer extends GameEntity {
         console.log("HIDE FLAMING SOUL");
         toggleMeshVisibility(this._glowingMesh, false);
         toggleMeshVisibility(this.mesh, true);
-     }
+    }
+
+    die() {
+        this._glowingMesh.dispose();
+        this.mesh.dispose();
+        this.dispose();
+    }
 
     private _setGlowingMesh(mesh : any) {
         this._glowingMesh = mesh.clone("FlamingSoul");

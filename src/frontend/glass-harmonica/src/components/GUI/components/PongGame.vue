@@ -1,8 +1,21 @@
 <template>
-  <div>
-    <canvas ref="pongCanvas" style="z-index:10;"></canvas>
+  <div class="game-container overlay-2">
+    <canvas id="pong-game" ref="pongCanvas"></canvas>
   </div>
 </template>
+
+<style>
+  .game-container {
+    position:absolute;
+    z-index: 11;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  #pong-game {
+    margin : 36px auto;
+  }
+</style>
 
 <script lang="ts">
 /* eslint-disable */
@@ -60,6 +73,7 @@ export default defineComponent({
           this.socket.on("connect", () => {
             console.log("Connected to the server.");
             console.log("log Token", globalThis.logToken)
+            console.log(" BEGGINGING GAME");
             this.socket?.emit("beginGame", {
               mode: this.modo,
               pongRoomId: this.pongRoomId,

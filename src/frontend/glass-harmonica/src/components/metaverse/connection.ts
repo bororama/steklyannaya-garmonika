@@ -74,7 +74,7 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 	});
 
 	metaSocket.on('playerLeft', (payload : Player) => { 
-		//console.log('Player left ....>>', `${payload.user.name}`);
+		console.log('Player left ....>>', `${payload.user.name}`);
 		metaverse.gameWorld.removePlayer(payload);
 	});
 
@@ -104,6 +104,12 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 	metaSocket.on('exception', (data) => {
 		console.log('event', data);
 	});
+
+
+	metaSocket.on('banned', () => {
+		metaverse.gameWorld.showPopUp("Away with you, cursed one, into the eternal fire.", false);
+		metaverse.gameWorld.resetLivePlayers();
+	})
 
 	metaSocket.on('disconnect', () => {
 		console.log('Disconnected');
