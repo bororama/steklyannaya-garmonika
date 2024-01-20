@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <canvas ref="pongCanvas" style="z-index:10;"></canvas>
-  </div>
+  <div class="crt">
+    <canvas  ref="pongCanvas" style="z-index:10;position:absolute"></canvas>
+  </div> 
 </template>
 
 <script lang="ts">
@@ -48,7 +48,6 @@ export default defineComponent({
     this.colors = ["black", "BlueViolet", "CadetBlue", "brown", "DarkGreen"];
     if (canvas) {
       this.ctx = canvas.getContext("2d");
-
       if (this.ctx) {
         this.ctx.canvas.width = window.innerWidth / 2;
         this.ctx.canvas.height = this.ctx.canvas.width / 2;
@@ -284,3 +283,7 @@ export default defineComponent({
     },
   });
 </script>
+
+<style>
+@import './crt.css'
+</style>

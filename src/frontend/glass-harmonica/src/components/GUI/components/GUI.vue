@@ -1,4 +1,5 @@
 <template>
+    <PongGame/>
     <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
     <button v-if='!in_metaverse && profile_state != "no" && profile_state != "registering"' @click="close_profile" class="fa_button">Close Profile</button>
     <button v-if='!in_metaverse && in_admin_page' @click="close_admin_page" class="fa_button">Close Admin</button>
