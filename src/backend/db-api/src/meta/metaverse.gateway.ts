@@ -14,7 +14,6 @@ import { ServerToClientEvents, ClientToServerEvents, Message, Player, LiveClient
 import { UsersService } from '../users/services/users.service';
 
 const liveClients : Array<LiveClient> = Array();
-let clientLocator : number = 0;
 
 @WebSocketGateway(777,{
   cors: {
@@ -47,25 +46,22 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     const disconnectedPlayer : Player = liveClients[i].player;
     this.usersService.setOnlineStatus(liveClients[i].player.user.name, false)
     liveClients.splice(i, 1);
-    console.log("connection end for", disconnectedPlayer.user.name);
     this.server.emit('playerLeft', disconnectedPlayer);
   }
 
   @SubscribeMessage('reconnect')
   async onReconnect(): Promise<String> {
-    console.log("recconecting fired");
     return `reconnecting`;
   }
 
   @SubscribeMessage('userData')
-  async onUserDataMessage(@MessageBody() payload: string, @ConnectedSocket() socket : Socket): Promise<String> {
+  async onUserDataMessage(@MessageBody() payload: User, @ConnectedSocket() socket : Socket): Promise<String> {
     
     const clientIndex = liveClients.findIndex((p) => {
        return p.socket === socket;
     });
 
-    const newUser : User = { locator: clientLocator, name : payload };
-    clientLocator++;
+    const newUser : User = { id: payload.id, name : payload.name };
     const newPlayer : Player = { user : newUser, position : [0,0,0], rotation : [0,0,0,1.0], state : 0};
     liveClients[clientIndex].player = newPlayer;
     let i = 0;
@@ -81,7 +77,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     socket.emit('welcomePack', {newPlayer, livePlayers});
     socket.broadcast.emit('newPlayer', {retries : 0, player : newPlayer});
 
-    this.usersService.setOnlineStatus(payload, true);
+    this.usersService.setOnlineStatus(payload.id, true);
 
     return `You sent : userData ${ payload }`;
   }
@@ -133,17 +129,22 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     socket.broadcast.emit('stopApotheosis', payload);
   }
 
-
-  /*
-    kickFromMetaverse(id : string ) {
-      const bannedClient = liveClients.find( (c) => {
-        return c.id === id;
-      });
+  
+  kickFromMetaverse(id : string ) {
+    console.log("KIIIIIIIIIIICK");
+    const bannedClient = liveClients.find( (c) => {
+      console.log("id : ", id);
+      console.log("c : ", c.player);
+      console.log("c.player.user.id === id>>", c.player.user.id === id);
+      console.log("c.player.user.id", c.player.user.id);
+      console.log("id", id);
+      return c.player.user.id == id;
+    });
+    console.log("KICKING ", bannedClient);
+    if (bannedClient) {
       bannedClient.socket.emit('banned');
       bannedClient.socket.disconnect();
     }
-
-  */
-
+  }
 }
 

@@ -27,8 +27,8 @@ class Metaverse {
     constructor() {
     }
 
-    async initPlayerData(locator: number, username: string) {
-        this.playerData = new PlayerData(locator, username);
+    async initPlayerData(id: string, username: string) {
+        this.playerData = new PlayerData(id, username);
     }
 
     async initGameWorld(metaSocket: Socket) {
@@ -37,8 +37,6 @@ class Metaverse {
             await this.gameWorld.ready();
         }
     }
-
-
 }
 
 
@@ -50,7 +48,7 @@ class GameWorld {
     private _canvas: HTMLCanvasElement;
     private _engine: Engine;
     private _metaSocket: Socket;
-    public assets: any;
+    public  assets: any;
     private _environment: Environment | null;
     private _playerData: PlayerData | null;
     private _player: LocalPlayer | null;
@@ -67,7 +65,7 @@ class GameWorld {
         this._engine.setHardwareScalingLevel(6);
         this._scene = new Scene(this._engine);
         this._playerData = playerData,
-            this._player = null;
+        this._player = null;
         this._input = null;
         this._livePlayers = new Array();
         this._environment = null;
@@ -180,23 +178,8 @@ class GameWorld {
         this._livePlayers = Array<RemotePlayer>();
     }
 
-    /*async spawnPlayer(player: PlayerData) {
-
-        if (this._findLivePlayer(player.user.name) !== undefined) {
-            console.log(`   Player : ${player.user.name} already joined`);
-            return;
-        }
-        if ( player && player.user.name !== this._playerData?.user.name) {
-            console.log("Instancing mesh for ", player.user.name);
-            const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
-            let newPlayer: any;
-            newPlayer = new RemotePlayer(assets, this._scene, player.user.name);
-            this._livePlayers.push(newPlayer);
-        }
-    }*/
-
     async spawnPlayer(player: PlayerData) {
-        if (this._findLivePlayer(player.user.name) !== undefined) {
+        if (this._findLivePlayer(player.user.id) !== undefined) {
             console.log(`Player: ${player.user.name} already joined`);
             return;
         }
@@ -211,7 +194,7 @@ class GameWorld {
                     return;
                 }
 
-                let newPlayer: any = new RemotePlayer(assets, this._scene, player.user.name);
+                let newPlayer: any = new RemotePlayer(assets, this._scene, player.user);
                 if (!newPlayer) {
                     console.error('Failed to instantiate RemotePlayer.');
                     return;
@@ -227,7 +210,7 @@ class GameWorld {
 
     removePlayer(playerToRemove: PlayerData) {
         const playerIndex = this._livePlayers.findIndex((p) => {
-            return playerToRemove.user.name === p.name;
+            return playerToRemove.user.id === p.user.id;
         });
         if (playerIndex != -1) {
             this._livePlayers[playerIndex].die();
@@ -237,7 +220,9 @@ class GameWorld {
 
     applyRemotePlayerUpdate(p: PlayerData) {
 
-        let player = this._findLivePlayer(p.user.name);
+        let player = this._findLivePlayer(p.user.id);
+        console.log("livePlayers >>", this._livePlayers);
+        console.log("UPDATING : ", player);
         player?.updateMesh(
             new Vector3(p.position[0], p.position[1], p.position[2]),
             new Quaternion(p.rotation[0], p.rotation[1], p.rotation[2], p.rotation[3]),
@@ -247,14 +232,14 @@ class GameWorld {
 
     makeRemotePlayerSay(m: Message) {
 
-        let player = this._findLivePlayer(m.user.name);
+        let player = this._findLivePlayer(m.user.id);
         if (player) {
             player.say(m.text);
         }
     }
 
-    private _findLivePlayer(targetPlayerName: string): RemotePlayer | undefined {
-        let player = this._livePlayers.find((p) => { return p.name == targetPlayerName }) // change this for a locator
+    private _findLivePlayer(targetPlayerId: string): RemotePlayer | undefined {
+        let player = this._livePlayers.find((p) => { return p.user.id == targetPlayerId }) // change this for a locator
 
         return player;
     }

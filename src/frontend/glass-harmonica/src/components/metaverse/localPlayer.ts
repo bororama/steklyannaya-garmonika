@@ -145,7 +145,7 @@ export class LocalPlayer extends TransformNode {
 
         message = message.trim();
         if (message === "PING" || message === "PONG") {
-            this._metaSocket.emit(`PingPong`, this._playerData.user.name);
+            this._metaSocket.emit(`PingPong`, this._playerData.user.id);
             this._state = playerStates.PLAYING;
         }
     }
