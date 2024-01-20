@@ -11,7 +11,7 @@
                 <Username :username="this.username" :editable="display_status == 'registering' || display_status == 'my_profile'" @change_username="changeUsername"/>
                 <div class="float_left">
                     <Enabler2FA v-if="display_status != 'registering' && display_status != 'profile_display'"/>
-                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && !is_friend" @click="befriend">Befriend</button>
+                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && !is_friend && !is_potential_friend" @click="befriend">Befriend</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked" @click="block">Block</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online'" @click="match">Match</button>
                 </div>
@@ -51,6 +51,7 @@ export default defineComponent({
       player_data: {},
       is_blocked: false,
       is_friend: false,
+      is_potential_friend: false,
       online_status: 'disconnected',
       matchUserId: '0'
     })
@@ -65,15 +66,20 @@ export default defineComponent({
       fetch(backend + '/log/register', myData).then((r) => {
         r.json().then((registerAnswer) => {
           if (registerAnswer.status === 'ok') {
-            this.$emit('successful_register')
             const formData = new FormData()
-            console.log(this.image)
             formData.append('image', this.image)
             fetch(backend + '/users/' + this.username + '/uploadProfilePic', {
               method: 'POST',
               body: formData
             })
-            globalThis.logToken = registerAnswer.meta_token
+            fetch(backend + '/log/me/' + registerAnswer.token, getRequestParams).then((a) => {
+              a.json().then((player) => {
+                globalThis.id = player.id
+                globalThis.my_data = player
+                globalThis.username = player.name
+                this.$emit('successful_register')
+              })
+            })
           }
         })
       })
@@ -144,6 +150,17 @@ export default defineComponent({
           fetch (backend + '/players/' + globalThis.id + '/isFriend/' + this.userId).then((a) => {a.text().then((isFriend) => {
                 if (isFriend == 'yes')
                   this.is_friend = true
+            })
+          })
+          console.log("FRIeNDING")
+          fetch (backend + '/players/' + globalThis.id + '/getFrienshipRequests', getRequestParams).then((a) => {
+            a.json().then((pfriends) => {
+              for (const f in pfriends) {
+                if (pfriends[f].id == this.userId || pfriends[f].name == this.userId)
+                {
+                  this.is_potential_friend = true
+                }
+              }
             })
           })
           this.loaded = true

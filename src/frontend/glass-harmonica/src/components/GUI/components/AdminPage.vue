@@ -46,6 +46,7 @@ export default defineComponent({
             })
           })
         }
+        this.users.splice(0, 1)
       })
     })
     fetch(backend + '/admins/getChatsAndMembers', getRequestParams).then((a) => {
@@ -54,6 +55,7 @@ export default defineComponent({
           let c = chats[chat]
           this.channels.push(c)
         }
+        this.channels.splice(0, 1)
       })
     })
   }

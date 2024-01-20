@@ -58,7 +58,6 @@ export class AuthenticatorController {
   }
 
   async pixelizeImage(imageUrl:string, login:string) {
-    console.log(imageUrl)
     axios({
       method: 'get',
       url: imageUrl,
@@ -92,7 +91,6 @@ export class AuthenticatorController {
             this.pixelizeImage(personal.image.link, personal.login)
           }
           const return_tok = {status: log_attempt.status, register_token: log_attempt.register_token, log_token: log_attempt.log_token, fa_token: log_attempt.fa_token, auto_image:'/src/profile_pics/' + personal.login + '.png'}
-          console.log(return_tok.auto_image)
           return (return_tok);
       }
       else {
@@ -108,10 +106,12 @@ export class AuthenticatorController {
      //TODO incorrect verify
 
     const secret = await this.userService.get2FAsecret(payload.username)
+    console.log(fa_info.code)
     const token = speakeasy.totp({
       secret: secret,
       encoding: 'base32'
     })
+    console.log(token)
     const isValid = speakeasy.totp.verify({secret:secret,
                                           encoding: 'base32',
                                           token: fa_info.code,
@@ -133,7 +133,6 @@ export class AuthenticatorController {
   @ApiBody({type: RegisterInfoDto, required:true})
   async registerUser(@Body() register_info : RegisterInfoDto) : Promise<RegisterAnswerDto> {
      let payload:any = jwt.verify(register_info.register_token, 'TODO change SUPER SECRET')
-     console.log(register_info)
      //TODO incorrect verify
      const player : NewPlayer = {
        userName: register_info.username,

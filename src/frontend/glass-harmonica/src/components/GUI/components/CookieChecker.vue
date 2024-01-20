@@ -2,6 +2,7 @@
     <div>
         <textarea v-model='code2fa' v-if="needs2fa"></textarea>
         <button @click="send_with_code" v-if="needs2fa">Send</button>
+        <h1 v-if="wrong_code">WRONG CODE</h1>
     </div>
 </template>
 
@@ -15,7 +16,8 @@ export default defineComponent({
     return ({
       needs2fa: false,
       code2fa: '',
-      fa_token: '1234'
+      fa_token: '1234',
+      wrong_code: false
     })
   },
   created () {
@@ -32,13 +34,25 @@ export default defineComponent({
       const myData :any = postRequestParams
       myData.body = JSON.stringify({
         fa_token: this.fa_token,
-        code: this.code2fa
+        code: this.code2fa,
       })
       fetch(backend + '/log/with_fa', myData).then((r) => {
         r.json().then((answer) => {
-          this.$emit('log_success', answer.log_token)
-          globalThis.logToken = answer.token
-          this.needs2fa = false
+          if (answer.status === 'ok') {
+            globalThis.logToken = answer.token
+            fetch(backend + '/log/me/' + answer.token, getRequestParams).then((a) => {
+              a.json().then((player) => {
+                globalThis.id = player.id
+                globalThis.my_data = player
+                globalThis.username = player.name
+                this.$emit('log_success', answer.token)
+                this.needs2fa = false
+              })
+            })
+          }
+          if (answer.status === "ko") {
+              this.wrong_code = true
+          }
         })
       })
     },

@@ -113,6 +113,7 @@ export default {
             } else if (action == "accept_friendship") {
               fetch(backend + '/players/' + globalThis.id + '/acceptFrienshipRequest/' + this.item.sender, postRequestParams);
               this.close_drop();
+              this.item = generate_pearl(this.item.sender, this.item.target);
             } else if (action == "reject_friendship") {
               fetch(backend + '/players/' + globalThis.id + '/declineFrienshipRequest/' + this.item.sender, postRequestParams);
               this.close_drop();

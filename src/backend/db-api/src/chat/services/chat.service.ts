@@ -514,7 +514,7 @@ export class ChatService {
         {
             throw new BadRequestException('User doesn\'t exist');
         }
-        const chatRelation = await this.chatUserModel.findOne({
+        let chatRelation = await this.chatUserModel.findOne({
             where: {
                 userId: user,
                 chatId: chatId

@@ -53,6 +53,7 @@ export default defineComponent({
         r.text().then((answer) => {
           if (answer === 'ok') {
             this.not_enabled = false
+            this.enabling = true
           } else if (answer === 'ko') {
             this.wrong_code = true
           }

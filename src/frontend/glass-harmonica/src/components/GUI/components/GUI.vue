@@ -1,7 +1,7 @@
 <template>
     <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse"/>
     <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
-    <ProfilePage v-if="profile_state == 'registering'" :display_status="profile_state" :auto_image="auto_image" :register_token="register_token" />
+    <ProfilePage v-if="profile_state == 'registering'" :display_status="profile_state" :auto_image="auto_image" :register_token="register_token" @successful_register="go_to_metaverse"/>
     <div class="overlay" v-if="showing_profile_image">
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
@@ -63,8 +63,6 @@ export default defineComponent({
       this.log_token = logToken
     },
     metaProfileHandler (profile) {
-//      router.push('profile_page/' + profile.name)
-      console.log("PRROOOFILE")
       this.meta_colleague_id = profile.name
       this.showing_profile_image = true
     },

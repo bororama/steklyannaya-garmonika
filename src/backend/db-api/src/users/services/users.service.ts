@@ -213,7 +213,8 @@ export class UsersService {
                 model: Chat,
                 where: {
                     isPrivateChat: false
-                }
+                },
+                required: false
             }
         });
         if (!user) {
@@ -260,7 +261,6 @@ export class UsersService {
     }
 
     async addCoins(userId: string, quantity: number) : Promise<string> {
-        console.log(userId)
         let user = await this.findOne(userId);
         if (!user) {
             throw new BadRequestException('User doesn\'t exist')

@@ -21,7 +21,6 @@ export class MessageService {
             throw new BadRequestException("User doesn't exist");
 		}
 		
-		console.log(message);
 		await this.messageModel.create({
 			senderId: user,
 			chatId: receptor.id,
@@ -35,15 +34,15 @@ export class MessageService {
 			where: {
 				chatId: chat.chatId,
 				sentDate: {
-					[Op.gt]: chat.lastMsgReadDate
+					[Op.gte]: chat.lastMsgReadDate
 				},
 				[Op.not]: {
 					senderId: chat.userId
-				},
-				order: [
-					['sentDate', 'ASC']
-				]
-			}
+				}
+			},
+            order: [
+                ['sentDate', 'ASC']
+            ]
 		})
 	}
 }

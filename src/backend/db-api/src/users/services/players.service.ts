@@ -325,20 +325,24 @@ export class PlayersService {
         if (!player) {
             throw new BadRequestException("Player doesn\'t exists");
         }
-        const friend = await this.findOne(friendId);
+        const friend = await this.usersService.userExists(friendId);
         if (!friend) {
             throw new BadRequestException("Player doesn\'t exists");
         }
-        return this.getFriends(playerId).then((friends) => {
-          for (const f in friends) {
-            console.log(friends[f].friendId)
-            console.log(friend.id)
-            if (friends[f].friendId == friend.id)
-              return 'yes';
-          }
-          return 'no';
-        })
-
+        return this.friendshipModel.findOne({
+            where: {
+                [Op.or]: [
+                  {
+                      userId: player,
+                      friendId: friend
+                  },
+                  {
+                      userId: friend,
+                      friendId: player
+                  }
+                ]
+            }
+        }).then(f => f != null && f != undefined ? "yes" : "no");
     }
 
     async update(userId: string, newPlayer: UpdatePlayerDto): Promise<Player> {
