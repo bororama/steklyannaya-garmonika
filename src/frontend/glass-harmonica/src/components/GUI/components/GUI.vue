@@ -23,6 +23,7 @@ import ATalkWithGod from './ATalkWithGod.vue'
 import AlreadyConnected from './AlreadyConnected.vue'
 import Home from '../../Home.vue'
 import Shop from './Shop.vue'
+import Leaderboard from './Leaderboard.vue'
 
 export default defineComponent({
   name: 'GUI',
@@ -34,7 +35,8 @@ export default defineComponent({
     ATalkWithGod,
     AlreadyConnected,
     Home,
-    Shop
+    Shop,
+    Leaderboard
   },
   data () {
     return ({
