@@ -1,5 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Chat } from '../models/chat.model';
 import { ChatUsers } from '../../chat-user/models/chatUsers.model';
 import { UsersService } from '../../users/services/users.service';
@@ -148,8 +149,40 @@ export class ChatService {
         });
     }
 
-    async join(user: string, chat: Chat): Promise<void> {
+    async join(userId: string, chat: Chat): Promise<ChatUsers> {
+        const user: User = await this.userService.findOne(userId);
+        let locked = false;
+
+        if (!user) {
+            throw new BadRequestException('User doesn\'t exists');
+        }
+        
+        if (await this.isBannedId(chat.id, user.id)) {
+            throw new ForbiddenException('User is banned from this chat');
+        }
+
+        if (chat.isPrivateChat) {
+            throw new ForbiddenException('User can\'t join a private chat');
+        }
+
+        if (chat.password) {
+            locked = true;
+        }
+
+        let chatUserRelation = await this.chatUserModel.create({
+            userId: user.id,
+            chatId: chat.id,
+            isAdmin: false,
+            chatLocked: locked,
+        });
+
+        chatUserRelation.user = user;
+        return chatUserRelation;
+    }
+
+    async changeLockStatus(user: string, chat: Chat, lock: boolean): Promise<ChatUsers> {
         const userId: number = await this.userService.userExists(user);
+
         if (!userId) {
             throw new BadRequestException('User doesn\'t exists');
         }
@@ -158,11 +191,23 @@ export class ChatService {
             throw new ForbiddenException('User can\'t join a private chat');
         }
 
-        this.chatUserModel.create({
-            userId: userId,
-            chatId: chat.id,
-            isAdmin: false
+        if (!chat.password) {
+            throw new BadRequestException('Chat doesn\'t have a password');
+        }
+
+        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
+            where: {
+                userId: userId,
+                chatId: chat.id
+            }
         });
+
+        if (!userChatRelation) {
+            throw new ForbiddenException('User don\'t belong to chat');
+        }
+
+        userChatRelation.chatLocked = lock;
+        return userChatRelation.save();
     }
 
     async leave(user: string, id: number): Promise<void> {
@@ -217,7 +262,7 @@ export class ChatService {
             throw new BadRequestException('Requester doesn\'t belong to chat');
         }
 
-        return (userChatRelation.isAdmin && await this.isBannedId(userChatRelation.chatId, userChatRelation.userId));
+        return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
     }
 
     async changePrivileges(id: number, chatAdmin: string, user: string, admin: boolean): Promise<void> {
@@ -262,6 +307,7 @@ export class ChatService {
         }
 
         userChatRelation.isAdmin = admin;
+        userChatRelation.chatLocked = !admin;
         userChatRelation.save();
     }
 
@@ -467,10 +513,13 @@ export class ChatService {
         return this.chatBansModel.findAll({
             where: {
                 chatId: id,
+                endDate: {
+                    [Op.gte]: new Date()
+                }
             },
             include: {
                 model: User
-            }
+            },
         });
     }
 
@@ -479,7 +528,10 @@ export class ChatService {
         return this.chatBansModel.findAll({
             where: {
                 chatId: id,
-                usersId: users
+                userId: userIds,
+                endDate: {
+                    [Op.gte]: new Date()
+                }
             }
         });
     }
@@ -496,40 +548,87 @@ export class ChatService {
         }
 
         if (chat.isPrivateChat) {
-            throw new BadRequestException('Private chat doesn\'t have password');
+            throw new BadRequestException('Private chat can\'t have password');
         }
 
         chat.password = this.hashPassword(password);
-        chat.save();
+        await chat.save();
+        
+        await this.chatUserModel.update({ chatLocked: true }, {
+            where: {
+                chatId: chat.id,
+                isAdmin: false,
+                isOwner: false,
+            }
+        });
     }
 
     async unsetPassword(chat: Chat, password: string): Promise<void> {
         chat.password = null;
-        chat.save();
+        await chat.save();
+        await this.chatUserModel.update({ chatLocked: false }, { where: { chatId: chat.id } });
     }
 
-    async getNewMessages(userId: string, chatId: number, password?: string): Promise<Message[]> {
+    async getNewMessages(userId: string, chatId: number): Promise<Message[]> {
         const user = await this.userService.userExists(userId);
         if (!user)
         {
             throw new BadRequestException('User doesn\'t exist');
         }
+
+        if (await this.isBannedId(chatId, user)) {
+            throw new ForbiddenException('User is banned from this chat');
+        }
+
         const chatRelation = await this.chatUserModel.findOne({
             where: {
                 userId: user,
                 chatId: chatId
-            },
-            include: Chat
+            }
         });
+
         if (!chatRelation)
         {
             throw new BadRequestException('User doesn\'t belong to that chat');
         }
 
-        this.validatePassword(chatRelation.chat, password);
+        if (chatRelation.chatLocked) {
+            throw new BadRequestException('Chat is locked for this user. Unlock it to be able to read messages');
+        }
+
         const messagesPromise = this.messageService.getMessages(chatRelation);
         chatRelation.lastMsgReadDate = new Date();
         await chatRelation.save();
         return messagesPromise;
+    }
+
+    async sendMessageToChat(userId: string, chat: Chat, message: string): Promise<void> {
+        const user = await this.userService.findOneLight(userId);
+        if (!user)
+        {
+            throw new BadRequestException('User doesn\'t exist');
+        }
+
+        if (await this.isBannedId(chat.id, user.id)) {
+            throw new ForbiddenException('User is banned from this chat');
+        }
+
+        const chatRelation = await this.chatUserModel.findOne({
+            where: {
+                userId: user.id,
+                chatId: chat.id
+            },
+        });
+
+        if (!chatRelation)
+        {
+            throw new BadRequestException('User doesn\'t belong to that chat');
+        }
+
+        if (chatRelation.chatLocked) {
+            throw new BadRequestException('Chat is locked for this user. Unlock it to be able to send messages.');
+        }
+
+        return this.messageService.sendMessage(user, chat, message);
     }
 }

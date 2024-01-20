@@ -35,6 +35,10 @@ export class ChatUsers extends Model {
     @Column
     isMuted: boolean;
 
+    @Default(false)
+    @Column
+    chatLocked: boolean;
+
     @Default(Sequelize.literal('CURRENT_TIMESTAMP'))
     @Column
     lastMsgReadDate: Date;

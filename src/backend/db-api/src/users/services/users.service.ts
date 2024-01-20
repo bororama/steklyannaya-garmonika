@@ -33,6 +33,17 @@ export class UsersService {
         });
     }
 
+    async findOneLight(user: string): Promise<User> {
+        const searchCriteria = isNaN(+user)
+            ? { userName: user }
+            : { id: +user };
+        return this.userModel.findOne({
+            where: searchCriteria,
+            attributes: ['id']
+        });
+    }
+
+
     async findOneById(user: number): Promise<User> {
         return this.userModel.findByPk(user);
     }
