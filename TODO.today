@@ -3,10 +3,9 @@
         - Correct Player Model behaviour after game :
             a) second match queue[X]
             b) flaming soul on disconnection [X]
-        - LeaderBoard []
         - Kick from metaverse []
         - reset flaming soul when disconnect [X]
-        - 3d models []
+        - 3d models [X]
         << QUICK WINS >> do now
     high-importance & high-effort : include and work with user Id [], LE GRAND MERGE [X], ROUTING []<< GREAT PROJECTS >> do next
     low-importance & low-effort : music[X], << FILL INS >> do later

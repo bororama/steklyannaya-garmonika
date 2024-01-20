@@ -382,9 +382,10 @@ class GameWorld {
 
     private async _instanceNPCs() {
         /*curro*/
-        const assets = await this._loadPlayerAssets(this._scene, false, 'humanoid.glb');
+        const assets = await this._loadPlayerAssets(this._scene, false, 'curro.glb');
         this._yellowDevil = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
-        this._yellowDevil.updatePosition(new Vector3(-138, -73, 335));
+        this._yellowDevil.updatePosition(new Vector3(-138, -75, 335));
+        this._yellowDevil.rotationQuaternion = new Quaternion(0, 30);
     }
 
 
