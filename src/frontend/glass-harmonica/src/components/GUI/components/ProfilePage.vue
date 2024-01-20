@@ -6,7 +6,7 @@
             <div :class="{personal_data:true, float_right:display_status != 'registering'}">
                 <div class=status_profile_pair>
                     <StatusPearl v-if="display_status == 'profile_display'" :username="this.userId" @user_status_update="update_user_status"/>
-                    <ProfileImage v-if="loaded" :editable="display_status =='registering' || display_status == 'my_profile'" :path="player_data.profilePic" :auto_image="display_status =='registering'" :auto_image_path="auto_image" @change_profile_image="changeImage"/>
+                    <ProfileImage v-if="loaded" :editable="display_status =='registering' || display_status == 'my_profile'" :path="player_data.profilePic" :auto_image="display_status =='registering'" :auto_image_path="auto_image" @change_profile_image="changeImage" @auto_image_loaded="allow_register"/>
                 </div>
                 <Username :username="this.username" :editable="display_status == 'registering' || display_status == 'my_profile'" @change_username="changeUsername"/>
                 <div class="float_left">
@@ -14,11 +14,13 @@
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && !is_friend && !is_potential_friend" @click="befriend">Befriend</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked" @click="block">Block</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online'" @click="match">Match</button>
+                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online'" @click="match_boundless">Boundless</button>
+                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'in_match'" @click="spectate">Spectate</button>
                 </div>
             </div>
         </div>
     </div>
-    <button class='fa_button' v-if="display_status == 'registering'" @click="registerUser">Descend to جَيَّان</button>
+    <button class='fa_button' v-if="display_status == 'registering' && can_register" @click="registerUser">Descend to جَيَّان</button>
 
 </template>
 
@@ -53,7 +55,8 @@ export default defineComponent({
       is_friend: false,
       is_potential_friend: false,
       online_status: 'disconnected',
-      matchUserId: '0'
+      matchUserId: '0',
+      can_register: false
     })
   },
   methods: {
@@ -77,6 +80,7 @@ export default defineComponent({
                 globalThis.id = player.id
                 globalThis.my_data = player
                 globalThis.username = player.name
+                globalThis.is_admin = player.is_admin
                 this.$emit('successful_register')
               })
             })
@@ -121,8 +125,20 @@ export default defineComponent({
         this.$emit('start_match', created_match)
       }))
     },
+    match_boundless () {
+      fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams).then((a) => a.json().then((created_match) => {
+        created_match.match_id = created_match.roomId;
+        created_match.boundless = true
+        this.$emit('start_match', created_match)
+      }))
+    },
+    spectate () {
+    },
     update_user_status (new_status : string) {
       this.online_status = new_status
+    },
+    allow_register () {
+      this.can_register = true
     }
   },
   created () {
@@ -133,6 +149,7 @@ export default defineComponent({
         a.json().then((player) => {
           globalThis.id = player.id
           globalThis.my_data = player
+          globalThis.is_admin = player.is_admin
           this.player_data = player
           this.username = player.name
           this.matchUserId = globalThis.id

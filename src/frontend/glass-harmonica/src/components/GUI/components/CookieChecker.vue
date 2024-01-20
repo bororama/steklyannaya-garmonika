@@ -45,6 +45,7 @@ export default defineComponent({
                 globalThis.id = player.id
                 globalThis.my_data = player
                 globalThis.username = player.name
+                globalThis.is_admin = player.is_admin
                 this.$emit('log_success', answer.token)
                 this.needs2fa = false
               })
@@ -52,6 +53,8 @@ export default defineComponent({
           }
           if (answer.status === "ko") {
               this.wrong_code = true
+          } else if (access.status === 'already_connected') {
+            this.$emit('already_connected')
           }
         })
       })
@@ -77,6 +80,8 @@ export default defineComponent({
             this.needs2fa = true
             globalThis.has2FA = true
             this.fa_token = access.fa_token
+          } else if (access.status === 'already_connected') {
+            this.$emit('already_connected')
           }
         })
       })

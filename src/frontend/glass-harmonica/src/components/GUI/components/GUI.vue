@@ -1,12 +1,12 @@
 <template>
-    <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse"/>
+    <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse" @already_connected="go_to_alredy_connected_page"/>
     <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
     <ProfilePage v-if="profile_state == 'registering'" :display_status="profile_state" :auto_image="auto_image" :register_token="register_token" @successful_register="go_to_metaverse"/>
     <div class="overlay" v-if="showing_profile_image">
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
     </div>
-    <AlreadyConnected v-if="false"/>
+    <AlreadyConnected v-if="already_connected"/>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
 
@@ -43,7 +43,8 @@ export default defineComponent({
       access: {register_token: '',
                 auto_image: ''},
       showing_profile_image: false,
-      meta_colleague_id: ''
+      meta_colleague_id: '',
+      already_connnected: false
     })
   },
   methods: {
@@ -70,6 +71,9 @@ export default defineComponent({
     },
     close_profile() {
       this.showing_profile_image = false
+    },
+    go_to_alredy_connected_page () {
+      this.already_connected = true
     }
 
   }

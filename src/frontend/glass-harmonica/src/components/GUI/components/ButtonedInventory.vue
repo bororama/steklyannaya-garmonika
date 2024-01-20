@@ -1,13 +1,11 @@
 <template>
 
 <img class="inventory_button" :src="this.current_image" @click="toggle_inventory">
-<!--InventoryPopupable v-if="this.inventory_opened" @close_request="close_inventory()" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}"/-->
 
 
 </template>
 
 <script>
-//import InventoryPopupable from "./InventoryPopupable.vue"
 import Bolsa1 from "../assets/Bolsa1.png"
 import Bolsa2 from "../assets/Bolsa2.png"
 import Bolsa3 from "../assets/Bolsa3.png"
@@ -55,8 +53,8 @@ export default {
 <style>
 
 .inventory_button {
-	width: 50px;
-	height: 50px;
+	width: 100px;
+	height: 100px;
 	cursor: pointer;
 }
 

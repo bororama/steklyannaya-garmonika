@@ -62,7 +62,6 @@ export default {
 				this.close_drop();
 			} else if (action == "view_messages") {
 				this.active_interaction = "viewing_messages";
-				this.item.glow = false;
 				this.close_drop();
 			} else if (action == "close_drop") {
 				this.close_drop()

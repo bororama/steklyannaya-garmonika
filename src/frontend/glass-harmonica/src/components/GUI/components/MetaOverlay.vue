@@ -4,7 +4,7 @@
       <ButtonedInventory @inventory_open="open_inventory" @inventory_close="close_inventory"/>
       <button class="fa_button see_profile_button" v-if='profile_state === "no"' @click="open_profile">See Profile</button>
       <button v-if='profile_state != "no"' @click="close_profile" class="fa_button">Close Profile</button>
-      <button class="fa_button float_right" v-if="!in_admin_page" @click="open_admin_page">AdminPage</button>
+      <button class="fa_button float_right" v-if="!in_admin_page && is_admin" @click="open_admin_page">AdminPage</button>
       <button v-if='in_admin_page' @click="close_admin_page" class="fa_button">Close Admin</button>
       </div>
       <div class="overlay" v-if="profile_state != 'no'">
@@ -40,7 +40,8 @@ export default defineComponent({
         profile_state: 'no',
         in_admin_page: false,
         auto_image: '',
-        opened_inventory: false
+        opened_inventory: false,
+        is_admin: globalThis.is_admin
       })
     },
     methods: {

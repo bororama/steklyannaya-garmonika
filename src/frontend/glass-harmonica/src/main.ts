@@ -14,6 +14,7 @@ declare global {
   var username: string;
   var has2FA : boolean
   var my_data : any
+  var is_admin : boolean;
 }
 
 const routes = [
