@@ -30,7 +30,9 @@ import { backend, getRequestParams, postRequestParams } from './connect_params'
       name: "Shop",
       data() {
         return {
+          data: true,
           coins: 0,
+
           text: "Welcome to my bazaar.",
           texts: [],
         };
@@ -46,7 +48,8 @@ import { backend, getRequestParams, postRequestParams } from './connect_params'
           'In haste there is regret, but in patience and care there is peace and safety.',
           'The envious were created just to be infuriated.',
           'Thanks for your purchase friend.',
-          'Thanks hehe'
+          'Thanks hehe',
+          'Meow'
         ];
         this.updateInfo();
 
@@ -112,7 +115,7 @@ import { backend, getRequestParams, postRequestParams } from './connect_params'
   margin: 0 auto;
 }
 div {
-
+  margin: 10%;
 }
 
 .image {
@@ -143,6 +146,7 @@ div {
   font-size: 2.5em;
 }
 
+/* Alineación horizontal de las imágenes y botones */
 .items,
 .item-container,
 .button-container {

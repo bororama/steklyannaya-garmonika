@@ -2,14 +2,16 @@
   <div class="global">
     <h1>Leaderboard</h1>
     <div v-for="(player, index) in leaderboard" :key="index">
-      <div>{{ player.name }}</div>
-      <div class="coins-container">
-        <img src="../../../../public/items/perla.png" class="mini">
-        {{ player.pearls }}
-      </div>
-      <div class="coins-container">
-        <img src="../../../../public/items/collar.png" class="mini">
-        {{ player.necklaces }}
+      <div><h3>{{ player.name }}</h3></div>
+      <div class="items">
+        <div class="item-container">
+          <img src="../../../../public/items/perla.png" class="mini">
+            {{ player.pearls }}
+          </div>
+        <div class="item-container">
+          <img src="../../../../public/items/collar.png" class="mini">
+          {{ player.necklaces }}
+        </div>
       </div>
       <hr>
     </div>
@@ -28,7 +30,6 @@ export default {
     };
   },
   mounted(){
-    globalThis.id = 1; // QUITAR
     this.getLeaderboard();
   },
   methods: {
@@ -49,15 +50,20 @@ export default {
 <style>
 
 .mini {
-  width: 15%;
+  width: 60%;
   margin: 1.4em;
+  border: solid;
+  border-width: 4px;
+  border-color: var(--border_color);
+  border-radius: 2px;
+  margin: 1em;
 }
 
-.coins-container {
+.item-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5em;
+  font-size: 2em;
 }
 
 .global {
@@ -69,7 +75,13 @@ export default {
   margin: 0 auto;
 }
 div {
+  margin: 10%;
+}
 
+.items{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 </style>
