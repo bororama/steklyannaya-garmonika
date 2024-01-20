@@ -10,7 +10,6 @@
     <button class="fa_button float_right" v-if='in_metaverse && profile_state === "no"' @click="open_admin_page">AdminPage</button>
     <AlreadyConnected v-if="false"/>
     <Home/>
-
 </template>
 
 <script lang="ts">
@@ -24,6 +23,7 @@ import AlreadyConnected from './AlreadyConnected.vue'
 import Home from '../../Home.vue'
 import Shop from './Shop.vue'
 import Leaderboard from './Leaderboard.vue'
+import PongGame from './PongGame.vue'
 
 export default defineComponent({
   name: 'GUI',
@@ -36,7 +36,8 @@ export default defineComponent({
     AlreadyConnected,
     Home,
     Shop,
-    Leaderboard
+    Leaderboard,
+    PongGame
   },
   data () {
     return ({
