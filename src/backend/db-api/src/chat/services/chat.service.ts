@@ -67,6 +67,22 @@ export class ChatService {
         return new ChatDto(chat, [chatUser], []);
     }
 
+    async createWithUser(creator: User, password?: string): Promise<Chat> {
+        const chat: Chat = await this.chatModel.create({
+            password: (password ? this.hashPassword(password) : null)
+        });
+
+        await this.chatUserModel.create({
+            userId: creator.id,
+            chatId: chat.id,
+            isAdmin: true,
+            isOwner: true,
+            isBanned: false
+        });
+
+        return chat;
+    }
+
     async createFriendshipChat(user: User, friend: User, friendship: Friendship): Promise<Chat> {
         return this.chatModel.create({
             isPrivateChat: true,

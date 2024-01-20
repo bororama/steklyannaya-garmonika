@@ -281,28 +281,20 @@ export class UsersService {
         return ('ok');
     }
 
-    async subtractCoins(userId: string, quantity: number) : Promise<string> {
-        let user = await this.findOne(userId);
-        if (!user) {
-            throw new BadRequestException('User doesn\'t exist')
-        }
+    async subtractCoins(user: User, quantity: number) : Promise<string> {
         if (user.franciscoins < quantity)
             return ('not_enough_coins')
         else {
             user.franciscoins -= quantity;
-            user.save();
+            await user.save();
             return ('ok');
         }
     }
 
-    async addPearls(userId: string, quantity: number) : Promise<string> {
-        let user = await this.findOne(userId);
-        if (!user) {
-            throw new BadRequestException('User doesn\'t exist')
-        }
-        user.pearls += quantity
-        user.save()
-        return ('ok')
+    async addPearls(user: User, quantity: number) : Promise<string> {
+        user.pearls += quantity;
+        await user.save();
+        return ('ok');
     }
 
     async subtractPearls(userId: string, quantity: number) : Promise<string> {
@@ -319,14 +311,10 @@ export class UsersService {
         }
     }
 
-    async addNecklace(userId: string, quantity: number) : Promise<string> {
-        let user = await this.findOne(userId);
-        if (!user) {
-            throw new BadRequestException('User doesn\'t exist')
-        }
-        user.necklaces += quantity
-        user.save()
-        return ('ok')
+    async addNecklace(user: User, quantity: number) : Promise<string> {
+        user.necklaces += quantity;
+        await user.save();
+        return ('ok');
     }
 
     async subtractNecklace(userId: string, quantity: number) : Promise<string> {
