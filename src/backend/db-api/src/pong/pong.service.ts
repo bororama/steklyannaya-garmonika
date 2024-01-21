@@ -27,8 +27,7 @@ export class PongService {
       return(
         existingMatch.isGameInProgress !== Constants.MATCH_FAILED &&
         existingMatch.isGameInProgress !== Constants.MATCH_ENDED &&
-        existingMatch.pongRoomId === data.pongRoomId &&
-        existingMatch.collisionController.mode === data.mode
+        existingMatch.pongRoomId === data.pongRoomId
       );
     }
   }
