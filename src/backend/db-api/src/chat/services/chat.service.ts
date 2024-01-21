@@ -641,4 +641,65 @@ export class ChatService {
 
         return this.messageService.sendMessage(user, chat, message);
     }
+
+    async lockChat(chat: Chat, userId: string): Promise<void> {
+        const user = await this.userService.userExists(userId);
+        if (!user) {
+            throw new BadRequestException('User doesn\'t exist');
+        }
+
+        if (!chat.password) {
+            throw new BadRequestException('You can\'t lock a chat that doesn\'t have a password');
+        }
+
+        let chatUserRelation = await this.chatUserModel.findOne({
+            where: {
+                chatId: chat.id,
+                userId: user,
+            }
+        });
+
+        if (!chatUserRelation) {
+            throw new BadRequestException('User doesn\'t belong to this chat');
+        }
+
+        if (chatUserRelation.isOwner || chatUserRelation.isAdmin) {
+            throw new ForbiddenException('Owner and Admin can\'t lock chats');
+        }
+
+        chatUserRelation.chatLocked = true;
+        return chatUserRelation.save().then();
+    }
+
+    async unlockChat(chat: Chat, userId: string, password: string): Promise<void> {
+        const user = await this.userService.userExists(userId);
+        if (!user) {
+            throw new BadRequestException('User doesn\'t exist');
+        }
+
+        if (!chat.password) {
+            throw new BadRequestException('You can\'t unlock a chat that doesn\'t have a password');
+        }
+
+        let chatUserRelation = await this.chatUserModel.findOne({
+            where: {
+                chatId: chat.id,
+                userId: user,
+            }
+        });
+
+        if (!chatUserRelation) {
+            throw new BadRequestException('User doesn\'t belong to this chat');
+        }
+
+        if (chatUserRelation.isOwner || chatUserRelation.isAdmin) {
+            throw new ForbiddenException('Owner and Admin can\'t lock chats');
+        }
+
+        await this.validatePassword(chat, password);
+
+        chatUserRelation.chatLocked = false;
+        return chatUserRelation.save().then();
+    }
+
 }
