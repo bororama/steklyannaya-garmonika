@@ -8,6 +8,8 @@
       <button v-if='in_admin_page' @click="close_admin_page" class="fa_button">Close Admin</button>
       <button class="fa_button float_right" v-if="!inLeaderBoard" @click="openLeaderBoard">Ranking</button>
       <button v-if='inLeaderBoard' @click="closeLeaderBoard" class="fa_button">Close Ranking</button>
+      <button class="fa_button float_right" v-if="!inPongInstructions" @click="openPongInstructions">Instructions</button>
+      <button v-if='inPongInstructions' @click="closePongInstructions" class="fa_button">Close Instructions</button>
       </div>
       <div class="overlay" v-if="profile_state != 'no'">
         <ProfilePage display_status="personal_profile"/>
@@ -17,6 +19,7 @@
       </div>
       <AdminPage v-if="in_admin_page"/>
       <Leaderboard v-if="inLeaderBoard"/>
+      <PongInstructions v-if="inPongInstructions"/>
     </div>
 </template>
 
@@ -28,6 +31,7 @@ import AdminPage from './AdminPage.vue'
 import ButtonedInventory from './ButtonedInventory.vue'
 import InventoryPopupable from './InventoryPopupable.vue'
 import Leaderboard from './Leaderboard.vue'
+import PongInstructions from './PongInstructions.vue'
 
 import { defineComponent } from 'vue'
 
@@ -39,6 +43,7 @@ export default defineComponent({
       ButtonedInventory,
       InventoryPopupable,
       Leaderboard,
+      PongInstructions
     },
     data() {
       return ({
@@ -47,6 +52,7 @@ export default defineComponent({
         auto_image: '',
         opened_inventory: false,
         inLeaderBoard : false, 
+        inPongInstructions : false,
       })
     },
     methods: {
@@ -81,6 +87,14 @@ export default defineComponent({
       },
       closeLeaderBoard () {
         this.inLeaderBoard = false
+        this.in_metaverse = true
+      },
+      openPongInstructions () {
+        this.in_metaverse = false
+        this.inPongInstructions = true
+      },
+      closePongInstructions () {
+        this.inPongInstructions = false
         this.in_metaverse = true
       },
     }

@@ -11,7 +11,7 @@
             <img src="../../../../public/items/perla.png" class="mini">
           </td>
           <td class="t-column">
-            <img src="../../../../public/items/collar.png" class="mini">
+            <img src="../../../../public/items/franciscoin.png" class="mini">
           </td>
         </tr>
         <tr v-for="(player, index) in leaderboard" :key="index">
@@ -25,7 +25,7 @@
           </td>
           <td class="t-column">
             <div class="item-container">
-              {{ player.necklaces }}
+              {{ player.franciscoins }}
             </div>
           </td>
         </tr>
@@ -65,6 +65,7 @@ export default {
 
 <style>
 
+
 .mini {
   width: 100px;
 }
@@ -75,6 +76,7 @@ export default {
 }
 
 .item-container {
+
   display: flex;
   align-items: center;
   justify-content: center;
