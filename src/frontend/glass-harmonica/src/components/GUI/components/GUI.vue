@@ -43,11 +43,7 @@ export default defineComponent({
     Shop,
     Leaderboard,
     PongGame,
-<<<<<<< HEAD
-  },
-=======
    },
->>>>>>> origin/main
   data () {
     return ({
       profile_state: 'no',

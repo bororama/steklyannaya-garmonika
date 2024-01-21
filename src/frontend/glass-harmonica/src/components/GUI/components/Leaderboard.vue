@@ -11,7 +11,7 @@
             <img src="../../../../public/items/perla.png" class="mini">
           </td>
           <td class="t-column">
-            <img src="../../../../public/items/collar.png" class="mini">
+            <img src="../../../../public/items/franciscoin.png" class="mini">
           </td>
         </tr>
         <tr v-for="(player, index) in leaderboard" :key="index">
@@ -25,7 +25,7 @@
           </td>
           <td class="t-column">
             <div class="item-container">
-              {{ player.necklaces }}
+              {{ player.franciscoins }}
             </div>
           </td>
         </tr>
@@ -67,22 +67,12 @@ export default {
 
 
 .mini {
-<<<<<<< HEAD
-  width: 2vw;
-  margin: 1.4em;
-  border: solid;
-  border-width: 4px;
-  border-color: var(--border_color);
-  border-radius: 2px;
-  margin: 1em;
-=======
   width: 100px;
 }
 
 .t-column {
   width: 33%;
   background-color:#2f855b9e;
->>>>>>> origin/main
 }
 
 .item-container {
@@ -100,13 +90,7 @@ export default {
   flex-direction: column;
   width: 100vw;
   margin: 0 auto;
-<<<<<<< HEAD
-}
-div {
-
-=======
   font-family: 'joystix';
->>>>>>> origin/main
 }
 
 .items{
