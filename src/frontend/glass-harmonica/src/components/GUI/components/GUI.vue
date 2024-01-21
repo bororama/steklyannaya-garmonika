@@ -24,8 +24,6 @@ import Home from '../../Home.vue'
 import Shop from './Shop.vue'
 import Leaderboard from './Leaderboard.vue'
 import PongGame from './PongGame.vue'
-import SendMessagePopup from './SendMessagePopup.vue'
-import InformationPopup from './InformationPopup.vue'
 
 
 export default defineComponent({
@@ -41,8 +39,6 @@ export default defineComponent({
     Shop,
     Leaderboard,
     PongGame,
-    SendMessagePopup,
-    InformationPopup
   },
   data () {
     return ({
