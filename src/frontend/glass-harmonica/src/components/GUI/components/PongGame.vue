@@ -1,5 +1,5 @@
 <template>
-  <div class="game-container overlay-2">
+  <div class="game-container overlay-2 crt">
     <canvas id="pong-game" ref="pongCanvas"></canvas>
   </div>
 </template>
@@ -61,7 +61,6 @@ export default defineComponent({
     this.colors = ["black", "BlueViolet", "CadetBlue", "brown", "DarkGreen"];
     if (canvas) {
       this.ctx = canvas.getContext("2d");
-
       if (this.ctx) {
         this.ctx.canvas.width = window.innerWidth / 2;
         this.ctx.canvas.height = this.ctx.canvas.width / 2;
@@ -127,6 +126,7 @@ export default defineComponent({
           this.$emit('match_finish');
           this.metaSocket.emit('endDummyGame', globalThis.id);
       }, 1000);
+
 
       }
   },
@@ -297,3 +297,7 @@ export default defineComponent({
     },
   });
 </script>
+
+<style>
+@import './crt.css'
+</style>

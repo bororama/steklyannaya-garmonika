@@ -20,6 +20,10 @@ import AlreadyConnected from './AlreadyConnected.vue'
 import Metaverse from '../../Metaverse.vue'
 import MetaOverlay from './MetaOverlay.vue'
 import ProfilePage from './ProfilePage.vue'
+import Home from '../../Home.vue'
+import Shop from './Shop.vue'
+import Leaderboard from './Leaderboard.vue'
+import PongGame from './PongGame.vue'
 
 export default defineComponent({
   name: 'GUI',
@@ -29,7 +33,11 @@ export default defineComponent({
     AlreadyConnected,
     Metaverse,
     MetaOverlay,
-    ProfilePage
+    ProfilePage,
+    Home,
+    Shop,
+    Leaderboard,
+    PongGame
   },
   data () {
     return ({
