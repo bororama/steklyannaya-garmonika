@@ -402,9 +402,15 @@ class GameWorld {
                 new Vector3(-262.9376075888921, 49.41932127911506, -188.31524453127705),
                 new Quaternion(0, 0.15, 0),
                 [
-                    "'El aquelarre de Celia'",
+                    "Buy 'El aquelarre de Celia'",
+                    "Read 'El aquelarre de Celia'",
                     "The Falcon has spread its wings.",
-                    "Climb down this hill, find your destiny"
+                    "Climb down this hill, find your destiny",
+                    "Be careful in this God-forsaken land",
+                    "Do it for Him",
+                    "The wings of liberty glide across the sky",
+                    "Offer your heart",
+                    "MARCH ON",
                 ]
             )
         );
