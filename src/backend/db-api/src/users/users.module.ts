@@ -17,6 +17,7 @@ import { AuthMiddleware } from 'src/middleware/auth-middleware';
 import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
 import { ConnectedMiddleware } from 'src/middleware/connected-middleware';
 import { AdminsModule } from 'src/admins/admins.module';
+import { MatchesModule } from 'src/matches/matches.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { AdminsModule } from 'src/admins/admins.module';
     BansModule,
     ConfigModule,
     forwardRef(() => ChatModule),
-    forwardRef(() => AdminsModule)
+    forwardRef(() => AdminsModule),
+    forwardRef(() =>  MatchesModule)
   ],
   providers: [UsersService, PlayersService, { provide: APP_PIPE, useClass: ValidationPipe }],
   controllers: [UsersController, PlayersController],

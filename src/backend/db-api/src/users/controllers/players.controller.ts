@@ -10,6 +10,7 @@ import { LeaderboardPlayerDto } from "../dto/leaderboard-player.dto";
 import { FriendshipDto } from "../dto/friendship.dto";
 import { PublicPlayerDto } from "../dto/public-player.dto";
 import { AdminsService } from "src/admins/admins.service";
+import { MatchesService } from "src/matches/matches.service";
 
 @Controller('players')
 @ApiTags("Player Specific Data")
@@ -17,7 +18,8 @@ export class PlayersController {
     constructor (
         private readonly playerService : PlayersService,
         private readonly bansService : BansService,
-        private readonly adminService : AdminsService
+        private readonly adminService : AdminsService,
+        private readonly matchService : MatchesService
     ) {}
 
     @Get()
@@ -40,7 +42,8 @@ export class PlayersController {
     @Get(':idOrUsername')
     async findOne(@Param('idOrUsername') id: string): Promise<PlayerDto> {
         const player: Player = await this.playerService.findOne(id);
-        const playerDto = new PlayerDto(player, await this.adminService.isAdmin(player.id));
+        const matchRoomId: number = await this.matchService.getPlayerCurrentMatchByPlayerId(player.id).then(match => match?.roomId);
+        const playerDto = new PlayerDto(player, await this.adminService.isAdmin(player.id), matchRoomId);
 
         return playerDto;
     }

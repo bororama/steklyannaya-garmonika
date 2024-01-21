@@ -12,8 +12,9 @@ export class PlayerDto extends UserDto {
     franciscoins: number;
     status: UserStatus;
     isAdmin?: boolean;
+    matchRoomId?: number;
 
-    constructor(player: Player, isAdmin?: boolean) {
+    constructor(player: Player, isAdmin?: boolean, matchRoomId?: number) {
         super(player.user);
         this.defeats = player.defeats;
         this.wins = player.wins;
@@ -23,5 +24,6 @@ export class PlayerDto extends UserDto {
         this.franciscoins = player.user.franciscoins;
         this.status = player.user.status;
         this.isAdmin = isAdmin;
+        this.matchRoomId = matchRoomId
     }
 }
