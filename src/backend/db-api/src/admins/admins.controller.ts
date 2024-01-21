@@ -33,7 +33,23 @@ export class AdminsController {
 
     @Post(':idOrUsername')
     async riseToAdmin(@Param('idOrUsername') user: string): Promise<void> {
-        await this.adminService.riseToAdmin(user);
+        try {
+            await this.adminService.riseToAdmin(user);
+        }
+        catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                    throw new BadRequestException("User is already an admin");
+                } else {
+                    throw new BadRequestException('Other validation error:', validationError.message);
+                }
+                });
+            } else {
+                console.error('Error:', error);
+                throw new BadRequestException("There was an error");
+            }
+        }
     }
 
     @Delete(':idOrUsername')

@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, forwardRef } from "@nestjs/common";
+import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Ban } from "./ban.model";
 import { Player } from "../users/models/player.model";
@@ -20,10 +20,26 @@ export class BansService {
     }
 
     async banUser(player: Player, banner: Admin): Promise<void> {
-        await this.banModel.create({
-            adminId: banner.id,
-            playerId: player.id,
-        });
+        try {
+            const result = await this.banModel.create({
+                adminId: banner.id,
+                playerId: player.id,
+            });
+        }
+        catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                    throw new BadRequestException("User is already banned");
+                } else {
+                    throw new BadRequestException('Other validation error:', validationError.message);
+                }
+                });
+            } else {
+                console.error('Error:', error);
+                throw new BadRequestException("There was an error");
+            }
+        }
     }
 
     async unBanUser(player: Player): Promise<void> {

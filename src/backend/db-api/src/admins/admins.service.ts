@@ -32,14 +32,30 @@ export class AdminsService {
     }
 
     async create(newUser: NewUser): Promise<Admin> {
-        const user = await this.usersService.create(newUser);
+        try {
+            const user = await this.usersService.create(newUser);
 
-        const newAdmin = await this.adminModel.create({
-            id: user.id
-        });
+            const newAdmin = await this.adminModel.create({
+                id: user.id
+            });
 
-        newAdmin.user = user;
-        return newAdmin;
+            newAdmin.user = user;
+            return newAdmin;
+        }
+        catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                    throw new BadRequestException("User already exists");
+                } else {
+                    throw new BadRequestException('Other validation error:', validationError.message);
+                }
+                });
+            } else {
+                console.error('Error:', error);
+                throw new BadRequestException("There was an error");
+            }
+        }
     }
 
     async riseToAdmin(user: string): Promise<Admin> {

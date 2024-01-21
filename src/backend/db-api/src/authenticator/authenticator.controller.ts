@@ -137,19 +137,35 @@ export class AuthenticatorController {
   @Post('register')
   @ApiBody({type: RegisterInfoDto, required:true})
   async registerUser(@Body() register_info : RegisterInfoDto) : Promise<RegisterAnswerDto> {
-     let payload:any = jwt.verify(register_info.register_token, 'TODO change SUPER SECRET')
-     //TODO incorrect verify
-     const player : NewPlayer = {
-       userName: register_info.username,
-       loginFt: payload.login,
-       profilePic: 'src/profile_pics/' + payload.login + '.png',
-     }
-     let rval : any = await this.playerService.create(player)
-     let answer : RegisterAnswerDto = {
-        status:'ok',
-        meta_token: jwt.sign({username: rval.id}, 'TODO the REAL secret')
-     }
-     return (answer)
+    try {
+        let payload:any = jwt.verify(register_info.register_token, 'TODO change SUPER SECRET')
+        //TODO incorrect verify
+        const player : NewPlayer = {
+          userName: register_info.username,
+          loginFt: payload.login,
+          profilePic: 'src/profile_pics/' + payload.login + '.png',
+        }
+        let rval : any = await this.playerService.create(player)
+        let answer : RegisterAnswerDto = {
+            status:'ok',
+            meta_token: jwt.sign({username: rval.id}, 'TODO the REAL secret')
+        }
+        return (answer)
+      }
+      catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            error.errors.forEach((validationError) => {
+            if (validationError.type == 'unique violation') {
+                throw new BadRequestException("User already exists");
+            } else {
+                throw new BadRequestException('Other validation error:', validationError.message);
+            }
+            });
+        } else {
+            console.error('Error:', error);
+            throw new BadRequestException("There was an error");
+        }
+    }
   }
 
   @Get('me/:token')
