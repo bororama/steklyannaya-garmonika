@@ -1,4 +1,20 @@
 <style>
+:root {
+  --border_color: #603f22;
+  --pop_background: #392919;
+  --select_light: #85d8e5d0;
+}
+
+@font-face {
+  font-family: 'joystix';
+  src: url('/fonts/joystix_monospace.otf') format('opentype');
+}
+
+#app {
+  text-align: center;
+  color: white;
+}
+
 </style>
 
 <template>

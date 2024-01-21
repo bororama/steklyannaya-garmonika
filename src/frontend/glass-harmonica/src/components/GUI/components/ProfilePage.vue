@@ -161,6 +161,7 @@ export default defineComponent({
 .profile_container {
   display: flex;
   flex: 33vw;
+  font-family: joystix;
 }
 
 .personal_data_wrapper {

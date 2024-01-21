@@ -1,13 +1,13 @@
 <template>
 
 <img class="inventory_button" :src="this.current_image" @click="toggle_inventory">
-<InventoryPopupable v-if="this.inventory_opened" @close_request="close_inventory()" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}"/>
+<!--InventoryPopupable v-if="this.inventory_opened" @close_request="close_inventory()" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}"/-->
 
 
 </template>
 
 <script>
-import InventoryPopupable from "./InventoryPopupable.vue"
+//import InventoryPopupable from "./InventoryPopupable.vue"
 import Bolsa1 from "../assets/Bolsa1.png"
 import Bolsa2 from "../assets/Bolsa2.png"
 import Bolsa3 from "../assets/Bolsa3.png"
@@ -15,9 +15,6 @@ import Bolsa4 from "../assets/Bolsa4.png"
 
 export default {
 	name: "ButtonedInventory",
-	components: {
-		InventoryPopupable,
-	},
 	data () {
 		return ({
 			inventory_opened: false,
@@ -41,7 +38,7 @@ export default {
             }
 			else
             {
-              this.$emit('inventory_open')
+              this.$emit('inventory_close')
               this.inventory_opened = !this.inventory_opened;
               setTimeout(() => {this.current_image = this.bolsa[2]}, animation_delay);
               setTimeout(() => {this.current_image = this.bolsa[1]}, animation_delay * 2);

@@ -103,13 +103,14 @@ export default defineComponent({
   border: solid;
   border-radius: 2px;
   border-width: 3px;
-  width: 10em;
+  width: 12em;
   height: 2.3em;
   color: white;
   border-color: var(--border_color);
   background-color: var(--pop_background);
   cursor: pointer;
   margin: 1em;
+  font-family: joystix;
 }
 
 .fa_button:hover {

@@ -24,7 +24,6 @@ export class GameEntity extends TransformNode {
     private _nameLabel: Mesh;
 
     //Chat-related
-    private _bubbleTexture : AdvancedDynamicTexture;
     private _bubble : Rectangle;
     private _messageText : TextBlock;
     private _bubbleState : number;
@@ -46,7 +45,6 @@ export class GameEntity extends TransformNode {
             this._currentAnimation.play(true);
         }
         this._bubbleState = bubbleStates.INVISIBLE;
-        this._bubbleTexture = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
         this._bubble = new Rectangle();
         this._messageText = new TextBlock();
         this._setUpBubble();
@@ -63,7 +61,7 @@ export class GameEntity extends TransformNode {
     }
 
     private _setUpBubble() {
-        this._bubble.cornerRadius = 25;
+        this._bubble.cornerRadius = 12;
         this._bubble.thickness = 0;
         this._bubble.setPadding(0, 8, 0, 8);
         this._bubble.background = "white";
@@ -73,8 +71,8 @@ export class GameEntity extends TransformNode {
         this._bubble.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this._bubble.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         this._bubble.alpha = 0;
-        this._bubbleTexture.addControl(this._bubble);
-        this._bubble.addControl(this._messageText);
+        //this._bubbleTexture.addControl(this._bubble);
+        //this._bubble.addControl(this._messageText);
     }
 
     private _setUpLabel() {
@@ -148,26 +146,33 @@ export class GameEntity extends TransformNode {
     }
 
     say(message : string) {
+        let bubbleTexture = AdvancedDynamicTexture.CreateFullscreenUI("bubble");
+        bubbleTexture.removeControl(this._bubble);
+        this._bubble.removeControl(this._messageText);
         this._bubble.alpha = 1.0;
         const r : BoundingRect = this._getClientRectFromMesh();
         this._determineBubblePosition(r);
         this._determineBubbleFontSize(r);
+        this._messageText.textWrapping = 1;
         this._messageText.text = message;
         this._messageText.color = "black";
-        this._bubble.removeControl(this._messageText);
+        this._messageText.resizeToFit = true;
+        this._bubble.adaptHeightToChildren = true;
         this._bubble.addControl(this._messageText);
-        let context = this._bubbleTexture.getContext();
-        this._bubble.width = (clamp((context.measureText(message).width + (this._messageText.fontSizeInPixels * 3)), 64, 1024).toString() + "px");
-        this._bubble.height = (this._messageText.fontSizeInPixels * 2).toString() + "px";
-        let fadeOut = new AnimationGroup("fadeOut");
-        this._bubbleState = bubbleStates.VISIBLE;
-        fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._bubble);
-        fadeOut.onAnimationGroupEndObservable.add( () => {
-            this._bubbleState = bubbleStates.INVISIBLE;
-        });
+        let context = bubbleTexture.getContext();
+        this._bubble.width = (clamp((context.measureText(message).width + 24), 64, 1024).toString() + "px");
+        //this._bubble.height = (this._messageText.fontSizeInPixels * 2).toString() + "px";
+        bubbleTexture.addControl(this._bubble);
+       // let fadeOut = new AnimationGroup("fadeOut");
+       // this._bubbleState = bubbleStates.VISIBLE;
+       // fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._bubble);
+       // fadeOut.onAnimationGroupEndObservable.add( () => {
+       //     this._bubbleState = bubbleStates.INVISIBLE;
+       // });
         setTimeout(async () => {
-            fadeOut.play(false);
-        }, 750);
+            //fadeOut.play(false);
+            bubbleTexture.removeControl(this._bubble);
+        }, 400 + (message.length * 50));
     }
 
     private _determineBubblePosition(r : BoundingRect) {
@@ -178,12 +183,18 @@ export class GameEntity extends TransformNode {
     }
 
     private _determineBubbleFontSize(r : BoundingRect) {
-        const canvas  = super.getScene().getEngine().getRenderingCanvas();
-        const boundingRectArea : number = r.width * r.height;
-        const canvasArea : number = canvas!.clientWidth * canvas!.clientHeight;
-        const proportion : number = boundingRectArea / canvasArea;
-        const fontSize : number = clamp(8192 * ((proportion) - Math.pow(proportion / 2, 2)), 6, 22);
-        this._messageText.fontSize = fontSize;
+        const localPlayer  = this._scene.getMeshByName("outer");
+        /* not too based, but it's more consistent */
+        const distanceToPlayer : number = Vector3.Distance(localPlayer!.position, this.mesh.position);
+        this._messageText.fontSize = Math.max(16 - Math.floor(distanceToPlayer / 6), 2);
+
+        /* this is the based way */
+        //const canvas  = super.getScene().getEngine().getRenderingCanvas();
+        //const boundingRectArea : number = r.width * r.height;
+        //const canvasArea : number = canvas!.clientWidth * canvas!.clientHeight;
+        //const proportion : number = boundingRectArea / canvasArea;
+        //const fontSize : number = clamp(1024 * ((proportion) - Math.pow(proportion / 2, 2)), 8, 22);
+        //this._messageText.fontSize = fontSize;
     }
 
     private _getClientRectFromMesh(): BoundingRect {

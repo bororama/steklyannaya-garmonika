@@ -11,8 +11,8 @@ export class PlayerData implements Player {
     public rotation : Array<number>;
     public state : number;
 
-    constructor(locator : number, name : string) {
-        this.user  = { locator : locator,  name : name};
+    constructor(id : string, name : string) {
+        this.user  = { id : id,  name : name};
         this.position = Array(3);
         this.rotation = Array(4);
         this.state = 0;

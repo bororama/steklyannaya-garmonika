@@ -331,7 +331,9 @@ export class PlayersService {
         }
         return this.getFriends(playerId).then((friends) => {
           for (const f in friends) {
-            if (friends[f].id == friend.id)
+            console.log(friends[f].friendId)
+            console.log(friend.id)
+            if (friends[f].friendId == friend.id)
               return 'yes';
           }
           return 'no';

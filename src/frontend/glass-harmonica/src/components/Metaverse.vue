@@ -1,6 +1,5 @@
 <template>
-	<PongGame :meta-socket="metaSocket" :modo="0" :pong-room-id="-2" token:globalThis.logToken v-if="match" />
-  QR^20-berserk
+	<PongGame :meta-socket="metaSocket" :modo="0" :pong-room-id="-2"  v-if="match" />
 </template>
 
 <script setup lang="ts">
