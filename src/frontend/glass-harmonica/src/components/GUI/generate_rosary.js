@@ -12,6 +12,7 @@ export default function generate_rosary(sender, id) {
 			{ "text": "Alienate member", "action": "kick_member"},
 			{ "text": "Add Member", "action": "add_member"},
 			{ "text": "Securize", "action":"add_password"},
+			{ "text": "Ban time", "action":"time_ban"},
 		],
 		"options": [
 			{"text": "Send message", "action": "send_message"},
@@ -22,6 +23,8 @@ export default function generate_rosary(sender, id) {
 		],
 		"sender": sender,
         "chat_id":id,
+        "is_admin": false,
+        "is_owner": false,
 		"glow": false,
 		"description": "Is it better to conect with the indvidual, or with the group? What makes for better phylosophical debate? You seem to have found your own answer..."
 	}

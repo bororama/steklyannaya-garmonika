@@ -36,7 +36,7 @@ export default {
 		},
 		getMessages() {
           console.log(this.chatId, this.user)
-          fetch (backend + '/chats/' +  this.chatId + '/getMessages/' + this.user, postRequestParams).then((a) => {
+          fetch (backend + '/chats/' +  this.chatId + '/getMessages/' + this.user, getRequestParams).then((a) => {
             a.json().then((messages) => {
               console.log(messages)
                for (const m in messages) {

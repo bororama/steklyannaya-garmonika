@@ -126,25 +126,10 @@ export class PlayersService {
         if (player.pearls < 1)
           return ('not_enough_pearls')
         
-        try {
-            await this.friendshipModel.create({
-                userId: player,
-                friendId: friend,
-                accepted: false
-            });
-            player.pearls -= 1;
-            player.save()
-            return 'ok'
-        }
-        catch (error) {
-            if (error.name == "SequelizeUniqueConstraintError") {
-                throw new BadRequestException(error.message);
-            }
-
-            Logger.error(error);
-            throw new InternalServerErrorException('Could not send request');
-            return 'ko'
-        }
+        this.sendFriendshipPetitionById(player.id, friend.id);    
+        player.pearls -= 1;
+        player.save()
+        return 'ok'
     }
 
     async sendFriendshipPetition(playerId: string, newFriend: string) : Promise<void> {
@@ -178,6 +163,40 @@ export class PlayersService {
             await this.friendshipModel.create({
                 userId: player,
                 friendId: friend,
+                accepted: false
+            });
+        }
+        catch (error) {
+            if (error.name == "SequelizeUniqueConstraintError") {
+                throw new BadRequestException(error.message);
+            }
+
+            Logger.error(error);
+            throw new InternalServerErrorException('Could not send request');
+        }
+    }
+
+    async sendFriendshipPetitionById(playerId: number, newFriend: number) : Promise<void> {
+        const friendship = await this.friendshipModel.findOne({
+            where: {
+                [Op.or]: [
+                    {
+                       userId: playerId,
+                       friendId: newFriend
+                    },
+                    {
+                        userId: newFriend,
+                        friendId: playerId
+                    }
+                ]
+            }
+        });
+        if (friendship !== null && friendship !== undefined)
+            throw new BadRequestException("Already sent");
+        try {
+            await this.friendshipModel.create({
+                userId: playerId,
+                friendId: newFriend,
                 accepted: false
             });
         }

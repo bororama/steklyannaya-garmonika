@@ -11,10 +11,10 @@
         <ProfilePage display_status="my_profile"/>
       </div>
       <div class="overlay" v-if="opened_inventory">
-        <InventoryPopupable @go_to_pong_match="go_to_pong_match"/>
+        <InventoryPopupable @go_to_pong_match="go_to_pong_match" @close_inventory="close_inventory"/>
       </div>
       <AdminPage v-if="in_admin_page"/>
-      <PongGame v-if="in_match" :modo="0" :pong-room-id="room_id" @match_finish="close_match"/>
+      <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match"/>
     </div>
 </template>
 
@@ -46,7 +46,8 @@ export default defineComponent({
         opened_inventory: false,
         is_admin: globalThis.is_admin,
         in_match: false,
-        room_id: ''
+        room_id: '',
+        match_mode: 0
       })
     },
     methods: {
@@ -78,6 +79,7 @@ export default defineComponent({
       go_to_pong_match (match_data) {
         this.close_inventory()
         this.room_id = match_data.match_id
+        this.match_mode = match_data.mode
         this.in_match = true
       },
       close_match () {

@@ -2,7 +2,7 @@
 
 <div class="ItemDistributor">
 	<InventoryItem v-for="(group,index) in groups" :key="index" @change_active_description="relay_description_change" :item_data="group"/>
-	<InventoryItem v-for="(friendship_request,index) in frienship_requests" :key="index" @change_active_description="relay_description_change" :item_data="friendship_request"/>
+	<InventoryItem v-for="(friendship_request,index) in frienship_requests" :key="index" @change_active_description="relay_description_change" :item_data="friendship_request" @close_inventory="close_inventory"/>
 	<InventoryItem v-for="(friend,index) in friends" :key="index" @change_active_description="relay_description_change" :item_data="friend" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}"/>
 	<InventoryItem v-for="(block,index) in blocks" :key="index" @change_active_description="relay_description_change" :item_data="block"/>
 
@@ -37,13 +37,25 @@ export default {
 	methods: {
 		relay_description_change (new_description) {
 			this.$emit('change_active_description', new_description);
-		}
+		},
+        close_inventory() {
+          this.$emit('close_inventory')
+        }
 	},
     created() {
       fetch(backend + '/' + globalThis.id + '/chats', getRequestParams).then((r) => {
         r.json().then((answer) => {
           for (const chat in answer) {
-            this.groups.push(generate_rosary(globalThis.id, answer[chat].id))
+            let c = answer[chat]
+            let rosary = generate_rosary(globalThis.id, answer[chat].id)
+            for (const u in c.users) {
+              console.log(c.users[u])
+              if (globalThis.id == c.users[u].id) {
+                rosary.is_owner = c.users[u].isOwner
+                rosary.is_admin = c.users[u].isAdmin
+              }
+            }
+            this.groups.push(rosary)
           }
         })
       })

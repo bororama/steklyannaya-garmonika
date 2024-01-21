@@ -353,7 +353,7 @@ export class ChatService {
         if (!await this.isAdmin(chatAdmin, id)) {
             throw new BadRequestException('Requester is not a chat administrator');
         }
-        this.banUser(chat, user, minutes);
+        return this.banUser(chat, user, minutes);
     }
 
     async chatAdminUnbanUser(id: number, chatAdmin: string, user: string): Promise<void> {
@@ -611,7 +611,6 @@ export class ChatService {
         await chatRelation.save();
         return messagesPromise;
     }
-}
 
     async sendMessageToChat(userId: string, chat: Chat, message: string): Promise<void> {
         const user = await this.userService.findOneLight(userId);

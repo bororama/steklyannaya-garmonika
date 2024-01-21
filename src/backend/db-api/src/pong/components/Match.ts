@@ -61,7 +61,7 @@ export class Match {
 
   startGameLoop(io: Server) {
     if (this.isGameInProgress === Constants.MATCH_IN_PROGRESS) {
-      //this.matchesService.startMatchByRoom(this.pongRoomId)
+      this.matchesService.startMatchByRoom(this.pongRoomId)
       this.gameLoop(io);
     }
   }
@@ -84,7 +84,7 @@ export class Match {
       console.log('Match ended.', this.config.pointsToWin);
       this.isGameInProgress = Constants.MATCH_ENDED;
       io.to(this.matchIndex.toString()).emit('updateGameState', this);
-      //this.recordOnDB(); // ELCURRO
+      this.recordOnDB(); // ELCURRO
       return;
     }
     if (this.isGameInProgress === Constants.MATCH_IN_PROGRESS) {

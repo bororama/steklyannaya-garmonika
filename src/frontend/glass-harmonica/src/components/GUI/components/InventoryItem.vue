@@ -7,8 +7,8 @@
 	</div>
 	<div v-if="drop_enabled" class="dropdown_wrapper">
 		<ul class="dropdown_list">
-			<li v-for="(option, index) in item.owner_options" :key="index" class="dropdown_option" @click="act(option.action)">{{ option.text }}</li>
-			<li v-for="(option, index) in item.admin_options" :key="index" class="dropdown_option" @click="act(option.action)">{{ option.text }}</li>
+			<li v-if="item.is_owner" v-for="(option, index) in item.owner_options" :key="index" class="dropdown_option" @click="act(option.action)">{{ option.text }}</li>
+			<li v-if="item.is_admin" v-for="(option, index) in item.admin_options" :key="index" class="dropdown_option" @click="act(option.action)">{{ option.text }}</li>
 			<li v-for="(option, index) in item.options" :key="index" class="dropdown_option" @click="act(option.action)">{{ option.text }}</li>
 		</ul>
 	</div>
@@ -112,7 +112,7 @@ export default {
             } else if (action == "accept_friendship") {
               fetch(backend + '/players/' + globalThis.id + '/acceptFrienshipRequest/' + this.item.sender, postRequestParams);
               this.close_drop();
-              this.item = generate_pearl(this.item.sender, this.item.target);
+              this.$emit('close_inventory')
             } else if (action == "reject_friendship") {
               fetch(backend + '/players/' + globalThis.id + '/declineFrienshipRequest/' + this.item.sender, postRequestParams);
               this.close_drop();
@@ -121,6 +121,9 @@ export default {
               this.close_drop();
             } else if (action == "add_member") {
               this.active_interaction = "adding_member";
+              this.close_drop();
+            } else if (action == "time_ban") {
+              this.active_interaction = "time_banning";
               this.close_drop();
 			} else {
 				console.log("ERROR: Unrecognised option");
@@ -165,10 +168,11 @@ export default {
             }
 		},
 		make_admin(member) {
-            fetch(backend + "/chats/" + this.item.rhat_id + "/admins/" + member, postRequestParams); 
+            fetch(backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/riseToAdmin/' + member, postRequestParams); 
 			this.active_interaction = 'none';
 		},
 		unmake_admin(member) {
+            fetch(backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/revokeAdmin/' + member, postRequestParams); 
 			//TODO inform server of change
 			for (var i in this.item.admins) {
 				var a = this.item.admins[i];

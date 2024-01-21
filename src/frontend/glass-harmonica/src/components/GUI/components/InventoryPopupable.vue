@@ -1,5 +1,5 @@
 <template>
-<InventoryGrid  @change_active_description="change_active_description" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}"/>
+<InventoryGrid  @change_active_description="change_active_description" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}" @close_inventory="close_inventory"/>
 <SendMessagePopup :target="message_login" :sender="message_sender" v-if="message_popup" @close="disable_message_popup"/>
 <ViewMessagesPopup :target="message_login" :messages="view_messages" v-if="view_messages_popup" @close="disable_view_messages_popup"/>
 <InformationPopup class="info_popup" :info_text="this.active_description"/>
@@ -37,29 +37,12 @@ export default {
 		disable_message_popup() {
 			this.message_popup = false;
 		},
-/*		activate_view_messages_popup(sender, me) {
-			this.message_login = sender;
-			this.view_messages_popup = true;
-			try {
-				fetch ("http://localhost:4242/receive_messages?"+ new URLSearchParams({
-						recipient:me
-				})).then((result) => {
-					result.text().then((t) => {
-						const json = JSON.parse(t);
-						let messages_array = [];
-						for (let row in json) {
-							messages_array.push(json[row].message);
-						}
-						this.view_messages = messages_array;
-					});
-				});
-			} catch (e) {
-				console.log(e)
-			}
-		},
-*/		change_active_description(new_description) {
+		change_active_description(new_description) {
 			this.active_description = new_description;
-		}
+		},
+        close_inventory() {
+          this.$emit('close_inventory')
+        }
 	}
 }
 </script>

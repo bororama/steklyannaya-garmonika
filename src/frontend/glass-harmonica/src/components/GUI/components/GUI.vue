@@ -3,9 +3,10 @@
     <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
     <ProfilePage v-if="profile_state == 'registering'" :display_status="profile_state" :auto_image="auto_image" :register_token="register_token" @successful_register="go_to_metaverse"/>
     <div class="overlay" v-if="showing_profile_image">
-        <ProfilePage display_status="profile_display" :userId="meta_colleague_id"/>
+        <ProfilePage display_status="profile_display" :userId="meta_colleague_id" @start_match="go_to_pong_match" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
     </div>
+     <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match"/>
     <AlreadyConnected v-if="already_connected"/>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
@@ -20,6 +21,7 @@ import AlreadyConnected from './AlreadyConnected.vue'
 import Metaverse from '../../Metaverse.vue'
 import MetaOverlay from './MetaOverlay.vue'
 import ProfilePage from './ProfilePage.vue'
+import PongGame from './PongGame.vue'
 import { backend, getRequestParams } from './connect_params.ts'
 
 export default defineComponent({
@@ -45,7 +47,10 @@ export default defineComponent({
                 auto_image: ''},
       showing_profile_image: false,
       meta_colleague_id: '',
-      already_connnected: false
+      already_connnected: false,
+      in_match: false,
+      room_id: 0,
+      match_mode: 0,
     })
   },
   methods: {
@@ -84,8 +89,13 @@ export default defineComponent({
     },
     go_to_alredy_connected_page () {
       this.already_connected = true
+    },
+    go_to_pong_match (match_data) {
+      this.close_inventory()
+      this.room_id = match_data.match_id
+      this.match_mode = match_data.mode
+      this.in_match = true
     }
-
   }
 })
 </script>

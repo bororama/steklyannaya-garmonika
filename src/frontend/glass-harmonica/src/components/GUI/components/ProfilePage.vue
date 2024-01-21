@@ -13,8 +13,8 @@
                     <Enabler2FA v-if="display_status != 'registering' && display_status != 'profile_display'"/>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && !is_friend && !is_potential_friend" @click="befriend">Befriend</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked" @click="block">Block</button>
-                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online'" @click="match">Match</button>
-                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online'" @click="match_boundless">Boundless</button>
+                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online' && !unmatchable" @click="match">Match</button>
+                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online' && !unmatchable" @click="match_boundless">Boundless</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'in_match'" @click="spectate">Spectate</button>
                 </div>
             </div>
@@ -37,7 +37,7 @@ import { backend, postRequestParams, getRequestParams } from './connect_params'
 
 export default defineComponent({
   name: 'ProfilePage',
-  props: ['display_status', 'register_token', 'userId', 'auto_image'],
+  props: ['display_status', 'register_token', 'userId', 'auto_image', 'unmatchable'],
   components: {
     StatsDisplay,
     StatusPearl,

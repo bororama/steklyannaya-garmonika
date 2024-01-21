@@ -44,9 +44,9 @@ export class ChatController {
         if (chat  == null) {
             throw new BadRequestException('Chat doesn\'t exists');
         }
-        if (chat.password || chat.isPrivateChat) {
-            throw new ForbiddenException('Can see the members of this chat unless you belong to it');
-        }
+//        if (chat.password || chat.isPrivateChat) {
+//            throw new ForbiddenException('Can see the members of this chat unless you belong to it');
+//        }
         const users = await this.chatService.getChatUsers(id).then();
         const bans = await this.chatService.getBansMembers(id, users);
         console.log("Got banned users");

@@ -6,6 +6,7 @@
 		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_password" v-if="this.interaction == 'unlocking_password'"/>
 		<ViewMembersPopup @close_interaction="close" @user_interact="user_interact" :members="users_in_chat" v-if="this.interaction == 'displaying_members' || this.interaction == 'making_admin' || this.interaction == 'unmaking_admin' || this.interaction == 'kicking_member'"/>
         <AddMemberPopup v-if="this.interaction == 'adding_member'" :chat_id="item.chat_id" @close_interaction="close"/>
+        <BanTimeUserPopup v-if="this.interaction == 'time_banning'" :chat_id="item.chat_id" @close_interaction="close"/>
         <div  v-if="displaying_profile" class="overlay">
             <button @click="closeProfile">Close Profile</button>
             <ProfilePage display_status="profile_display" :userId="display_userId" @start_match="(param) => $emit('go_to_pong_match', param)"/>
@@ -25,8 +26,9 @@ import InputPasswordPopup from './InputPasswordPopup.vue'
 import ViewMembersPopup from './ViewMembersPopup.vue'
 import ProfilePage from './ProfilePage.vue'
 import AddMemberPopup from './AddMemberPopup.vue'
+import BanTimeUserPopup from './BanTimeUserPopup.vue'
 
-import {backend, postRequestParams} from './connect_params.ts' 
+import {backend, postRequestParams, getRequestParams} from './connect_params.ts' 
 
 export default {
 	name: 'SubItemInteraction',
@@ -38,7 +40,8 @@ export default {
 		SetPasswordPopup,
 		ViewMembersPopup,
         ProfilePage,
-        AddMemberPopup
+        AddMemberPopup,
+        BanTimeUserPopup
 	},
 	methods: {
 		close () {
@@ -83,7 +86,7 @@ export default {
         getUsersInChat(id) {
           if (this.item.item_type == "rosary")
           {
-            fetch(backend+ "/chats/"+ id +"/users", postRequestParams).then((response) => {
+            fetch(backend+ "/chats/"+ id +"/users", getRequestParams).then((response) => {
                 response.json().then( (r) => {
                   this.users_in_chat = r;
                 });
