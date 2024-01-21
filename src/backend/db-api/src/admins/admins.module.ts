@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, forwardRef } from '@nestjs/common';
 import { AdminsController } from './admins.controller';
 import { AdminsService } from './admins.service';
 import { UsersModule } from '../users/users.module';
@@ -12,7 +12,7 @@ import { AuthMiddleware } from '../middleware/auth-middleware';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Admin, Ban]), UsersModule, BansModule, ChatModule, ConfigModule],
+  imports: [SequelizeModule.forFeature([Admin, Ban]), forwardRef(() => UsersModule), BansModule, ChatModule, ConfigModule],
   controllers: [AdminsController],
   providers: [AdminsService],
   exports: [AdminsService]

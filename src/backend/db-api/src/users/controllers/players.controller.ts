@@ -9,13 +9,15 @@ import { UpdatePlayerDto } from "../dto/player-update.dto";
 import { LeaderboardPlayerDto } from "../dto/leaderboard-player.dto";
 import { FriendshipDto } from "../dto/friendship.dto";
 import { PublicPlayerDto } from "../dto/public-player.dto";
+import { AdminsService } from "src/admins/admins.service";
 
 @Controller('players')
 @ApiTags("Player Specific Data")
 export class PlayersController {
     constructor (
         private readonly playerService : PlayersService,
-        private readonly bansService : BansService
+        private readonly bansService : BansService,
+        private readonly adminService : AdminsService
     ) {}
 
     @Get()
@@ -38,7 +40,7 @@ export class PlayersController {
     @Get(':idOrUsername')
     async findOne(@Param('idOrUsername') id: string): Promise<PlayerDto> {
         const player: Player = await this.playerService.findOne(id);
-        const playerDto = new PlayerDto(player);
+        const playerDto = new PlayerDto(player, await this.adminService.isAdmin(player.id));
 
         return playerDto;
     }

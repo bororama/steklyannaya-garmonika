@@ -1,6 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { Player } from "../models/player.model";
 import { UserDto } from "./user.dto";
+import { UserStatus } from "./user-status.enum";
 
 export class PlayerDto extends UserDto {
     defeats: number;
@@ -9,8 +10,10 @@ export class PlayerDto extends UserDto {
     pearls: number;
     necklaces: number;
     franciscoins: number;
+    status: UserStatus;
+    isAdmin?: boolean;
 
-    constructor(player: Player) {
+    constructor(player: Player, isAdmin?: boolean) {
         super(player.user);
         this.defeats = player.defeats;
         this.wins = player.wins;
@@ -18,5 +21,7 @@ export class PlayerDto extends UserDto {
         this.pearls = player.user.pearls;
         this.necklaces = player.user.necklaces;
         this.franciscoins = player.user.franciscoins;
+        this.status = player.user.status;
+        this.isAdmin = isAdmin;
     }
 }

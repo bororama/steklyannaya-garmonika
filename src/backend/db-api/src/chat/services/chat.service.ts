@@ -611,7 +611,6 @@ export class ChatService {
         await chatRelation.save();
         return messagesPromise;
     }
-}
 
     async sendMessageToChat(userId: string, chat: Chat, message: string): Promise<void> {
         const user = await this.userService.findOneLight(userId);

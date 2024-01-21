@@ -16,9 +16,17 @@ import { ChatModule } from '../chat/chat.module';
 import { AuthMiddleware } from 'src/middleware/auth-middleware';
 import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
 import { ConnectedMiddleware } from 'src/middleware/connected-middleware';
+import { AdminsModule } from 'src/admins/admins.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([User, Player, Block, Friendship]), ChatUserModule, BansModule, ConfigModule, forwardRef(() => ChatModule)],
+  imports: [
+    SequelizeModule.forFeature([User, Player, Block, Friendship]),
+    ChatUserModule,
+    BansModule,
+    ConfigModule,
+    forwardRef(() => ChatModule),
+    forwardRef(() => AdminsModule)
+  ],
   providers: [UsersService, PlayersService, { provide: APP_PIPE, useClass: ValidationPipe }],
   controllers: [UsersController, PlayersController],
   exports: [UsersService, PlayersService]
