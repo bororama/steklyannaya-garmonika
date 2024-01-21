@@ -18,12 +18,17 @@ import * as fs from "fs"
 import { authenticator, totp } from 'otplib'
 import * as qrcode from "qrcode"
 import * as speakeasy from "speakeasy"
+import { AdminsService } from 'src/admins/admins.service';
+import { Player } from 'src/users/models/player.model';
 
 @Controller('log')
 export class AuthenticatorController {
 
-  constructor (private readonly userService:UsersService,private readonly playerService:PlayersService) {
-  }
+  constructor (
+    private readonly userService : UsersService,
+    private readonly playerService : PlayersService,
+    private readonly adminService : AdminsService
+  ) {}
 
   @Get('code/:code')
   tryLogWithCode(@Param('code') code :string) : Promise<any> {
@@ -150,9 +155,9 @@ export class AuthenticatorController {
   @Get('me/:token')
   async getMyData(@Param('token') token :string) : Promise<PlayerDto> {
     // TODO answer with bad request
-     let payload:any = jwt.verify(token, 'TODO the REAL secret')
-     const player:any = await this.playerService.findOne(payload.username)
-     const playerDto = new PlayerDto(player)
+     let payload: any = jwt.verify(token, 'TODO the REAL secret')
+     const player: Player = await this.playerService.findOne(payload.username)
+     const playerDto = new PlayerDto(player, await this.adminService.isAdmin(player.id))
      return playerDto
   }
 

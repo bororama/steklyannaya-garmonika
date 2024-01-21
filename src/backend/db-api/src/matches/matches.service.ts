@@ -129,6 +129,47 @@ export class MatchesService {
         });
     }
 
+    async getPlayerCurrentMatchByPlayerId(playerId: number): Promise<Match> {
+        return this.matchModel.findOne({
+            where: {
+                [Op.or]: [
+                    {
+                        idPlayer1: playerId
+                    },
+                    {
+                        idPlayer2: playerId
+                    }
+                ],
+                startDate: {
+                    [Op.ne]: null
+                },
+                endDate: {
+                    [Op.eq]: null
+                }
+            },
+            include: [
+                {
+                    model: Player,
+                    as: 'player1',
+                    include: [
+                        {
+                          model: User
+                        }
+                    ]
+                },
+                {
+                    model: Player,
+                    as: 'player2',
+                    include: [
+                        {
+                          model: User
+                        }
+                    ]
+                }
+            ]
+        });
+    }
+
     delete(matchId: number): Promise<void> {
         return this.matchModel.destroy({
             where: {

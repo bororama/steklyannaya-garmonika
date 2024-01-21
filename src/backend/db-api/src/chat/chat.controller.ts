@@ -137,6 +137,35 @@ export class ChatController {
         return this.chatService.unsetPassword(chat, createChatDto.password);
     }
 
+    @Post(':id/lock/:idOrUsername')
+    @ApiOperation({
+        summary: 'Lock a chat room with an assigned password',
+        description: 'This endpoint will a chat room for the given user.'
+    })
+    async lockChatForUser(@Param('id', ParseIntPipe) id: number, @Param('idOrUsername') userId: string): Promise<void> { //TODO: Finish this endpoint
+        const chat: Chat = await this.chatService.findOne(id);
+        if (!chat) {
+            throw new BadRequestException('Chat doesn\'t exists');
+        }
+
+        return this.chatService.lockChat(chat, userId);
+    }
+    
+    @Post(':id/unlock/:idOrUsername')
+    @ApiBody({type: CreateChatDto})
+    @ApiOperation({
+        summary: 'Unlock a chat room with an assigned password',
+        description: 'This endpoint will unlock a chat room for the give user with the correct password.'
+    })
+    async unlockChatForUser(@Param('id', ParseIntPipe) id: number, @Param('idOrUsername') userId: string, @Body() createChatDto: CreateChatDto): Promise<void> { //TODO: Finish this endpoint
+        const chat: Chat = await this.chatService.findOne(id);
+        if (!chat) {
+            throw new BadRequestException('Chat doesn\'t exists');
+        }
+
+        return this.chatService.unlockChat(chat, userId, createChatDto.password);
+    }
+
     @Post(':id/sendMessage/:idOrUsername')
     @ApiBody({ description: 'message', required: true, type: SendMessageDto })
     async sendMessage(@Param('id', ParseIntPipe) id: number, @Param('idOrUsername') user: string, @Body() message: SendMessageDto): Promise<void> {
