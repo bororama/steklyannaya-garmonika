@@ -28,8 +28,8 @@
   <style>
 
   .instructions-box{
-    width: 700px;
-    height: 350px;
+    width: 35%;
+    height: 30%;
     background-color: #392919d5;
     margin: 0 auto;
 
