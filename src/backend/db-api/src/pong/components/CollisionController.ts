@@ -20,7 +20,7 @@ export class CollisionController {
   private ballImpactsPaddle(paddle: Paddle){
     return(this.ball.posx + this.ball.sizex >= paddle.posx &&
       this.ball.posx <= paddle.posx + paddle.sizex &&
-      this.ball.posy >= paddle.posy &&
+      this.ball.posy + this.ball.sizex >= paddle.posy &&
       this.ball.posy <= paddle.posy + paddle.sizey)
   }
   checkCollisions(config: BackendConfig) {
