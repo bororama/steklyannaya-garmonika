@@ -1,5 +1,5 @@
 <template>
-    <div class="overlay">
+    <div class="overlay" style="z-index: 20;">
       <div class="instructions-box">
         <div class = "instructions-text">
           <h2>جَيَّان controls:<br></h2>

@@ -8,6 +8,7 @@
     </div>
     <Shop v-if="in_store" @closeShop="closeShop"/>
     <AlreadyConnected v-if="false"/>
+  	<router-view></router-view>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
 

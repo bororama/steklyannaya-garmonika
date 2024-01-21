@@ -23,8 +23,15 @@
 
 <script setup lang="ts">
 
-import ProfilePage from './components/ProfilePage.vue';
+import NotFound from './components/NotFound.vue';
+import PongInstructions from './components/GUI/components/PongInstructions.vue';
 import Home from './components/ProfilePage.vue';
+import { useRouter } from 'vue-router';
+
+
+//const router = useRouter();
+
+
 
 </script>
 
