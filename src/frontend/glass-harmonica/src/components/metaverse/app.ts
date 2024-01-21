@@ -7,6 +7,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
 import { PlayerData } from "./playerData";
 import { LocalPlayer } from "./localPlayer";
+import { NPC } from "./NPC";
 import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
 import { GameEntity } from "./gameEntity";
@@ -56,6 +57,7 @@ class GameWorld {
     private _livePlayers: Array<RemotePlayer>;
     private _yellowDevilName: string;
     private _yellowDevil : GameEntity | any;
+    private _NPCS : Array<NPC> | any;
 
     constructor(metaSocket: Socket, playerData: PlayerData) {
         this._canvas = this._createCanvas();
@@ -68,6 +70,7 @@ class GameWorld {
         this._player = null;
         this._input = null;
         this._livePlayers = new Array();
+        this._NPCS = new Array();
         this._environment = null;
         this._yellowDevilName = 'فرانسيسكو خيسوس دي جاتا وفالديس';
         //Events for debugging
@@ -85,9 +88,21 @@ class GameWorld {
                 console.log("Player position : ",
                 `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
             }
+            
+            else if( ev.key === "r") {
+                console.log("Player rotation : ", `${this._player!.mesh.rotationQuaternion}`);
+            }
 
             else if ( ev.key === "R") {
                 this._player!.mesh.position = Vector3.Zero();
+            }
+
+            else if ( ev.key === "p") {
+                this.showPopUp("This is a pop up");
+            }
+
+            else if ( ev.key === "P") {
+                this.showPopUp("This is a pop up with a longer text so that we can see how it goes. I want it to be longer still, and hope there's no issue");
             }
         });
     }
@@ -136,8 +151,8 @@ class GameWorld {
         this._popUpTexture = AdvancedDynamicTexture.CreateFullscreenUI('pop-up');
 
         this._popUpStack = new StackPanel();
-        this._popUpStack.width = '300px';
-        this._popUpStack.height = '200px';
+        this._popUpStack.width = '80%';
+        this._popUpStack._automaticSize = true;
         this._popUpStack.background = 'white';
         this._popUpStack.alpha = 0.8;
         this._popUpStack.paddingBottom = '20px';
@@ -302,8 +317,13 @@ class GameWorld {
                     document.dispatchEvent(shopEvent);
                     vueEmitter('storeRequest', { username: this._playerData!.user.name });
                 }
-                else {
+                else if (pickInfo?.pickedMesh?.metadata.type === 'remote') {
                     vueEmitter('profileRequest', { name: pickInfo!.pickedMesh!.metadata.name });
+                }
+                else {
+                    let NPC = this._NPCS.find((npc : any) => { return npc.name === pickInfo!.pickedMesh!.metadata.name})
+                    console.log(NPC.name, ": About to saySomething()");
+                    NPC.saySomething();
                 }
             }
         });
@@ -357,7 +377,7 @@ class GameWorld {
         this._engine.hideLoadingUI();
         this._scene.attachControl();
         this._setUpMaterials();
-        await this._instanceNPCs();
+        await this._instanceAllNpcs();
     }
 
     private async _initializeGameAsync(scene: Scene): Promise<void> {
@@ -368,12 +388,28 @@ class GameWorld {
         const camera = this._player.activatePlayerCamera();
     }
 
-    private async _instanceNPCs() {
+    private async _instanceAllNpcs() {
         /*curro*/
-        const assets = await this._loadPlayerAssets(this._scene, false, 'curro.glb');
+        let assets = await this._loadPlayerAssets(this._scene, false, 'curro.glb');
         this._yellowDevil = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
         this._yellowDevil.updatePosition(new Vector3(-138, -75, 335));
         this._yellowDevil.rotationQuaternion = new Quaternion(0, 30);
+
+        /*guille*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'humanoid.glb');
+        this._NPCS.push(
+            new NPC(assets, this._scene, 'Guillermo', 'angel',
+                new Vector3(-262.9376075888921, 49.41932127911506, -188.31524453127705),
+                new Quaternion(0, 0.15, 0),
+                [
+                    "'El aquelarre de Celia'",
+                    "The Falcon has spread its wings.",
+                    "Climb down this hill, find your destiny"
+                ]
+            )
+        );
+        //Player rotation :  {X: 0 Y: 0.15132534047226934 Z: 0 W: 0.9884840116718889}
+        //Player position :  -262.9376075888921, 49.41932127911506, -188.31524453127705
     }
 
 
