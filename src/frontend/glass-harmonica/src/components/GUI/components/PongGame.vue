@@ -1,5 +1,5 @@
 <template>
-  <div class="game-container overlay-2 crt">
+  <div class="game-container overlay-2">
     <canvas id="pong-game" ref="pongCanvas"></canvas>
   </div>
 </template>

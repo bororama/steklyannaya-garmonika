@@ -314,8 +314,8 @@ class GameWorld {
             });
             if (pickInfo!.hit) {
                 if (pickInfo?.pickedMesh?.metadata.type === 'Devil') {
-                    document.dispatchEvent(shopEvent);
-                    vueEmitter('storeRequest', { username: this._playerData!.user.name });
+                    console.log("Emitter ", vueEmitter);
+                    vueEmitter('storeRequest', { userId: this._playerData!.user.id });
                 }
                 else if (pickInfo?.pickedMesh?.metadata.type === 'remote') {
                     vueEmitter('profileRequest', { name: pickInfo!.pickedMesh!.metadata.name });
