@@ -162,6 +162,7 @@ export class ChatService {
     async join(userId: string, chat: Chat): Promise<ChatUsers> {
         const user: User = await this.userService.findOne(userId);
         let locked = false;
+        let chatUserRelation;
 
         if (!user) {
             throw new BadRequestException('User doesn\'t exists');
@@ -179,14 +180,30 @@ export class ChatService {
             locked = true;
         }
 
-        let chatUserRelation = await this.chatUserModel.create({
-            userId: user.id,
-            chatId: chat.id,
-            isAdmin: false,
-            chatLocked: locked,
-        });
+        try {
+            chatUserRelation = await this.chatUserModel.create({
+                userId: user.id,
+                chatId: chat.id,
+                isAdmin: false,
+                chatLocked: locked,
+            });
+            chatUserRelation.user = user;
+        }
+        catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                    throw new BadRequestException("User is alredy on this chat");
+                } else {
+                    throw new BadRequestException('Other validation error:', validationError.message);
+                }
+                });
+            } else {
+                console.error('Error:', error);
+                throw new BadRequestException("There was an error");
+            }
+        }
 
-        chatUserRelation.user = user;
         return chatUserRelation;
     }
 

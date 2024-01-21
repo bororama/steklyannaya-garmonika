@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
-import { ItemsModule } from './items/items.module';
 import { ChatModule } from './chat/chat.module';
 import { ChatUserModule } from './chat-user/chat-user.module';
 import { MatchesModule } from './matches/matches.module';
@@ -16,7 +15,6 @@ import { MetaverseModule } from './meta/metaverse.module';
   imports: [
     DatabaseProviderModule,
     UsersModule,
-    ItemsModule,
     ChatModule,
     ChatUserModule,
     MatchesModule,

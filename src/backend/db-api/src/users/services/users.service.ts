@@ -184,10 +184,26 @@ export class UsersService {
             throw new BadRequestException('User doesn\'t exists');
         }
 
-        this.blockModel.create({
-            blockerId: userId,
-            blockedId: blockedUserId
-        });
+        try {
+            await this.blockModel.create({
+                blockerId: userId,
+                blockedId: blockedUserId
+            });
+        }
+        catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                    throw new BadRequestException("User is already blocked");
+                } else {
+                    throw new BadRequestException('Other validation error:', validationError.message);
+                }
+                });
+            } else {
+                console.error('Error:', error);
+                throw new BadRequestException("There was an error");
+            }
+        }
     }
 
     async unblockUser(blocker:string, blocked: string): Promise<void> {

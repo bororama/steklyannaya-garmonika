@@ -103,12 +103,18 @@ export class PlayersService {
             return (player);
         }
         catch (error) {
-            if (error.name == "SequelizeUniqueConstraintError") {
-                throw new BadRequestException(error.message);
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                    throw new BadRequestException("User is already exists");
+                } else {
+                    throw new BadRequestException('Other validation error:', validationError.message);
+                }
+                });
+            } else {
+                console.error('Error:', error);
+                throw new BadRequestException("There was an error");
             }
-
-            Logger.error(error);
-            throw new InternalServerErrorException('Could not create user');
         }
     }
 
@@ -138,7 +144,7 @@ export class PlayersService {
         }
         catch (error) {
             if (error.name == "SequelizeUniqueConstraintError") {
-                throw new BadRequestException(error.message);
+                throw new BadRequestException("Already friends");
             }
 
             Logger.error(error);
@@ -183,7 +189,7 @@ export class PlayersService {
         }
         catch (error) {
             if (error.name == "SequelizeUniqueConstraintError") {
-                throw new BadRequestException(error.message);
+                throw new BadRequestException("Already friends");
             }
 
             Logger.error(error);
