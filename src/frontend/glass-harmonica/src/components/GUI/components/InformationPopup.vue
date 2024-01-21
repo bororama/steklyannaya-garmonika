@@ -16,9 +16,6 @@ export default {
 </script>
 
 <style>
-body {
-  background-color: #39291985;
-}
 .information_background {
 	height:30vh;
 	background-color: #392919;
@@ -29,6 +26,8 @@ body {
 	border-style: solid;
 	border-color: #603f22;
     border-width: 1em;
+    position: relative;
+    top: 15vh;
 }
 
 .information_wrapper {

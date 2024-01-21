@@ -1,56 +1,67 @@
 <template>
-    <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
-    <button v-if='!in_metaverse && profile_state != "no" && profile_state != "registering"' @click="close_profile" class="fa_button">Close Profile</button>
-    <button v-if='!in_metaverse && in_admin_page' @click="close_admin_page" class="fa_button">Close Admin</button>
-    <ProfilePage v-if="profile_state != 'no'" :display_status="profile_state" :register_token="register_token" :auto_image="auto_image" @successful_register="go_to_metaverse"/>
     <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse"/>
-    <button class="fa_button" v-if='in_metaverse && profile_state === "no"' @click="open_profile">See Profile</button>
-    <ButtonedInventory v-if="in_metaverse" @inventory_open="open_inventory" @inventory_close="close_inventory" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}"/>
-    <AdminPage v-if="in_admin_page"/>
-    <button class="fa_button float_right" v-if='in_metaverse && profile_state === "no"' @click="open_admin_page">AdminPage</button>
+    <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
+    <ProfilePage v-if="profile_state == 'registering'" :display_status="profile_state" :auto_image="auto_image" :register_token="register_token" />
+    <div class="overlay" v-if="showing_profile_image">
+      <ProfilePage display_status="profile_display" :userId="meta_colleague_id"/>
+      <button class="fa_button" @click="close_profile">Close Profile</button>
+    </div>
+    <Shop v-if="in_store" @closeShop="closeShop"/>
     <AlreadyConnected v-if="false"/>
-    <Home/>
+    <MetaOverlay v-if="in_metaverse"/>
+    <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
+
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import ProfilePage from './ProfilePage.vue'
-import AdminPage from './AdminPage.vue'
 import CookieChecker from './CookieChecker.vue'
-import ButtonedInventory from './ButtonedInventory.vue'
 import ATalkWithGod from './ATalkWithGod.vue'
 import AlreadyConnected from './AlreadyConnected.vue'
+import Metaverse from '../../Metaverse.vue'
+import MetaOverlay from './MetaOverlay.vue'
+import ProfilePage from './ProfilePage.vue'
 import Home from '../../Home.vue'
 import Shop from './Shop.vue'
 import Leaderboard from './Leaderboard.vue'
 import PongGame from './PongGame.vue'
+import { Socket, io } from "socket.io-client";
+import {getRandomUsername, numberIsInRange} from './metaverse/utils';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
   name: 'GUI',
   components: {
-    ProfilePage,
-    AdminPage,
     CookieChecker,
-    ButtonedInventory,
     ATalkWithGod,
     AlreadyConnected,
+    Metaverse,
+    MetaOverlay,
+    ProfilePage,
     Home,
     Shop,
     Leaderboard,
     PongGame,
+<<<<<<< HEAD
   },
+=======
+   },
+>>>>>>> origin/main
   data () {
     return ({
       profile_state: 'no',
       register_token: '',
+      in_store: false,
       in_metaverse: false,
       in_admin_page: false,
       log_token: '',
       auto_image: '',
       listening_to_god: false,
       access: {register_token: '',
-                auto_image: ''}
+                auto_image: ''},
+      showing_profile_image: false,
+      meta_colleague_id: ''
     })
   },
   methods: {
@@ -66,31 +77,23 @@ export default defineComponent({
       this.profile_state = 'registering'
     },
     go_to_metaverse (logToken : string) {
-      this.profile_state = 'my_profile'
-      this.in_metaverse = false
+      this.in_metaverse = true
       this.log_token = logToken
     },
-    open_profile () {
-      this.profile_state = 'my_profile'
-      this.in_metaverse = false
+    metaProfileHandler (profile) {
+//    router.push('profile_page/' + profile.name)
+      this.meta_colleague_id = profile.name
+      this.showing_profile_image = true
     },
-    close_profile () {
-      this.profile_state = 'no'
-      this.in_metaverse = true
+    storeHandler () {
+      console.log("STORRRRrrrE");
+      this.in_store = true;
     },
-    open_inventory () {
-      this.profile_state = 'no'
+    close_profile() {
+      this.showing_profile_image = false
     },
-    close_inventory () {
-    //  this.in_metaverse = true
-    },
-    open_admin_page () {
-      this.in_metaverse = false
-      this.in_admin_page = true
-    },
-    close_admin_page () {
-      this.in_admin_page = false
-      this.in_metaverse = true
+    closeShop() {
+      this.in_store = false;
     }
   }
 })
@@ -98,24 +101,83 @@ export default defineComponent({
 
 <style>
 
-:root {
-  --border_color: #603f22;
-  --pop_background: #392919;
-  --select_light: #85d8e5d0;
-}
-
-@font-face {
-  font-family: 'joystix';
-  src: url('~@/assets/fonts/joystix_monospace.otf') format('opentype');
-}
-
-#app {
-  text-align: center;
-  font-family: monospace;
-  color: white;
-}
 
 body {
   background-color: #392919d5
 }
+
+.overlay {
+	width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+    z-index: 9;
+    background : url('/GUI_assets/pattern.png');
+    background-repeat: repeat;
+    background-size: 15%;
+    padding: 32px;
+}
+
+.overlay::before{
+    content: '';
+    background: radial-gradient(circle, rgba(246,246,0,0.27493004037552526) 4%, rgba(255,73,0,0.4429972672662815) 29%, rgba(255,214,0,0.43459390592174374) 73%, rgba(192,0,255,0.49341743533350846) 100%);
+    width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+    z-index: -1;
+}
+
+.overlay-2 {
+	width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: 9;
+  background : url('/GUI_assets/heaven.png');
+  background-size: contain;
+  background-position: center center;
+  image-rendering: pixelated;
+  background-repeat:repeat
+}
+
+.overlay-2::before{
+  content: '';
+  background: radial-gradient(circle, rgba(255,255,255,0) 47%, rgba(209,254,255,1) 77%, rgba(255,255,255,1) 94%);
+  width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: -1;
+}
+
+.overlay-3 {
+	width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: 9;
+  background : url('/GUI_assets/money_power_respect.png');
+  background-size: contain;
+  background-position: center center;
+  image-rendering: pixelated;
+  background-repeat:repeat
+}
+
+.overlay-3::before{
+  content: '';
+  background: radial-gradient(circle, rgba(255,255,255,0) 47%, rgb(255, 247, 0) 77%, rgba(255,255,255,1) 94%);
+  width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: -1;
+}
+
 </style>

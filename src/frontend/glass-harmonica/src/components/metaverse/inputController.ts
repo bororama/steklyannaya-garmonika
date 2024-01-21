@@ -38,7 +38,6 @@ export class PlayerInput {
         else {
             this.jumping = false;
         }
-
         
         if (this.inputMap["q"]) {
             this.camera = -1;

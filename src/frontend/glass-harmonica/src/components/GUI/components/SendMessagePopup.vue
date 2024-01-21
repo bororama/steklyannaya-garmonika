@@ -11,22 +11,21 @@
 </template>
 
 <script>
+
+import { backend, postRequestParams } from './connect_params'
 export default {
-	props: ['target', 'sender'],
+	props: ['chat_id', 'sender'],
 	data: () => ({
 		message_text_component: ""
 	}),
 	methods:{
 		send_message() {
-			try {
-				fetch ("http://localhost:4242/send_message?" + new URLSearchParams({
-					sender: this.sender,
-					target: this.target,
-					text: this.message_text_component
-				}));
-			} catch (e) {
-				console.log(e);
-			}
+            let param = postRequestParams
+
+            param.body = JSON.stringify({
+              "message": this.message_text_component
+            })
+            fetch (backend + '/chats/' + this.chat_id + '/sendMessage/' + this.sender, param)
 			this.$emit('close_interaction');
 		}
 	}
@@ -35,7 +34,10 @@ export default {
 </script>
 
 <style>
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 .send_popup_background {
 	height:30vh;
 	background-color: #392919;

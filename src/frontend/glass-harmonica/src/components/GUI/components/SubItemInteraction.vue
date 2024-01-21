@@ -1,7 +1,7 @@
 <template>
 	<div class="sub_interaction_wrapper" v-if="this.interaction != 'none'">
-		<ViewMessagesPopup @close_interaction="close" v-if="this.interaction == 'viewing_messages'" :messages="['Hola', 'Buenos días']"/>
-		<SendMessagePopup @close_interaction="close" v-if="this.interaction == 'sending_message'"/>
+		<ViewMessagesPopup @close_interaction="close" :chatId="item.chat_id" :user="item.sender" v-if="this.interaction == 'viewing_messages'"/>
+		<SendMessagePopup @close_interaction="close" :chat_id="item.chat_id" :sender="item.sender" v-if="this.interaction == 'sending_message'"/>
 		<SetPasswordPopup @close_interaction="close" @set_password="set_password" v-if="this.interaction == 'setting_password'"/>
 		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_password" v-if="this.interaction == 'unlocking_password'"/>
 		<ViewMembersPopup @close_interaction="close" @user_interact="user_interact" :members="users_in_chat" v-if="this.interaction == 'displaying_members' || this.interaction == 'making_admin' || this.interaction == 'unmaking_admin' || this.interaction == 'kicking_member'"/>

@@ -50,9 +50,15 @@ export default defineComponent({
           } else if (access.status === 'needs_register') {
             this.$emit('register', access)
           } else if (access.status === 'success') {
-            this.$emit('log_success', access.log_token)
             globalThis.logToken = access.log_token
-            console.log(logToken)
+            fetch(backend + '/log/me/' + access.log_token, getRequestParams).then((a) => {
+              a.json().then((player) => {
+                globalThis.id = player.id
+                globalThis.my_data = player
+                globalThis.username = player.name
+                this.$emit('log_success', access.log_token)
+              })
+            })
           } else if (access.status === 'needs_2fa') {
             this.needs2fa = true
             globalThis.has2FA = true

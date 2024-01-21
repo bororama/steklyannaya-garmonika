@@ -1,12 +1,13 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color3, Color4, Matrix, Quaternion, StandardMaterial, SceneLoader, PickingInfo, GlowLayer } from "@babylonjs/core";
+import { Engine, Scene, HemisphericLight, Mesh, MeshBuilder, FreeCamera, Color3, Color4, Matrix, Quaternion, StandardMaterial, SceneLoader, PickingInfo, GlowLayer, Sound } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui"
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
 import { PlayerData } from "./playerData";
 import { LocalPlayer } from "./localPlayer";
+import { NPC } from "./NPC";
 import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
 import { GameEntity } from "./gameEntity";
@@ -17,18 +18,18 @@ import { pointCloudVertex } from "@babylonjs/core/Shaders/ShadersInclude/pointCl
 
 enum STATES { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
 
-let vueEmitter : (event : string, metadata : any) => void;
+let vueEmitter: (event: string, metadata: any) => void;
 
 class Metaverse {
 
-    playerData : PlayerData;
-    gameWorld : GameWorld;
+    playerData: PlayerData;
+    gameWorld: GameWorld;
 
-    constructor () {
+    constructor() {
     }
 
-    async initPlayerData(locator : number, username : string) {
-        this.playerData = new PlayerData(locator, username);
+    async initPlayerData(id: string, username: string) {
+        this.playerData = new PlayerData(id, username);
     }
 
     async initGameWorld(metaSocket: Socket) {
@@ -37,9 +38,11 @@ class Metaverse {
             await this.gameWorld.ready();
         }
     }
-    
-    
 }
+
+
+const shopEvent = new Event("openShop");
+
 
 class GameWorld {
     private _scene: Scene;
@@ -52,9 +55,11 @@ class GameWorld {
     private _player: LocalPlayer | null;
     private _input: PlayerInput | null;
     private _livePlayers: Array<RemotePlayer>;
-    private _yellowDevilName : string;
+    private _yellowDevilName: string;
+    private _yellowDevil : GameEntity | any;
+    private _NPCS : Array<NPC> | any;
 
-    constructor(metaSocket: Socket, playerData : PlayerData) {
+    constructor(metaSocket: Socket, playerData: PlayerData) {
         this._canvas = this._createCanvas();
         this._metaSocket = metaSocket;
         // initialize babylon scene and engine
@@ -65,9 +70,10 @@ class GameWorld {
         this._player = null;
         this._input = null;
         this._livePlayers = new Array();
+        this._NPCS = new Array();
         this._environment = null;
         this._yellowDevilName = 'فرانسيسكو خيسوس دي جاتا وفالديس';
-        // hide/show the Inspector
+        //Events for debugging
         window.addEventListener("keydown", (ev) => {
             // Shift+ctrl+I
             if (ev.shiftKey && ev.ctrlKey && ev.keyCode === 73) {
@@ -77,18 +83,39 @@ class GameWorld {
                     this._scene.debugLayer.show();
                 }
             }
+
+            else if( ev.key === "l") {
+                console.log("Player position : ",
+                `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
+            }
+            
+            else if( ev.key === "r") {
+                console.log("Player rotation : ", `${this._player!.mesh.rotationQuaternion}`);
+            }
+
+            else if ( ev.key === "R") {
+                this._player!.mesh.position = Vector3.Zero();
+            }
+
+            else if ( ev.key === "p") {
+                this.showPopUp("This is a pop up");
+            }
+
+            else if ( ev.key === "P") {
+                this.showPopUp("This is a pop up with a longer text so that we can see how it goes. I want it to be longer still, and hope there's no issue");
+            }
         });
     }
 
-/*
-**  check the state of usability of the scene
-*/
+    /*
+    **  check the state of usability of the scene
+    */
 
     isReady() {
         return this._scene.isReady();
     }
 
-    async ready(){
+    async ready() {
         // run the main render loop
         await this._main();
     }
@@ -96,18 +123,20 @@ class GameWorld {
     isSceneReady(): boolean {
         return this._scene.isReady();
     }
-/*
-**  Methods and properties of the pop up system
-*/
-
-    private _popUpTexture : AdvancedDynamicTexture;
-    private _popUpStack : StackPanel;
-    private _popUpLabel : TextBlock;
-    private _popUpCloseButton : Button;
 
 
+    /*
+    **  Methods and properties of the pop up system
+    */
 
-    showPopUp(message : string, enableButton: boolean = true) {
+    private _popUpTexture: AdvancedDynamicTexture;
+    private _popUpStack: StackPanel;
+    private _popUpLabel: TextBlock;
+    private _popUpCloseButton: Button;
+
+
+
+    showPopUp(message: string, enableButton: boolean = true) {
 
         this._popUpStack.isVisible = true;
         this._popUpCloseButton.isEnabled = enableButton;
@@ -122,12 +151,12 @@ class GameWorld {
         this._popUpTexture = AdvancedDynamicTexture.CreateFullscreenUI('pop-up');
 
         this._popUpStack = new StackPanel();
-        this._popUpStack.width = '300px';
-        this._popUpStack.height = '200px';
+        this._popUpStack.width = '80%';
+        this._popUpStack._automaticSize = true;
         this._popUpStack.background = 'white';
         this._popUpStack.alpha = 0.8;
-        this._popUpStack.paddingBottom = '20px';        
-        
+        this._popUpStack.paddingBottom = '20px';
+
         this._popUpCloseButton = Button.CreateImageWithCenterTextButton('closeButton', 'Close', '');
         this._popUpCloseButton.width = '100px';
         this._popUpCloseButton.height = '40px';
@@ -139,25 +168,26 @@ class GameWorld {
         });
         this._popUpLabel = new TextBlock();
         this._popUpLabel.text = 'This is a pop-up!';
-        this._popUpLabel.fontSize = 20;
+        this._popUpLabel.fontSize = 10;
         this._popUpLabel.height = '100px';
         this._popUpLabel.width = '300px';
+        this._popUpLabel.textWrapping = 1;
         this._popUpLabel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        
+
         this._popUpStack.addControl(this._popUpLabel);
         this._popUpTexture.addControl(this._popUpStack);
         this._popUpStack.addControl(this._popUpCloseButton);
         this._popUpStack.isVisible = false;
     }
 
-/*
-**  Routines that interact with the livePLayers array and the local player
-*/
+    /*
+    **  Routines that interact with the livePLayers array and the local player
+    */
     getLivePlayers() {
         return this._livePlayers;
     }
 
-    setLivePlayers(u : any) {
+    setLivePlayers(u: any) {
         this._livePlayers = u;
     }
 
@@ -168,65 +198,49 @@ class GameWorld {
         this._livePlayers = Array<RemotePlayer>();
     }
 
-    /*async spawnPlayer(player: PlayerData) {
-
-        if (this._findLivePlayer(player.user.name) !== undefined) {
-            console.log(`   Player : ${player.user.name} already joined`);
-            return;
-        }
-        if ( player && player.user.name !== this._playerData?.user.name) {
-            console.log("Instancing mesh for ", player.user.name);
-            const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
-            let newPlayer: any;
-            newPlayer = new RemotePlayer(assets, this._scene, player.user.name);
-            this._livePlayers.push(newPlayer);
-        }
-    }*/
-
     async spawnPlayer(player: PlayerData) {
-        if (this._findLivePlayer(player.user.name) !== undefined) {
+        if (this._findLivePlayer(player.user.id) !== undefined) {
             console.log(`Player: ${player.user.name} already joined`);
             return;
         }
-    
+
         if (player && player.user.name !== this._playerData?.user.name) {
             console.log("Instancing mesh for ", player.user.name);
-    
+
             try {
                 const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
                 if (!assets) {
                     console.error('Failed to load player assets.');
                     return;
                 }
-    
-                let newPlayer: any = new RemotePlayer(assets, this._scene, player.user.name);
+
+                let newPlayer: any = new RemotePlayer(assets, this._scene, player.user);
                 if (!newPlayer) {
                     console.error('Failed to instantiate RemotePlayer.');
                     return;
                 }
-    
+
                 this._livePlayers.push(newPlayer);
             } catch (error) {
                 console.error('Error during player spawning:', error);
             }
         }
     }
-    
 
-    removePlayer(playerToRemove : PlayerData) {
-        const playerIndex = this._livePlayers.findIndex( (p) => {
-            return playerToRemove.user.name === p.name;
-        })
+
+    removePlayer(playerToRemove: PlayerData) {
+        const playerIndex = this._livePlayers.findIndex((p) => {
+            return playerToRemove.user.id === p.user.id;
+        });
         if (playerIndex != -1) {
-            this._livePlayers[playerIndex].dispose();
-            this._livePlayers[playerIndex].mesh.dispose();
-            this._livePlayers = this._livePlayers.splice(playerIndex, 1);
+            this._livePlayers[playerIndex].die();
+            this._livePlayers.splice(playerIndex, 1);
         }
     }
 
     applyRemotePlayerUpdate(p: PlayerData) {
 
-        let player = this._findLivePlayer(p.user.name);
+        let player = this._findLivePlayer(p.user.id);
         player?.updateMesh(
             new Vector3(p.position[0], p.position[1], p.position[2]),
             new Quaternion(p.rotation[0], p.rotation[1], p.rotation[2], p.rotation[3]),
@@ -234,25 +248,25 @@ class GameWorld {
         );
     }
 
-    makeRemotePlayerSay(m : Message) {
-        
-        let player = this._findLivePlayer(m.user.name);
+    makeRemotePlayerSay(m: Message) {
+
+        let player = this._findLivePlayer(m.user.id);
         if (player) {
             player.say(m.text);
         }
     }
 
-    private _findLivePlayer(targetPlayerName: string): RemotePlayer | undefined {
-        let player = this._livePlayers.find((p) => { return p.name == targetPlayerName }) // change this for a locator
+    private _findLivePlayer(targetPlayerId: string): RemotePlayer | undefined {
+        let player = this._livePlayers.find((p) => { return p.user.id == targetPlayerId }) // change this for a locator
 
         return player;
     }
 
-    setLocalPlayerState(state : number) {
+    setLocalPlayerState(state: number) {
         this._player?.setState(state);
     }
 
-    apotheosis(name : string) {
+    apotheosis(name: string) {
         const player = this._findLivePlayer(name);
 
         if (player) {
@@ -260,9 +274,9 @@ class GameWorld {
         }
     }
 
-    stopApotheosis(name : string) {
+    stopApotheosis(name: string) {
         const player = this._findLivePlayer(name);
-        
+
         if (player) {
             player.hideFlamingSoul();
         }
@@ -283,9 +297,9 @@ class GameWorld {
         const SoulGlow = new GlowLayer("Glowing Souls", this._scene);
         SoulGlow.customEmissiveColorSelector = function (mesh, subMesh, material, result) {
             if (mesh.material?.name === "Flaming Soul") {
-              result.set(1, 1, 1, 0.6);
+                result.set(1, 1, 1, 0.6);
             } else {
-              result.set(0, 0, 0, 0);
+                result.set(0, 0, 0, 0);
             }
         }
     }
@@ -300,10 +314,16 @@ class GameWorld {
             });
             if (pickInfo!.hit) {
                 if (pickInfo?.pickedMesh?.metadata.type === 'Devil') {
-                    vueEmitter('storeRequest', {username : this._playerData!.user.name});
+                    console.log("Emitter ", vueEmitter);
+                    vueEmitter('storeRequest', { userId: this._playerData!.user.id });
+                }
+                else if (pickInfo?.pickedMesh?.metadata.type === 'remote') {
+                    vueEmitter('profileRequest', { name: pickInfo!.pickedMesh!.metadata.name });
                 }
                 else {
-                    vueEmitter('profileRequest', {name : pickInfo!.pickedMesh!.metadata.name});
+                    let NPC = this._NPCS.find((npc : any) => { return npc.name === pickInfo!.pickedMesh!.metadata.name})
+                    console.log(NPC.name, ": About to saySomething()");
+                    NPC.saySomething();
                 }
             }
         });
@@ -325,6 +345,9 @@ class GameWorld {
         window.addEventListener('resize', () => {
             this._engine.resize();
         });
+        window.addEventListener('keydown', () => {
+            this._setUpMusic();
+        }, { once : true })
     }
 
 
@@ -354,7 +377,7 @@ class GameWorld {
         this._engine.hideLoadingUI();
         this._scene.attachControl();
         this._setUpMaterials();
-        this._instanceNPCs();
+        await this._instanceAllNpcs();
     }
 
     private async _initializeGameAsync(scene: Scene): Promise<void> {
@@ -365,11 +388,59 @@ class GameWorld {
         const camera = this._player.activatePlayerCamera();
     }
 
-    private async _instanceNPCs() {
+    private async _instanceAllNpcs() {
         /*curro*/
-        const assets = await this._loadPlayerAssets(this._scene, false, 'humanoid.glb');
-        const curro = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
-        curro.updatePosition(new Vector3(0, -13, 0));
+        let assets = await this._loadPlayerAssets(this._scene, false, 'curro.glb');
+        this._yellowDevil = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
+        this._yellowDevil.updatePosition(new Vector3(-138, -75, 335));
+        this._yellowDevil.rotationQuaternion = new Quaternion(0, 30);
+
+        /*guille*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'humanoid.glb');
+        this._NPCS.push(
+            new NPC(assets, this._scene, 'Guillermo', 'angel',
+                new Vector3(-262.9376075888921, 49.41932127911506, -188.31524453127705),
+                new Quaternion(0, 0.15, 0),
+                [
+                    "Buy 'El aquelarre de Celia'",
+                    "Read 'El aquelarre de Celia'",
+                    "The Falcon has spread its wings.",
+                    "Climb down this hill, find your destiny",
+                    "Be careful in this God-forsaken land",
+                    "Do it for Him",
+                    "The wings of liberty glide across the sky",
+                    "Offer your heart",
+                    "MARCH ON",
+                    "I like you. I want you",
+                ]
+            )
+        );
+        //Player rotation :  {X: 0 Y: 0.15132534047226934 Z: 0 W: 0.9884840116718889}
+        //Player position :  -262.9376075888921, 49.41932127911506, -188.31524453127705
+    }
+
+
+    private _setUpMusic() {
+        Engine.audioEngine!.useCustomUnlockedButton = true;
+        window.addEventListener('click', () => {
+            if (Engine.audioEngine!.unlocked) {
+                Engine.audioEngine!.unlock();
+            }
+        }, { once: true });
+
+        const overWorldTheme = new Sound("overworld theme", "/sounds/glassHarmonica.mp3", this._scene, null, {
+            loop: true,
+            autoplay: true,
+        });
+        const evilTheme = new Sound("Evil theme", "/sounds/shopMusic.mp3", this._scene, null, {
+            loop: true,
+            autoplay: true,
+            //distanceModel : "exponential",
+        });
+
+        evilTheme.attachToMesh(this._yellowDevil.mesh);
+
+        console.log("theme : ", evilTheme, "mesh position", this._yellowDevil.mesh.position);
     }
 
 
@@ -377,7 +448,7 @@ class GameWorld {
     ** Mesh loading
     */
 
-    private async _loadPlayerModel(scene: Scene, collisionMesh: Mesh | null, path : string) {
+    private async _loadPlayerModel(scene: Scene, collisionMesh: Mesh | null, path: string) {
 
         const importedMesh = await SceneLoader.ImportMeshAsync(null, "/3d/", path, scene);
         const body = importedMesh.meshes[0];
@@ -393,7 +464,7 @@ class GameWorld {
         return importedMesh;
     }
 
-    private async _loadPlayerAssets(scene: Scene, checkCollisions : boolean, modelPath : string) {
+    private async _loadPlayerAssets(scene: Scene, checkCollisions: boolean, modelPath: string) {
         //collision mesh
         const outer = MeshBuilder.CreateBox("outer", { width: 1, depth: 1, height: 1 }, scene);
         outer.isVisible = false;
@@ -412,11 +483,12 @@ class GameWorld {
         return {
             mesh: outer as Mesh,
             animationGroups: importedMesh.animationGroups,
+            popUpCallback : this.showPopUp,
         }
     }
 }
 
-async function initializeMetaverse(metaSocket: Socket, vueEmitterCallback : (event : string, metadata : any) => void) {
+async function initializeMetaverse(metaSocket: Socket, vueEmitterCallback: (event: string, metadata: any) => void) {
     const metaverse = new Metaverse();
     vueEmitter = vueEmitterCallback;
     return metaverse;
