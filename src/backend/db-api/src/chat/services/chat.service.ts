@@ -46,12 +46,6 @@ export class ChatService {
             throw new BadRequestException('User doesn\'t exists');
         }
 
-        const necklaceSpend: boolean = await this.userService.subtractNecklaceFromUser(creator, 1);
-
-        if (!necklaceSpend) {
-            throw new ForbiddenException('Not enought necklaces');
-        }
-
         const chat: Chat = await this.chatModel.create({
             password: (password ? this.hashPassword(password) : null)
         });

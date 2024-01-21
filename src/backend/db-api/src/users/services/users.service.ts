@@ -39,7 +39,7 @@ export class UsersService {
             : { id: +user };
         return this.userModel.findOne({
             where: searchCriteria,
-            attributes: ['id']
+            attributes: ['id', 'userName', 'status']
         });
     }
 
@@ -271,7 +271,6 @@ export class UsersService {
     }
 
     async addCoins(userId: string, quantity: number) : Promise<string> {
-        console.log(userId)
         let user = await this.findOne(userId);
         if (!user) {
             throw new BadRequestException('User doesn\'t exist')
