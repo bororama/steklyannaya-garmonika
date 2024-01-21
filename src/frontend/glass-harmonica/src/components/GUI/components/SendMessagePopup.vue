@@ -34,10 +34,6 @@ export default {
 </script>
 
 <style>
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 .send_popup_background {
 	height:30vh;
 	background-color: #392919;
