@@ -360,12 +360,11 @@ export class PlayersService {
         return this.playerModel.findAll({
             include: {
                 model: User,
-                attributes: ['userName', 'necklaces', 'pearls'],
-                order: [
-                    ['necklaces', 'ASC'],
-                    ['pearls', 'ASC'],
-                ]
+                attributes: ['userName', 'franciscoins', 'pearls'],
             },
+            order: [
+                ['user', 'pearls', 'DESC'],
+            ]
         });
     }
 

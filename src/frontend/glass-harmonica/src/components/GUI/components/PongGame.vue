@@ -162,12 +162,12 @@ export default defineComponent({
   },
     handleKeys() {
       if (this.socket) {
-        if (this.keysPressed["w"]) {
+        if (this.keysPressed["w"] || this.keysPressed["W"] ) {
           this.socket.emit("movePaddle", {
             playerId: this.socket.id,
             direction: "up",
           });
-        } else if (this.keysPressed["s"]) {
+        } else if (this.keysPressed["s"] || this.keysPressed["S"]) {
           this.socket.emit("movePaddle", {
             playerId: this.socket.id,
             direction: "down",
@@ -178,13 +178,13 @@ export default defineComponent({
             direction: "stop",
           });
         }
-        if (this.keysPressed["o"]) {
+        if (this.keysPressed["o"] || this.keysPressed["O"]) {
           if (this.colorSelector != 0){
             this.colorSelector--;  
             this.config!.BACKGROUND_COLOUR = this.colors[this.colorSelector];
             console.log(this.colorSelector);
           }
-        } else if (this.keysPressed["p"]) {
+        } else if (this.keysPressed["p"] || this.keysPressed["P"]) {
           if (this.colorSelector < this.colors.length - 1){
             this.colorSelector++;
             this.config!.BACKGROUND_COLOUR = this.colors[this.colorSelector];

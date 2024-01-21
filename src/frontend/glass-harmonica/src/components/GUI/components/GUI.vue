@@ -29,6 +29,7 @@ import { Socket, io } from "socket.io-client";
 import {getRandomUsername, numberIsInRange} from './metaverse/utils';
 import { useRouter } from 'vue-router';
 
+
 export default defineComponent({
   name: 'GUI',
   components: {
