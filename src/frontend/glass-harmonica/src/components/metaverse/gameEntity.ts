@@ -172,7 +172,7 @@ export class GameEntity extends TransformNode {
         setTimeout(async () => {
             //fadeOut.play(false);
             bubbleTexture.removeControl(this._bubble);
-        }, 750);
+        }, 400 + (message.length * 50));
     }
 
     private _determineBubblePosition(r : BoundingRect) {

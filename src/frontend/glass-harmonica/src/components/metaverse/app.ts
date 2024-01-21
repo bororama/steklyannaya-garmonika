@@ -411,6 +411,7 @@ class GameWorld {
                     "The wings of liberty glide across the sky",
                     "Offer your heart",
                     "MARCH ON",
+                    "I like you. I want you",
                 ]
             )
         );
