@@ -5,9 +5,11 @@
     <div class="overlay" v-if="showing_profile_image">
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" @start_match="go_to_pong_match" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
+        <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match"/>
     </div>
-    <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match"/>
-    <AlreadyConnected v-if="already_connected"/>
+    <Shop v-if="in_store" @closeShop="closeShop"/>
+    <AlreadyConnected v-if="false"/>
+  	<router-view></router-view>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
 
@@ -23,6 +25,13 @@ import MetaOverlay from './MetaOverlay.vue'
 import ProfilePage from './ProfilePage.vue'
 import PongGame from './PongGame.vue'
 import { backend, getRequestParams } from './connect_params.ts'
+import Home from '../../Home.vue'
+import Shop from './Shop.vue'
+import Leaderboard from './Leaderboard.vue'
+import { Socket, io } from "socket.io-client";
+import {getRandomUsername, numberIsInRange} from './metaverse/utils';
+import { useRouter } from 'vue-router';
+
 
 export default defineComponent({
   name: 'GUI',
@@ -32,12 +41,17 @@ export default defineComponent({
     AlreadyConnected,
     Metaverse,
     MetaOverlay,
-    ProfilePage
-  },
+    ProfilePage,
+    Home,
+    Shop,
+    Leaderboard,
+    PongGame,
+   },
   data () {
     return ({
       profile_state: 'no',
       register_token: '',
+      in_store: false,
       in_metaverse: false,
       in_admin_page: false,
       log_token: '',
@@ -79,14 +93,21 @@ export default defineComponent({
       })
     },
     metaProfileHandler (profile) {
+<<<<<<< HEAD
+=======
+//    router.push('profile_page/' + profile.name)
+>>>>>>> 686fe3d66c20858e13afacbed2a9e1d74ebb7005
       this.meta_colleague_id = profile.name
       this.showing_profile_image = true
     },
     storeHandler () {
+      console.log("STORRRRrrrE");
+      this.in_store = true;
     },
     close_profile() {
       this.showing_profile_image = false
     },
+<<<<<<< HEAD
     go_to_alredy_connected_page () {
       this.already_connected = true
     },
@@ -96,6 +117,10 @@ export default defineComponent({
       this.room_id = match_data.match_id
       this.match_mode = match_data.mode
       this.in_match = true
+=======
+    closeShop() {
+      this.in_store = false;
+>>>>>>> 686fe3d66c20858e13afacbed2a9e1d74ebb7005
     }
   }
 })
@@ -149,6 +174,31 @@ body {
 .overlay-2::before{
   content: '';
   background: radial-gradient(circle, rgba(255,255,255,0) 47%, rgba(209,254,255,1) 77%, rgba(255,255,255,1) 94%);
+  width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: -1;
+}
+
+.overlay-3 {
+	width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: 9;
+  background : url('/GUI_assets/money_power_respect.png');
+  background-size: contain;
+  background-position: center center;
+  image-rendering: pixelated;
+  background-repeat:repeat
+}
+
+.overlay-3::before{
+  content: '';
+  background: radial-gradient(circle, rgba(255,255,255,0) 47%, rgb(255, 247, 0) 77%, rgba(255,255,255,1) 94%);
   width: 100vw;
 	height: 100vh;
 	position:absolute;

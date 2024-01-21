@@ -1,5 +1,5 @@
 <template>
-	<PongGame :meta-socket="metaSocket" :modo="0" :pong-room-id="-2"  v-if="match" />
+	<PongGame :meta-socket="metaSocket" :modo="0" :pong-room-id="-2"  v-if="match" @closeGame="closeGame"/>
 </template>
 
 <script setup lang="ts">
@@ -27,5 +27,9 @@ onMounted(async () => {
   const metaverseInstance : Metaverse = await initializeMetaverse(metaSocket, vueEmitter);
   connectionManager(metaSocket, metaverseInstance, match);
 });
+
+function closeGame() {
+  match.value = false;
+}
 
 </script>

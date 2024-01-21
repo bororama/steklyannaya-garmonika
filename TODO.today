@@ -3,11 +3,19 @@
         - Correct Player Model behaviour after game :
             a) second match queue[X]
             b) flaming soul on disconnection [X]
-        - Kick from metaverse []
+        - Kick from metaverse [\] (jev and curr need to protect the rest);
         - reset flaming soul when disconnect [X]
         - 3d models [X]
+        - Respawn key [X]
+        - Render curro shoppe []
+        - Change username []
+        - FONT SIZES!!! []
+        - Revise bubbles [] (need an account)
+        - Revise Pop up system [X]
+        - Wrap Npc class, add random dialogue []
+        - disable body scroll []
         << QUICK WINS >> do now
-    high-importance & high-effort : include and work with user Id [], LE GRAND MERGE [X], ROUTING []<< GREAT PROJECTS >> do next
+    high-importance & high-effort : include and work with user Id [X], LE GRAND MERGE [X], ROUTING []<< GREAT PROJECTS >> do next
     low-importance & low-effort : music[X], << FILL INS >> do later
-    low-importance & high-effort :  << THANKLESS TASKS >> delegate
+    low-importance & high-effort : debug id type [X]  skybox[] << THANKLESS TASKS >> delegate
 

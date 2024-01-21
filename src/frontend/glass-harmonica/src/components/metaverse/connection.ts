@@ -42,15 +42,15 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 
 	metaSocket.on('connect', () => {
 		//setTimeout( () => {
-			console.log("CONNECTION REQUESTED")
-			metaSocket.emit('userData', globalThis.username);
+			//why is globalThis.id a number??????
+			metaSocket.emit('userData', { id : globalThis.id + '', name : globalThis.username});
 		//}, 1)
 	});
 	
 	metaSocket.on('welcomePack', async (payload : { newPlayer : Player, livePlayers : Array<PlayerData>}) => {
 		console.log('WelcomePack >>');
 		await metaverse.initPlayerData(
-			payload.newPlayer.user.locator,
+			payload.newPlayer.user.id,
 			payload.newPlayer.user.name
 		);
 		await metaverse.initGameWorld(metaSocket);
@@ -107,6 +107,7 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 
 
 	metaSocket.on('banned', () => {
+		console.log("B A N N E D");
 		metaverse.gameWorld.showPopUp("Away with you, cursed one, into the eternal fire.", false);
 		metaverse.gameWorld.resetLivePlayers();
 	})

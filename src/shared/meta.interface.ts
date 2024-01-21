@@ -1,6 +1,6 @@
 
 export interface User {
-  locator: number;
+  id: string;
   name: string;
 } 
 

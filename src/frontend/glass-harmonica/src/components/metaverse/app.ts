@@ -7,6 +7,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Environment } from "./environment";
 import { PlayerData } from "./playerData";
 import { LocalPlayer } from "./localPlayer";
+import { NPC } from "./NPC";
 import { PlayerInput } from "./inputController";
 import { Socket } from "socket.io-client";
 import { GameEntity } from "./gameEntity";
@@ -27,8 +28,8 @@ class Metaverse {
     constructor() {
     }
 
-    async initPlayerData(locator: number, username: string) {
-        this.playerData = new PlayerData(locator, username);
+    async initPlayerData(id: string, username: string) {
+        this.playerData = new PlayerData(id, username);
     }
 
     async initGameWorld(metaSocket: Socket) {
@@ -37,8 +38,6 @@ class Metaverse {
             await this.gameWorld.ready();
         }
     }
-
-
 }
 
 
@@ -57,7 +56,8 @@ class GameWorld {
     private _input: PlayerInput | null;
     private _livePlayers: Array<RemotePlayer>;
     private _yellowDevilName: string;
-    private _yellowDevil : GameEntity | any;
+    private _yellowDevil: NPC | any;
+    private _NPCS: Array<NPC> | any;
 
     constructor(metaSocket: Socket, playerData: PlayerData) {
         this._canvas = this._createCanvas();
@@ -70,9 +70,10 @@ class GameWorld {
             this._player = null;
         this._input = null;
         this._livePlayers = new Array();
+        this._NPCS = new Array();
         this._environment = null;
         this._yellowDevilName = 'فرانسيسكو خيسوس دي جاتا وفالديس';
-        //Events for debugging only
+        //Events for debugging
         window.addEventListener("keydown", (ev) => {
             // Shift+ctrl+I
             if (ev.shiftKey && ev.ctrlKey && ev.keyCode === 73) {
@@ -83,10 +84,26 @@ class GameWorld {
                 }
             }
 
-            else if( ev.key == "l") {
+            else if (ev.key === "l") {
                 console.log("Player position : ",
-                `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
+                    `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
             }
+
+            else if (ev.key === "r") {
+                console.log("Player rotation : ", `${this._player!.mesh.rotationQuaternion}`);
+            }
+
+            else if (ev.key === "R") {
+                this._player!.mesh.position = Vector3.Zero();
+            }
+
+            /*else if ( ev.key === "p") {
+                this.showPopUp("This is a pop up");
+            }
+
+            else if ( ev.key === "P") {
+                this.showPopUp("This is a pop up with a longer text so that we can see how it goes. I want it to be longer still, and hope there's no issue");
+            }*/
         });
     }
 
@@ -134,8 +151,8 @@ class GameWorld {
         this._popUpTexture = AdvancedDynamicTexture.CreateFullscreenUI('pop-up');
 
         this._popUpStack = new StackPanel();
-        this._popUpStack.width = '300px';
-        this._popUpStack.height = '200px';
+        this._popUpStack.width = '80%';
+        this._popUpStack._automaticSize = true;
         this._popUpStack.background = 'white';
         this._popUpStack.alpha = 0.8;
         this._popUpStack.paddingBottom = '20px';
@@ -151,9 +168,10 @@ class GameWorld {
         });
         this._popUpLabel = new TextBlock();
         this._popUpLabel.text = 'This is a pop-up!';
-        this._popUpLabel.fontSize = 20;
+        this._popUpLabel.fontSize = 10;
         this._popUpLabel.height = '100px';
         this._popUpLabel.width = '300px';
+        this._popUpLabel.textWrapping = 1;
         this._popUpLabel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
 
         this._popUpStack.addControl(this._popUpLabel);
@@ -180,23 +198,8 @@ class GameWorld {
         this._livePlayers = Array<RemotePlayer>();
     }
 
-    /*async spawnPlayer(player: PlayerData) {
-
-        if (this._findLivePlayer(player.user.name) !== undefined) {
-            console.log(`   Player : ${player.user.name} already joined`);
-            return;
-        }
-        if ( player && player.user.name !== this._playerData?.user.name) {
-            console.log("Instancing mesh for ", player.user.name);
-            const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
-            let newPlayer: any;
-            newPlayer = new RemotePlayer(assets, this._scene, player.user.name);
-            this._livePlayers.push(newPlayer);
-        }
-    }*/
-
     async spawnPlayer(player: PlayerData) {
-        if (this._findLivePlayer(player.user.name) !== undefined) {
+        if (this._findLivePlayer(player.user.id) !== undefined) {
             console.log(`Player: ${player.user.name} already joined`);
             return;
         }
@@ -211,7 +214,7 @@ class GameWorld {
                     return;
                 }
 
-                let newPlayer: any = new RemotePlayer(assets, this._scene, player.user.name);
+                let newPlayer: any = new RemotePlayer(assets, this._scene, player.user);
                 if (!newPlayer) {
                     console.error('Failed to instantiate RemotePlayer.');
                     return;
@@ -227,7 +230,7 @@ class GameWorld {
 
     removePlayer(playerToRemove: PlayerData) {
         const playerIndex = this._livePlayers.findIndex((p) => {
-            return playerToRemove.user.name === p.name;
+            return playerToRemove.user.id === p.user.id;
         });
         if (playerIndex != -1) {
             this._livePlayers[playerIndex].die();
@@ -237,7 +240,7 @@ class GameWorld {
 
     applyRemotePlayerUpdate(p: PlayerData) {
 
-        let player = this._findLivePlayer(p.user.name);
+        let player = this._findLivePlayer(p.user.id);
         player?.updateMesh(
             new Vector3(p.position[0], p.position[1], p.position[2]),
             new Quaternion(p.rotation[0], p.rotation[1], p.rotation[2], p.rotation[3]),
@@ -247,14 +250,14 @@ class GameWorld {
 
     makeRemotePlayerSay(m: Message) {
 
-        let player = this._findLivePlayer(m.user.name);
+        let player = this._findLivePlayer(m.user.id);
         if (player) {
             player.say(m.text);
         }
     }
 
-    private _findLivePlayer(targetPlayerName: string): RemotePlayer | undefined {
-        let player = this._livePlayers.find((p) => { return p.name == targetPlayerName }) // change this for a locator
+    private _findLivePlayer(targetPlayerId: string): RemotePlayer | undefined {
+        let player = this._livePlayers.find((p) => { return p.user.id == targetPlayerId }) // change this for a locator
 
         return player;
     }
@@ -311,11 +314,16 @@ class GameWorld {
             });
             if (pickInfo!.hit) {
                 if (pickInfo?.pickedMesh?.metadata.type === 'Devil') {
-                    document.dispatchEvent(shopEvent);
-                    vueEmitter('storeRequest', { username: this._playerData!.user.name });
+                    console.log("Emitter ", vueEmitter);
+                    vueEmitter('storeRequest', { userId: this._playerData!.user.id });
+                }
+                else if (pickInfo?.pickedMesh?.metadata.type === 'remote') {
+                    vueEmitter('profileRequest', { name: pickInfo!.pickedMesh!.metadata.name });
                 }
                 else {
-                    vueEmitter('profileRequest', { name: pickInfo!.pickedMesh!.metadata.name });
+                    let NPC = this._NPCS.find((npc: any) => { return npc.name === pickInfo!.pickedMesh!.metadata.name })
+                    console.log(NPC.name, ": About to saySomething()");
+                    NPC.saySomething();
                 }
             }
         });
@@ -339,7 +347,7 @@ class GameWorld {
         });
         window.addEventListener('keydown', () => {
             this._setUpMusic();
-        }, { once : true })
+        }, { once: true })
     }
 
 
@@ -369,7 +377,7 @@ class GameWorld {
         this._engine.hideLoadingUI();
         this._scene.attachControl();
         this._setUpMaterials();
-        await this._instanceNPCs();
+        await this._instanceAllNpcs();
     }
 
     private async _initializeGameAsync(scene: Scene): Promise<void> {
@@ -380,12 +388,102 @@ class GameWorld {
         const camera = this._player.activatePlayerCamera();
     }
 
-    private async _instanceNPCs() {
+    private async _instanceAllNpcs() {
         /*curro*/
-        const assets = await this._loadPlayerAssets(this._scene, false, 'curro.glb');
-        this._yellowDevil = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
-        this._yellowDevil.updatePosition(new Vector3(-138, -75, 335));
-        this._yellowDevil.rotationQuaternion = new Quaternion(0, 30);
+        let assets: any = await this._loadPlayerAssets(this._scene, false, 'curro1.glb');
+        assets["height"] = 5;
+        this._yellowDevil = new NPC(assets, this._scene, this._yellowDevilName, 'Devil',
+            new Vector3(-141.20595719108053, -73.68085679880434, 329.60593356864916),
+            new Quaternion(0, 0.99, 0, -0.89)
+        );
+
+        /*guille*/
+         assets = await this._loadPlayerAssets(this._scene, false, 'escultura1.glb');
+         assets["height"] = 6;
+         this._NPCS.push(
+             new NPC(assets, this._scene, 'Guillermo', 'angel',
+                 new Vector3(-259.19837561453, 49.69347184924647, -181.9513474067934),
+                 new Quaternion(0, 0.8, 0),
+                 [
+                     "Buy 'El aquelarre de Celia'",
+                     "Read 'El aquelarre de Celia'",
+                     "The Falcon has spread its wings.",
+                     "Climb down this hill, find your destiny",
+                     "Be careful in this God-forsaken land",
+                     "Do it for Him",
+                     "The wings of liberty glide across the sky",
+                     "Offer your heart",
+                     "MARCH ON",
+                     "I like you. I want you",
+                     "*frowns*",
+                 ]
+             )
+         );
+ 
+         /*Nico*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'nico1.glb');
+        assets["height"] = 5;
+        this._NPCS.push(
+            new NPC(assets, this._scene, 'Botticelli', 'artist',
+                new Vector3(-75.93741380345205, -73.29292600487902, 229.75875289758943),
+                new Quaternion(0, -0.186713555771165, 0, 0.9824143973351003),
+                [
+                    "Oh ¿Es eso una armónica de cristal?...",
+                    "Ten cuidado con las sonrisas en el desierto...",
+                    "El desierto solía ser una rosaleda hace mucho mucho tiempo....",
+                    "...Solían florecer con el tañer de las campanas ... PING PONG...",
+                    "¿Eres fan de Schnittke?...",
+                    "El ángel de la montaña parece agresivo a veces, pero es nuestro ángel...",
+                    "Si entregas tu corazón a este sitio, podrás ver a los dioses...",
+                    "Ignora a mi hermano pequeño si lo vas saltando entre árboles...",
+                    "*Dibujando una de las esculturas de la Catedral*",
+                    "*Bostezando*",
+                    "*Infusionando te*",
+                ])
+        );
+
+        /*Jav*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'jav1.glb');
+        this._NPCS.push(
+            new NPC(assets, this._scene, 'Botticello', 'scientist',
+                new Vector3(-81.97072654511088, -73.63999168465243, 231.13467107770862),
+                new Quaternion(0, -0.186713555771165, 0, 0.9824143973351003),
+                [
+                    "Ten cuidado al hablar sobre ciertas personas mientras estés aquí...",
+                    "Nuestro Ángel protector? Yo lo hago todo por él.",
+                    "Sí, sí. Perdón para todos! Salvo a los corruptos.",
+                    "¿Te has detenido a observar los mosaicos?",
+                    "Las vistas son maravillosas desde la altura de los árboles.",
+                    "Si hablas con mi hermano, recuérdale que tiene que pintar.",
+                    "*Dibujando una especie de formula en la arena*",
+                    "*Sorbiendo de su mate*",
+                    "Extraño las flores..."
+                ]
+            )
+        );
+
+        /*Guitarra1*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'guitarra1.glb');
+        assets["height"] = 5;
+        this._NPCS.push(
+            new NPC(assets, this._scene, 'Pablo', 'bard',
+                new Vector3(-79.48917234424871, -73.79349910868692, 268.8783399458853),
+                new Quaternion(0, 0.9620386395130945, 0, 0.27291327568178436),
+                [
+                    "♫♩La arena del desierto no para de ensuciar mi guitarra♪♫",
+                    "♫♩Temo al gato de ojos amarillos♪♫",
+                    "♫♩Escogí la música sobre la cimitarra♪♫",
+                    "♫♩Bella tierra de جَيَّان , tierra que me vio nacer♪♫",
+                    "♫♩El hambre, los colmillos♪♫",
+                    "*Afinando la guitarra*",
+                    "*golpeando la caja de la guitarra*",
+                    "*Cambiando una cuerda*",
+                    "♫♩ !¿Y esa música horrible?! Debería ir a escucharla de cercaaaa♪♫",
+                ]
+            )
+        );
+        //Player rotation :  {X: 0 Y: 0.15132534047226934 Z: 0 W: 0.9884840116718889}
+        //Player position :  -262.9376075888921, 49.41932127911506, -188.31524453127705
     }
 
 
@@ -452,6 +550,7 @@ class GameWorld {
         return {
             mesh: outer as Mesh,
             animationGroups: importedMesh.animationGroups,
+            popUpCallback: this.showPopUp,
         }
     }
 }

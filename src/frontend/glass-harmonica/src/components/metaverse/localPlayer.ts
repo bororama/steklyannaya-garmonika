@@ -51,6 +51,9 @@ export class LocalPlayer extends TransformNode {
     private _nameLabel: Mesh;
     private _playerData: PlayerData;
 
+    //Notifications
+    private _popUpCallback : any;
+
 
     //Chat-related
     private _bubbleTexture : AdvancedDynamicTexture;
@@ -65,6 +68,7 @@ export class LocalPlayer extends TransformNode {
     constructor(assets: any, scene: Scene, input : PlayerInput, metaSocket : Socket, playerData : PlayerData) {
         super("LocalPlayer", scene);
         this.scene = scene;
+        this._popUpCallback = assets.popUpCallback;
         this._metaSocket = metaSocket;
         this._setupPlayerCamera();
         this._playerData = playerData;
@@ -116,23 +120,33 @@ export class LocalPlayer extends TransformNode {
                     this._inputBox.blur();
             }
         });
-        this._inputBox.onKeyboardEventProcessedObservable.add((eventData) => {
-
-        });
     }
 
     private _say(message : string) {
+        this._bubbleTexture.removeControl(this._bubble);
+        this._bubble.removeControl(this._messageText);
         this._bubble.alpha = 1.0;
         this._bubble.top = ((Math.random() * (45 - 30)) + 30).toString() + "%";
         this._bubble.left = ((Math.random() * (5 -(-5))) - 5).toString() + "%";
-        this._messageText.text = message;
         this._messageText.color = "black";
-
-        this._metaSocket.emit('chat',  {user : this._playerData.user, text : message}, response  => console.log('Server:', response));
-        this._bubble.addControl(this._messageText);
+        this._messageText.textWrapping  = 1;
+        this._messageText.fontSize = "12px";
+        this._messageText.resizeToFit = true;        
+        this._bubble.adaptHeightToChildren = true;
+        
+        if (message.length > 64) {
+            this._messageText.text = "Message too long...";
+        }
+        else {
+            this._messageText.text = message;
+            this._metaSocket.emit('chat',  {user : this._playerData.user, text : message}, response  => console.log('Server:', response));
+        }
         let context = this._bubbleTexture.getContext();
-
-        this._bubble.width = (clamp((context.measureText(message).width + 24), 64, 256).toString() + "px");
+        let textWidth = clamp((context.measureText(this._messageText.text).width), 64, 128);
+        this._bubble.width = (textWidth + 24).toString() + "px";
+        this._bubble.addControl(this._messageText);
+        this._bubbleTexture.addControl(this._bubble);
+        this._messageText.height
         let fadeOut = new AnimationGroup("fadeOut");
         this._bubbleState = bubbleStates.VISIBLE;
         fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._bubble);
@@ -145,7 +159,7 @@ export class LocalPlayer extends TransformNode {
 
         message = message.trim();
         if (message === "PING" || message === "PONG") {
-            this._metaSocket.emit(`PingPong`, this._playerData.user.name);
+            this._metaSocket.emit(`PingPong`, this._playerData.user.id);
             this._state = playerStates.PLAYING;
         }
     }
@@ -381,9 +395,9 @@ export class LocalPlayer extends TransformNode {
 //temporary helpers, should be refactored into the generic Player class
 function createLocalPlayerInputBox() : InputText {
     let inputBox : InputText = new InputText();
-    inputBox.width = 0.2;
-    inputBox.maxWidth = 0.2;
-    inputBox.height = "40px";
+    inputBox.width = 0.4;
+    inputBox.maxWidth = 0.4;
+    inputBox.height = "24px";
     inputBox.text = "";
     inputBox.color = "white";
     inputBox.background = "transparent";

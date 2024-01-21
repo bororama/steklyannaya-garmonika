@@ -1,13 +1,16 @@
 import { GameEntity } from "./gameEntity";
+import { type User } from "./shared/meta.interface"
 import { Color3, Scene, StandardMaterial, GlowLayer, Material } from "@babylonjs/core";
 
 export class RemotePlayer extends GameEntity {
 
+    user : User;
     private _soulMaterial : Material;
     private _glowingMesh : any;
 
-    constructor(assets : any, scene: Scene, name : string) {
-        super(assets, scene, name, 'remote');
+    constructor(assets : any, scene: Scene, user : User) {
+        super(assets, scene, user.name, 'remote');
+        this.user = user;
         this._soulMaterial = scene.materials.find( (m) => {
             if (m.name === "Flaming Soul")
             return true;

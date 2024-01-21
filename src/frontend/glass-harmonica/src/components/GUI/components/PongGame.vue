@@ -1,5 +1,6 @@
 <template>
   <div class="game-container overlay-2">
+    <button  @click="closeGame" class="fa_button" style="display: block; margin: 6px auto;">EXIT</button>
     <canvas id="pong-game" ref="pongCanvas"></canvas>
   </div>
 </template>
@@ -61,7 +62,6 @@ export default defineComponent({
     this.colors = ["black", "BlueViolet", "CadetBlue", "brown", "DarkGreen"];
     if (canvas) {
       this.ctx = canvas.getContext("2d");
-
       if (this.ctx) {
         this.ctx.canvas.width = window.innerWidth / 2;
         this.ctx.canvas.height = this.ctx.canvas.width / 2;
@@ -107,6 +107,11 @@ export default defineComponent({
   window.removeEventListener("resize", this.handleWindowResize);
   },
   methods: {
+    closeGame() {
+      this.socket!.disconnect();
+      this.metaSocket!.emit('endDummyGame', globalThis.id);
+      this.$emit('closeGame');
+    },
     writeStatusinCanvas(match: any){
       if (match.isGameInProgress === -1){
         if(this.socket)
@@ -114,10 +119,9 @@ export default defineComponent({
         setInterval(() => this.writeInCanvas("Your Peng opponent fled before finishing the game."), 100);
         if (this.metaSocket !== undefined){
           setTimeout(() => {
-            this.metaSocket?.emit('endDummyGame', globalThis.username);
-        }, 1000);          
+          this.metaSocket.emit('endDummyGame', globalThis.id);
+          }, 1000);          
         }
-
       }
       if (match.isGameInProgress === 0){
         this.writeInCanvas("Waiting for your Peng opponent...");
@@ -129,14 +133,13 @@ export default defineComponent({
         if (this.metaSocket !== undefined){
           setTimeout(() => {
             this.$emit('match_finish');
-            this.metaSocket?.emit('endDummyGame', globalThis.username);
+            this.metaSocket.emit('endDummyGame', globalThis.id);
         }, 1000);          
         } else {
           setTimeout(() => {
             this.$emit('match_finish');
         }, 1000);          
         }
-
       }
   },
     handleWindowResize() {
@@ -165,12 +168,12 @@ export default defineComponent({
   },
     handleKeys() {
       if (this.socket) {
-        if (this.keysPressed["w"]) {
+        if (this.keysPressed["w"] || this.keysPressed["W"] ) {
           this.socket.emit("movePaddle", {
             playerId: this.socket.id,
             direction: "up",
           });
-        } else if (this.keysPressed["s"]) {
+        } else if (this.keysPressed["s"] || this.keysPressed["S"]) {
           this.socket.emit("movePaddle", {
             playerId: this.socket.id,
             direction: "down",
@@ -181,13 +184,13 @@ export default defineComponent({
             direction: "stop",
           });
         }
-        if (this.keysPressed["o"]) {
+        if (this.keysPressed["o"] || this.keysPressed["O"]) {
           if (this.colorSelector != 0){
             this.colorSelector--;  
             this.config!.BACKGROUND_COLOUR = this.colors[this.colorSelector];
             console.log(this.colorSelector);
           }
-        } else if (this.keysPressed["p"]) {
+        } else if (this.keysPressed["p"] || this.keysPressed["P"]) {
           if (this.colorSelector < this.colors.length - 1){
             this.colorSelector++;
             this.config!.BACKGROUND_COLOUR = this.colors[this.colorSelector];
@@ -302,7 +305,11 @@ export default defineComponent({
           this.writeStatusinCanvas(match);
         }
       }
-      },
+    },
     },
   });
 </script>
+
+<style>
+@import './crt.css'
+</style>

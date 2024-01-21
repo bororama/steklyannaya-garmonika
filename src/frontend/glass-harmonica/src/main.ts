@@ -6,6 +6,7 @@ import ProfilePage from './components/ProfilePage.vue';
 import Home from './components/Home.vue';
 import NotFound from './components/NotFound.vue';
 import GUI from './components/GUI/components/GUI.vue';
+import PongInstructions from './components/GUI/components/PongInstructions.vue';
 
 
 declare global {
@@ -22,16 +23,12 @@ const routes = [
 		path: '/',
 		name: 'GUI',
 		component: GUI,
-	},
-	{
-		path: '/home/',
-		name: 'Home',
-		component : Home,
 		children : [{
-			path: '/profile/:userId',
-			name: 'profile',
-			component : ProfilePage
+			path: '/help',
+			name: 'help',
+			component : PongInstructions
 		}],
+
 	},
 	{
 		path: '/:pathMatch(.*)*',

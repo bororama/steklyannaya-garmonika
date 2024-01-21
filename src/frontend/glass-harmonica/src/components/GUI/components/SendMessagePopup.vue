@@ -1,7 +1,7 @@
 <template>
 	<div class="overlay">
 		<div class="send_popup_background bordered_popup">
-			<h3>Sending a  message to <b>{{ this.target }}</b></h3>
+			<h3 class="text">Sending a  message to <b>{{ this.target }}</b></h3>
 			<div class="text_wrapper">
 				<textarea class="text_input" v-model="message_text_component"></textarea>
 			</div>
@@ -35,29 +35,43 @@ export default {
 
 <style>
 .send_popup_background {
-	width: 45vw;
-	height: 15vh;
+	height:30vh;
+	background-color: #392919;
+	max-width: 1000px;
 	min-width: 300px;
-	min-height: 200px;
-	background-color: #497ae5;
-	margin: 25%;
+	margin: auto;
+	border-radius: 0.2em;
+	border-style: solid;
+	border-color: #603f22;
+    border-width: 1em;
 }
 
 .text_input {
+	
 	max-width: 40vw;
 	max-height: 5vw;
 }
 
+.text{
+	margin: 2%;
+
+	font-family: joystix;
+
+	text-shadow: 2px 2px black;
+}
 .send_message {
 	margin: 2%;
 	border-style: solid;
-	border-color: #efcd23; 
+	border-color: #5a281f; 
 	border-radius: 3px;
 	width: 40%;
 	height: 20%;
 	font-size: 15px;
-	font-family: monospace;
 	cursor: pointer;
+	font-family: joystix;
+	color:black;
+	margin: 0.8em 0 0.5em 0;
+	text-shadow: 2px 2px black;
 }
 
 .text_wrapper {
@@ -65,7 +79,7 @@ export default {
 }
 
 .h3 {
-	font-family: monospace;
+	font-family: joystix;
 }
 
 </style>

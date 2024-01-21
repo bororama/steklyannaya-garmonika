@@ -13,6 +13,7 @@ import { ChatService } from "../chat/services/chat.service";
 import { ChatUserDto } from "../users/dto/chat-user.dto";
 import { ChatWithUsernamesDto } from "../chat/dto/chat-usernames.dto";
 import { PublicUserDto } from "../users/dto/public-user.dto";
+import { MetaverseGateway } from "src/meta/metaverse.gateway";
 
 @Controller('admins')
 @ApiTags('Admins')
@@ -21,7 +22,8 @@ export class AdminsController {
         private readonly adminService : AdminsService,
         private readonly playerService: PlayersService,
         private readonly banService: BansService,
-        private readonly chatService: ChatService
+        private readonly chatService: ChatService,
+        private readonly metaverseGateway: MetaverseGateway
     ) {}
 
     @Post()
@@ -70,6 +72,7 @@ export class AdminsController {
         }
 
         await this.banService.banUser(player, admin);
+        this.metaverseGateway.kickFromMetaverse(player.id + '');
     }
 
     @Post('unban/:idOrUsername')

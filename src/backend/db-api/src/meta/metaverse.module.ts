@@ -6,6 +6,7 @@ import { UsersModule } from '../users/users.module'
 @Module({
   providers: [MetaverseGateway],
   controllers: [MetaverseController],
-  imports: [UsersModule]
+  imports: [UsersModule],
+  exports: [MetaverseGateway]
 })
 export class MetaverseModule {}
