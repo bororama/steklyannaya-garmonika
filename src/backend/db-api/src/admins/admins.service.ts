@@ -34,9 +34,12 @@ export class AdminsService {
     async create(newUser: NewUser): Promise<Admin> {
         const user = await this.usersService.create(newUser);
 
-        return this.adminModel.create({
+        const newAdmin = await this.adminModel.create({
             id: user.id
         });
+
+        newAdmin.user = user;
+        return newAdmin;
     }
 
     async riseToAdmin(user: string): Promise<Admin> {

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsEmail } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class NewUser
 {
@@ -6,9 +6,6 @@ export class NewUser
     userName: string;
     @IsNotEmpty({ message: '42 login cannot be empty' })
     loginFt: string;
-    @IsNotEmpty({ message: 'Email cannot be empty' })
-    @IsEmail({}, { message: 'Invalid email format' })
-    email: string;
     profilePic?: string;
     has2FA?: boolean;
 }
