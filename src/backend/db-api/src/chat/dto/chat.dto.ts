@@ -6,7 +6,7 @@ import { ChatBans } from "../../chat-user/models/chatBan.model";
 export class ChatDto {
     constructor (chat: Chat, chatUsers?: ChatUsers[], chatBans?: ChatBans[]) {
         this.id = chat.id;
-        this.users = chatUsers?.filter(c => c.chatId == chat.id).map(c => new ChatUserDto(c, chatBans.find(b => b.userId == c.userId) !== undefined)) ?? [];
+        this.users = chatUsers?.filter(c => c.chatId == chat.id).map(c => new ChatUserDto(c, chatBans?.find(b => b.userId == c.userId) !== undefined)) ?? [];
     }
     id: number;
     users: ChatUserDto[];

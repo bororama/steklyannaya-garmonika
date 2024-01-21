@@ -35,6 +35,7 @@ export default {
 			el.style.opacity = '100%';
 		},
 		getMessages() {
+          console.log(this.chatId, this.user)
           fetch (backend + '/chats/' +  this.chatId + '/getMessages/' + this.user, postRequestParams).then((a) => {
             a.json().then((messages) => {
               console.log(messages)

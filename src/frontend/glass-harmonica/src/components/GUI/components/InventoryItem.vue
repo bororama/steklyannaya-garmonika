@@ -119,6 +119,9 @@ export default {
             } else if (action == "go_to_pong_match") {
               this.$emit('go_to_pong_match', {match_id: this.item.match_id, mode: 0})
               this.close_drop();
+            } else if (action == "add_member") {
+              this.active_interaction = "adding_member";
+              this.close_drop();
 			} else {
 				console.log("ERROR: Unrecognised option");
 			}
@@ -127,7 +130,7 @@ export default {
 			this.active_interaction = 'none';
 		},
 		set_password(password) {
-            fetch(backend+ "/chats/"+ this.item.id + "/setPassword", {
+            fetch(backend+ "/chats/"+ this.item.chat_id + "/setPassword", {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
@@ -142,7 +145,7 @@ export default {
 		},
 		unlock_password(password) {
             try {
-              fetch(backend + "/chats/"+ this.item.locked_item.id + "/users", {
+              fetch(backend + "/chats/"+ this.item.locked_item.chat_id + "/users", {
                   method: 'POST',
                   mode: 'cors',
                   headers: {
@@ -162,7 +165,7 @@ export default {
             }
 		},
 		make_admin(member) {
-            fetch(backend + "/chats/" + this.item.id + "/admins/" + member, postRequestParams); 
+            fetch(backend + "/chats/" + this.item.rhat_id + "/admins/" + member, postRequestParams); 
 			this.active_interaction = 'none';
 		},
 		unmake_admin(member) {
@@ -175,7 +178,7 @@ export default {
 			this.active_interaction = 'none';
 		},
 		kick_member(member) {
-            fetch(backend + "/chats/" + member + "/" + this.item.id, deleteRequestParams); 
+            fetch(backend + "/chats/" + member + "/" + this.item.chat_id, deleteRequestParams); 
 			for (var i in this.item.target) {
 				if (this.item.target[i] == member)
 					this.item.target.splice(i, 1);

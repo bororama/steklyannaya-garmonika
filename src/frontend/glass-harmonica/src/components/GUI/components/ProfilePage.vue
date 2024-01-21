@@ -18,6 +18,7 @@
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'in_match'" @click="spectate">Spectate</button>
                 </div>
             </div>
+            <h3 v-if="not_enough_pearls">Not enough pearls</h3>
         </div>
     </div>
     <button class='fa_button' v-if="display_status == 'registering' && can_register" @click="registerUser">Descend to جَيَّان</button>
@@ -56,7 +57,8 @@ export default defineComponent({
       is_potential_friend: false,
       online_status: 'disconnected',
       matchUserId: '0',
-      can_register: false
+      can_register: false,
+      not_enough_pearls: false
     })
   },
   methods: {
@@ -69,21 +71,16 @@ export default defineComponent({
       fetch(backend + '/log/register', myData).then((r) => {
         r.json().then((registerAnswer) => {
           if (registerAnswer.status === 'ok') {
-            const formData = new FormData()
-            formData.append('image', this.image)
-            fetch(backend + '/users/' + this.username + '/uploadProfilePic', {
-              method: 'POST',
-              body: formData
-            })
-            fetch(backend + '/log/me/' + registerAnswer.token, getRequestParams).then((a) => {
-              a.json().then((player) => {
-                globalThis.id = player.id
-                globalThis.my_data = player
-                globalThis.username = player.name
-                globalThis.is_admin = player.is_admin
-                this.$emit('successful_register')
-              })
-            })
+            if (this.image != 'no_image')
+            {
+                const formData = new FormData()
+                formData.append('image', this.image)
+                fetch(backend + '/users/' + this.username + '/uploadProfilePic', {
+                  method: 'POST',
+                  body: formData
+                })
+            }
+            this.$emit('successful_register', registerAnswer.meta_token)
           }
         })
       })
@@ -105,12 +102,18 @@ export default defineComponent({
           body: formData
         })
       } else {
+        console.log(new_image)
         this.image = new_image
       }
     },
     befriend () {
-      fetch (backend + '/players/' + globalThis.id + '/sendFrienshipRequest/' + this.userId, postRequestParams).then((r) => {
-        r.json().then((a) => {
+      fetch (backend + '/players/' + globalThis.id + '/giftPearlTo/' + this.userId, postRequestParams).then((r) => {
+        r.text().then((a) => {
+          if (a === 'not_enough_pearls') {
+            this.not_enough_pearls = true
+          } else if (a === 'ok') {
+            this.is_potential_friend = true
+          }
         })
       })
     },
@@ -133,6 +136,7 @@ export default defineComponent({
       }))
     },
     spectate () {
+      this.$emit('start_match')
     },
     update_user_status (new_status : string) {
       this.online_status = new_status
@@ -169,7 +173,6 @@ export default defineComponent({
                   this.is_friend = true
             })
           })
-          console.log("FRIeNDING")
           fetch (backend + '/players/' + globalThis.id + '/getFrienshipRequests', getRequestParams).then((a) => {
             a.json().then((pfriends) => {
               for (const f in pfriends) {

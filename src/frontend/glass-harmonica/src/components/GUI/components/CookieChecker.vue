@@ -40,16 +40,8 @@ export default defineComponent({
         r.json().then((answer) => {
           if (answer.status === 'ok') {
             globalThis.logToken = answer.token
-            fetch(backend + '/log/me/' + answer.token, getRequestParams).then((a) => {
-              a.json().then((player) => {
-                globalThis.id = player.id
-                globalThis.my_data = player
-                globalThis.username = player.name
-                globalThis.is_admin = player.is_admin
                 this.$emit('log_success', answer.token)
                 this.needs2fa = false
-              })
-            })
           }
           if (answer.status === "ko") {
               this.wrong_code = true
@@ -67,15 +59,8 @@ export default defineComponent({
           } else if (access.status === 'needs_register') {
             this.$emit('register', access)
           } else if (access.status === 'success') {
-            globalThis.logToken = access.log_token
-            fetch(backend + '/log/me/' + access.log_token, getRequestParams).then((a) => {
-              a.json().then((player) => {
-                globalThis.id = player.id
-                globalThis.my_data = player
-                globalThis.username = player.name
-                this.$emit('log_success', access.log_token)
-              })
-            })
+              globalThis.logToken = access.log_token
+              this.$emit('log_success', access.log_token)
           } else if (access.status === 'needs_2fa') {
             this.needs2fa = true
             globalThis.has2FA = true

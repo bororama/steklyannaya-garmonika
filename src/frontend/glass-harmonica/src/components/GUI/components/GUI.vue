@@ -20,6 +20,7 @@ import AlreadyConnected from './AlreadyConnected.vue'
 import Metaverse from '../../Metaverse.vue'
 import MetaOverlay from './MetaOverlay.vue'
 import ProfilePage from './ProfilePage.vue'
+import { backend, getRequestParams } from './connect_params.ts'
 
 export default defineComponent({
   name: 'GUI',
@@ -54,14 +55,23 @@ export default defineComponent({
     },
     start_register () {
       this.listening_to_god = false
-      console.log('started')
       this.register_token = this.access.register_token
+      console.log(this.register_token)
       this.auto_image = this.access.auto_image
       this.profile_state = 'registering'
     },
     go_to_metaverse (logToken : string) {
-      this.in_metaverse = true
-      this.log_token = logToken
+      fetch (backend + '/log/me/' + logToken, getRequestParams).then((a) => {
+        a.json().then((player) => {
+          globalThis.id = player.id
+          globalThis.my_data = player
+          globalThis.username = player.name
+          globalThis.is_admin = player.is_admin
+          globalThis.logToken = logToken
+          this.in_metaverse = true
+          this.log_token = logToken
+        })
+      })
     },
     metaProfileHandler (profile) {
       this.meta_colleague_id = profile.name

@@ -29,7 +29,7 @@ export default defineComponent({
     modo: Number, // Define el prop "modo" que recibirá el componente
     pongRoomId: Number,
     isGameInProgress: Number, //deprecated
-    metaSocket: Socket,
+    metaSocket: Socket || undefined,
   },
   data() {
     return {
@@ -112,9 +112,12 @@ export default defineComponent({
         if(this.socket)
           this.socket.disconnect();
         setInterval(() => this.writeInCanvas("Your Peng opponent fled before finishing the game."), 100);
-        setTimeout(() => {
-          this.metaSocket.emit('endDummyGame', globalThis.username);
-      }, 1000);
+        if (this.metaSocket !== undefined){
+          setTimeout(() => {
+            this.metaSocket?.emit('endDummyGame', globalThis.username);
+        }, 1000);          
+        }
+
       }
       if (match.isGameInProgress === 0){
         this.writeInCanvas("Waiting for your Peng opponent...");
@@ -123,10 +126,16 @@ export default defineComponent({
         if(this.socket)
           this.socket.disconnect();
         setInterval(() => this.writeInCanvas("Match ended."), 100);
-        setTimeout(() => {
-          this.$emit('match_finish');
-          this.metaSocket.emit('endDummyGame', globalThis.username);
-      }, 1000);
+        if (this.metaSocket !== undefined){
+          setTimeout(() => {
+            this.$emit('match_finish');
+            this.metaSocket?.emit('endDummyGame', globalThis.username);
+        }, 1000);          
+        } else {
+          setTimeout(() => {
+            this.$emit('match_finish');
+        }, 1000);          
+        }
 
       }
   },

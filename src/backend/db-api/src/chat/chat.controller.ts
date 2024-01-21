@@ -43,8 +43,10 @@ export class ChatController {
         }
         this.chatService.validatePassword(chat, credentials?.password)
         const users = await this.chatService.getChatUsers(id);
+        console.log("Got users");
         const bans = await this.chatService.getBansMembers(id, users);
-        return users.map(u => new ChatUserDto(u, bans.find(b => b.userId == u.userId) !== undefined));
+        console.log("Got banned users");
+        return users.map(u => new ChatUserDto(u, bans?.find(b => b.userId == u.userId) !== undefined));
     }
 
     @Post(':id/admins')

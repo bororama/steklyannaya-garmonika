@@ -8,12 +8,13 @@
       <button v-if='in_admin_page' @click="close_admin_page" class="fa_button">Close Admin</button>
       </div>
       <div class="overlay" v-if="profile_state != 'no'">
-        <ProfilePage display_status="personal_profile"/>
+        <ProfilePage display_status="my_profile"/>
       </div>
       <div class="overlay" v-if="opened_inventory">
-        <InventoryPopupable/>
+        <InventoryPopupable @go_to_pong_match="go_to_pong_match"/>
       </div>
       <AdminPage v-if="in_admin_page"/>
+      <PongGame v-if="in_match" :modo="0" :pong-room-id="room_id" @match_finish="close_match"/>
     </div>
 </template>
 
@@ -24,6 +25,7 @@ import ProfilePage from './ProfilePage.vue'
 import AdminPage from './AdminPage.vue'
 import ButtonedInventory from './ButtonedInventory.vue'
 import InventoryPopupable from './InventoryPopupable.vue'
+import PongGame from './PongGame.vue'
 
 import { defineComponent } from 'vue'
 
@@ -33,7 +35,8 @@ export default defineComponent({
       ProfilePage,
       AdminPage,
       ButtonedInventory,
-      InventoryPopupable
+      InventoryPopupable,
+      PongGame
     },
     data() {
       return ({
@@ -41,7 +44,9 @@ export default defineComponent({
         in_admin_page: false,
         auto_image: '',
         opened_inventory: false,
-        is_admin: globalThis.is_admin
+        is_admin: globalThis.is_admin,
+        in_match: false,
+        room_id: ''
       })
     },
     methods: {
@@ -70,6 +75,14 @@ export default defineComponent({
         this.in_admin_page = false
         this.in_metaverse = true
       },
+      go_to_pong_match (match_data) {
+        this.close_inventory()
+        this.room_id = match_data.match_id
+        this.in_match = true
+      },
+      close_match () {
+        this.in_match = false
+      }
     }
 })
 

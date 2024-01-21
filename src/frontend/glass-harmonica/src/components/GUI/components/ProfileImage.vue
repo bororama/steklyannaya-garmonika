@@ -52,12 +52,6 @@ export default defineComponent({
         })
       }
     },
-    getAvatarImage () {
-      // TODO change "this.image" by requesting to server
-    },
-//    created () {
-//      this.getAvatarImage()
-//    },
     start_edit () {
       this.editing = true
     },
@@ -67,7 +61,6 @@ export default defineComponent({
     accept_edit () {
       this.editing = false
       this.$emit('change_profile_image', this.selected_image)
-      //this.uploadImage()
     },
     readFile (event) {
       if (event.target.files[0] !== undefined) {

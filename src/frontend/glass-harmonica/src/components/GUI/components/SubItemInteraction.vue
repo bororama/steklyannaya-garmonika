@@ -5,6 +5,7 @@
 		<SetPasswordPopup @close_interaction="close" @set_password="set_password" v-if="this.interaction == 'setting_password'"/>
 		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_password" v-if="this.interaction == 'unlocking_password'"/>
 		<ViewMembersPopup @close_interaction="close" @user_interact="user_interact" :members="users_in_chat" v-if="this.interaction == 'displaying_members' || this.interaction == 'making_admin' || this.interaction == 'unmaking_admin' || this.interaction == 'kicking_member'"/>
+        <AddMemberPopup v-if="this.interaction == 'adding_member'" :chat_id="item.chat_id" @close_interaction="close"/>
         <div  v-if="displaying_profile" class="overlay">
             <button @click="closeProfile">Close Profile</button>
             <ProfilePage display_status="profile_display" :userId="display_userId" @start_match="(param) => $emit('go_to_pong_match', param)"/>
@@ -23,17 +24,9 @@ import SetPasswordPopup from './SetPasswordPopup.vue'
 import InputPasswordPopup from './InputPasswordPopup.vue'
 import ViewMembersPopup from './ViewMembersPopup.vue'
 import ProfilePage from './ProfilePage.vue'
+import AddMemberPopup from './AddMemberPopup.vue'
 
-const server_url = "http://localhost:3000"
-const post_request_params = {
-  method: 'POST',
-  mode: 'cors',
-  headers: {
-    "Content-Type": "application/json",
-    'Accept': 'application/json'
-  },
-  body: JSON.stringify({})
-}
+import {backend, postRequestParams} from './connect_params.ts' 
 
 export default {
 	name: 'SubItemInteraction',
@@ -44,7 +37,8 @@ export default {
 		InputPasswordPopup,
 		SetPasswordPopup,
 		ViewMembersPopup,
-        ProfilePage
+        ProfilePage,
+        AddMemberPopup
 	},
 	methods: {
 		close () {
@@ -68,7 +62,6 @@ export default {
 			} else if (this.interaction == 'kicking_member') {
 				if (member != this.item.sender)
 				{
-                  //TODO change check
 					if (member.isAdmin)
 					{
 						if (member.isOwner)
@@ -90,7 +83,7 @@ export default {
         getUsersInChat(id) {
           if (this.item.item_type == "rosary")
           {
-            fetch(server_url + "/chats/"+ id +"/users", post_request_params).then((response) => {
+            fetch(backend+ "/chats/"+ id +"/users", postRequestParams).then((response) => {
                 response.json().then( (r) => {
                   this.users_in_chat = r;
                 });
@@ -112,7 +105,7 @@ export default {
       })
     },
     mounted() {
-      this.getUsersInChat(this.item.id);
+      this.getUsersInChat(this.item.chat_id);
     }
 }
 </script>

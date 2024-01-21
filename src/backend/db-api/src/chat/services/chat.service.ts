@@ -479,7 +479,7 @@ export class ChatService {
         return this.chatBansModel.findAll({
             where: {
                 chatId: id,
-                usersId: users
+                userId: userIds
             }
         });
     }
