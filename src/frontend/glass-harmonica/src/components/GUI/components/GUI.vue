@@ -71,7 +71,7 @@ export default defineComponent({
           globalThis.id = player.id
           globalThis.my_data = player
           globalThis.username = player.name
-          globalThis.is_admin = player.is_admin
+          globalThis.is_admin = player.isAdmin
           globalThis.logToken = logToken
           this.in_metaverse = true
           this.log_token = logToken
