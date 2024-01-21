@@ -170,15 +170,42 @@ export class MatchesService {
         });
     }
 
-    delete(matchId: number): Promise<void> {
-        return this.matchModel.destroy({
+    async delete(matchId: number): Promise<void> {
+        const match = await  this.matchModel.findOne({
             where: {
                 [Op.or]: [
                     { id: matchId },
                     { roomId: matchId }
                 ]
-            }
-        }).then();
+            },
+            include: [
+                {
+                    model: Player,
+                    as: 'player1',
+                    include: [
+                        {
+                          model: User
+                        }
+                    ]
+                },
+                {
+                    model: Player,
+                    as: 'player2',
+                    include: [
+                        {
+                          model: User
+                        }
+                    ]
+                }
+            ]
+        });
+
+        match.player1.user.status = UserStatus.online;
+        await match.player1.user.save();
+        match.player2.user.status = UserStatus.online;
+        await match.player2.user.save();
+
+        return match.destroy().then();
     }
 
     getByRoomId(roomId: number): Promise<Match> {
