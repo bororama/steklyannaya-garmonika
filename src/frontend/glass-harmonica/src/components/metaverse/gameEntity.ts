@@ -49,7 +49,7 @@ export class GameEntity extends TransformNode {
         this._messageText = new TextBlock();
         this._setUpBubble();
         this._nameLabel = MeshBuilder.CreatePlane("label", {width: 5, height : 1}, scene);
-        this._setUpLabel();
+        this._setUpLabel(assets.height);
     }
 
     private _setUpMesh(type : string) {
@@ -75,9 +75,9 @@ export class GameEntity extends TransformNode {
         //this._bubble.addControl(this._messageText);
     }
 
-    private _setUpLabel() {
+    private _setUpLabel(height : number = 4) {
         this._nameLabel.billboardMode = 7; //BILLBOARD_MODE_ALL, always facing the camera
-        this._nameLabel.translate(Vector3.Up(), 4);
+        this._nameLabel.translate(Vector3.Up(), height);
         this._nameLabel.isPickable = false;
         this._nameLabel.parent = this.mesh;
         const labelTexture = new DynamicTexture("label-texture", { width: 32 * (5), height : 32}, this._scene);
@@ -186,7 +186,7 @@ export class GameEntity extends TransformNode {
         const localPlayer  = this._scene.getMeshByName("outer");
         /* not too based, but it's more consistent */
         const distanceToPlayer : number = Vector3.Distance(localPlayer!.position, this.mesh.position);
-        this._messageText.fontSize = Math.max(16 - Math.floor(distanceToPlayer / 6), 2);
+        this._messageText.fontSize = Math.max(14 - Math.floor(distanceToPlayer / 16), 3);
 
         /* this is the based way */
         //const canvas  = super.getScene().getEngine().getRenderingCanvas();

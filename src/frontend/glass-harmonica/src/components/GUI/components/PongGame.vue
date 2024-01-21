@@ -1,5 +1,6 @@
 <template>
   <div class="game-container overlay-2">
+    <button  @click="closeGame" class="fa_button" style="display: block; margin: 6px auto;">EXIT</button>
     <canvas id="pong-game" ref="pongCanvas"></canvas>
   </div>
 </template>
@@ -106,6 +107,11 @@ export default defineComponent({
   window.removeEventListener("resize", this.handleWindowResize);
   },
   methods: {
+    closeGame() {
+      this.socket!.disconnect();
+      this.metaSocket!.emit('endDummyGame', globalThis.id);
+      this.$emit('closeGame');
+    },
     writeStatusinCanvas(match: any){
       if (match.isGameInProgress === -1){
         if(this.socket)
@@ -293,7 +299,7 @@ export default defineComponent({
           this.writeStatusinCanvas(match);
         }
       }
-      },
+    },
     },
   });
 </script>

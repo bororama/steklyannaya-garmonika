@@ -49,15 +49,15 @@ class GameWorld {
     private _canvas: HTMLCanvasElement;
     private _engine: Engine;
     private _metaSocket: Socket;
-    public  assets: any;
+    public assets: any;
     private _environment: Environment | null;
     private _playerData: PlayerData | null;
     private _player: LocalPlayer | null;
     private _input: PlayerInput | null;
     private _livePlayers: Array<RemotePlayer>;
     private _yellowDevilName: string;
-    private _yellowDevil : GameEntity | any;
-    private _NPCS : Array<NPC> | any;
+    private _yellowDevil: NPC | any;
+    private _NPCS: Array<NPC> | any;
 
     constructor(metaSocket: Socket, playerData: PlayerData) {
         this._canvas = this._createCanvas();
@@ -67,7 +67,7 @@ class GameWorld {
         this._engine.setHardwareScalingLevel(6);
         this._scene = new Scene(this._engine);
         this._playerData = playerData,
-        this._player = null;
+            this._player = null;
         this._input = null;
         this._livePlayers = new Array();
         this._NPCS = new Array();
@@ -84,26 +84,26 @@ class GameWorld {
                 }
             }
 
-            else if( ev.key === "l") {
+            else if (ev.key === "l") {
                 console.log("Player position : ",
-                `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
+                    `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
             }
-            
-            else if( ev.key === "r") {
+
+            else if (ev.key === "r") {
                 console.log("Player rotation : ", `${this._player!.mesh.rotationQuaternion}`);
             }
 
-            else if ( ev.key === "R") {
+            else if (ev.key === "R") {
                 this._player!.mesh.position = Vector3.Zero();
             }
 
-            else if ( ev.key === "p") {
+            /*else if ( ev.key === "p") {
                 this.showPopUp("This is a pop up");
             }
 
             else if ( ev.key === "P") {
                 this.showPopUp("This is a pop up with a longer text so that we can see how it goes. I want it to be longer still, and hope there's no issue");
-            }
+            }*/
         });
     }
 
@@ -321,7 +321,7 @@ class GameWorld {
                     vueEmitter('profileRequest', { name: pickInfo!.pickedMesh!.metadata.name });
                 }
                 else {
-                    let NPC = this._NPCS.find((npc : any) => { return npc.name === pickInfo!.pickedMesh!.metadata.name})
+                    let NPC = this._NPCS.find((npc: any) => { return npc.name === pickInfo!.pickedMesh!.metadata.name })
                     console.log(NPC.name, ": About to saySomething()");
                     NPC.saySomething();
                 }
@@ -347,7 +347,7 @@ class GameWorld {
         });
         window.addEventListener('keydown', () => {
             this._setUpMusic();
-        }, { once : true })
+        }, { once: true })
     }
 
 
@@ -390,28 +390,95 @@ class GameWorld {
 
     private async _instanceAllNpcs() {
         /*curro*/
-        let assets = await this._loadPlayerAssets(this._scene, false, 'curro.glb');
-        this._yellowDevil = new GameEntity(assets, this._scene, this._yellowDevilName, 'Devil');
-        this._yellowDevil.updatePosition(new Vector3(-138, -75, 335));
-        this._yellowDevil.rotationQuaternion = new Quaternion(0, 30);
+        let assets: any = await this._loadPlayerAssets(this._scene, false, 'curro1.glb');
+        assets["height"] = 5;
+        this._yellowDevil = new NPC(assets, this._scene, this._yellowDevilName, 'Devil',
+            new Vector3(-141.20595719108053, -73.68085679880434, 329.60593356864916),
+            new Quaternion(0, 0.99, 0, -0.89)
+        );
 
         /*guille*/
-        assets = await this._loadPlayerAssets(this._scene, false, 'humanoid.glb');
+         assets = await this._loadPlayerAssets(this._scene, false, 'escultura1.glb');
+         assets["height"] = 6;
+         this._NPCS.push(
+             new NPC(assets, this._scene, 'Guillermo', 'angel',
+                 new Vector3(-259.19837561453, 49.69347184924647, -181.9513474067934),
+                 new Quaternion(0, 0.8, 0),
+                 [
+                     "Buy 'El aquelarre de Celia'",
+                     "Read 'El aquelarre de Celia'",
+                     "The Falcon has spread its wings.",
+                     "Climb down this hill, find your destiny",
+                     "Be careful in this God-forsaken land",
+                     "Do it for Him",
+                     "The wings of liberty glide across the sky",
+                     "Offer your heart",
+                     "MARCH ON",
+                     "I like you. I want you",
+                     "*frowns*",
+                 ]
+             )
+         );
+ 
+         /*Nico*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'nico1.glb');
+        assets["height"] = 5;
         this._NPCS.push(
-            new NPC(assets, this._scene, 'Guillermo', 'angel',
-                new Vector3(-262.9376075888921, 49.41932127911506, -188.31524453127705),
-                new Quaternion(0, 0.15, 0),
+            new NPC(assets, this._scene, 'Botticelli', 'artist',
+                new Vector3(-75.93741380345205, -73.29292600487902, 229.75875289758943),
+                new Quaternion(0, -0.186713555771165, 0, 0.9824143973351003),
                 [
-                    "Buy 'El aquelarre de Celia'",
-                    "Read 'El aquelarre de Celia'",
-                    "The Falcon has spread its wings.",
-                    "Climb down this hill, find your destiny",
-                    "Be careful in this God-forsaken land",
-                    "Do it for Him",
-                    "The wings of liberty glide across the sky",
-                    "Offer your heart",
-                    "MARCH ON",
-                    "I like you. I want you",
+                    "Oh ¿Es eso una armónica de cristal?...",
+                    "Ten cuidado con las sonrisas en el desierto...",
+                    "El desierto solía ser una rosaleda hace mucho mucho tiempo....",
+                    "...Solían florecer con el tañer de las campanas ... PING PONG...",
+                    "¿Eres fan de Schnittke?...",
+                    "El ángel de la montaña parece agresivo a veces, pero es nuestro ángel...",
+                    "Si entregas tu corazón a este sitio, podrás ver a los dioses...",
+                    "Ignora a mi hermano pequeño si lo vas saltando entre árboles...",
+                    "*Dibujando una de las esculturas de la Catedral*",
+                    "*Bostezando*",
+                    "*Infusionando te*",
+                ])
+        );
+
+        /*Jav*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'jav1.glb');
+        this._NPCS.push(
+            new NPC(assets, this._scene, 'Botticello', 'scientist',
+                new Vector3(-81.97072654511088, -73.63999168465243, 231.13467107770862),
+                new Quaternion(0, -0.186713555771165, 0, 0.9824143973351003),
+                [
+                    "Ten cuidado al hablar sobre ciertas personas mientras estés aquí...",
+                    "Nuestro Ángel protector? Yo lo hago todo por él.",
+                    "Sí, sí. Perdón para todos! Salvo a los corruptos.",
+                    "¿Te has detenido a observar los mosaicos?",
+                    "Las vistas son maravillosas desde la altura de los árboles.",
+                    "Si hablas con mi hermano, recuérdale que tiene que pintar.",
+                    "*Dibujando una especie de formula en la arena*",
+                    "*Sorbiendo de su mate*",
+                    "Extraño las flores..."
+                ]
+            )
+        );
+
+        /*Guitarra1*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'guitarra1.glb');
+        assets["height"] = 5;
+        this._NPCS.push(
+            new NPC(assets, this._scene, 'Pablo', 'bard',
+                new Vector3(-79.48917234424871, -73.79349910868692, 268.8783399458853),
+                new Quaternion(0, 0.9620386395130945, 0, 0.27291327568178436),
+                [
+                    "♫♩La arena del desierto no para de ensuciar mi guitarra♪♫",
+                    "♫♩Temo al gato de ojos amarillos♪♫",
+                    "♫♩Escogí la música sobre la cimitarra♪♫",
+                    "♫♩Bella tierra de جَيَّان , tierra que me vio nacer♪♫",
+                    "♫♩El hambre, los colmillos♪♫",
+                    "*Afinando la guitarra*",
+                    "*golpeando la caja de la guitarra*",
+                    "*Cambiando una cuerda*",
+                    "♫♩ !¿Y esa música horrible?! Debería ir a escucharla de cercaaaa♪♫",
                 ]
             )
         );
@@ -483,7 +550,7 @@ class GameWorld {
         return {
             mesh: outer as Mesh,
             animationGroups: importedMesh.animationGroups,
-            popUpCallback : this.showPopUp,
+            popUpCallback: this.showPopUp,
         }
     }
 }
