@@ -12,7 +12,7 @@ import { MatchPointsDto } from './dtos/matchPoints.dto';
 
 @Injectable()
 export class MatchesService {
-    private readonly price = 50;
+    private readonly price = 3;
 
     constructor(
         @InjectModel(Match)
@@ -310,10 +310,10 @@ export class MatchesService {
             throw new BadRequestException("Second player is already in a match");
         }
 
-        match.player1.user.status = UserStatus[UserStatus.inMatch];
-        match.player1.user.save();
-        match.player2.user.status = UserStatus[UserStatus.inMatch];
-        match.player2.user.save();
+        match.player1.user.status = UserStatus.inMatch;
+        await match.player1.user.save();
+        match.player2.user.status = UserStatus.inMatch;
+        await match.player2.user.save();
 
         match.startDate = new Date();
         await match.save();
@@ -324,8 +324,30 @@ export class MatchesService {
       if (!match) {
           throw new BadRequestException("Match doesn't exist");
       }
+      
+      if (!match.idPlayer2) {
+          throw new BadRequestException("Match cannot start without a second player");
+      }
+
+      const statusPlayer1 = await this.playerService.getPlayerStatus(match.idPlayer1);
+      const statusPlayer2 = await this.playerService.getPlayerStatus(match.idPlayer2);
+      if (statusPlayer1 == UserStatus.inMatch)
+      {
+          throw new BadRequestException("First player is already in a match");
+      }
+      else if (statusPlayer2 == UserStatus.inMatch)
+      {
+          throw new BadRequestException("Second player is already in a match");
+      }
+
+      match.player1.user.status = UserStatus.inMatch;
+      await match.player1.user.save();
+      match.player2.user.status = UserStatus.inMatch;
+      await match.player2.user.save();
+
       match.startDate = new Date();
-      match.save()
+      await match.save();
+
     }
 
     async startMatch(player1: string, player2: string): Promise<void> {
@@ -378,14 +400,42 @@ export class MatchesService {
       if (!match) {
           throw new BadRequestException("Match doesn't exist");
       }
-      if (winner == 'player1')
-        this.finishMatchById(match.id, {pointsPlayer1: pointsP1, pointsPlayer2: pointsP2, winner: '' + match.player1.id})
-      else
-        this.finishMatchById(match.id, {pointsPlayer1: pointsP1, pointsPlayer2: pointsP2, winner: '' + match.player2.id})
+      if (!match.startDate) {
+            throw new BadRequestException("Match is not even started");
+        }
+
+        match.endDate = new Date();
+        if (winner !== undefined && winner !== null) {
+            if (!match.player2) {
+                throw new BadRequestException("First player cannot win a match without second player")
+            }
+
+            if (winner == "player1") {
+                match.player1.wins += 1;
+                match.player2.defeats += 1;
+                match.player1.user.franciscoins += this.price;
+                match.winnerId = match.player1.id;
+            }
+            else {
+                match.player2.wins += 1;
+                match.player1.defeats += 1;
+                match.player2.user.franciscoins += this.price;
+                match.winnerId = match.player2.id;
+            }
+
+        }
+        match.player1.user.status = UserStatus[UserStatus.online];
+        await match.player1.save();
+        await match.player1.user.save();
+        match.player2.user.status = UserStatus[UserStatus.online];
+        await match.player2.save();
+        await match.player2.user.save();
+        match.pointsPlayer1 = pointsP1;
+        match.pointsPlayer2 = pointsP2;
+        await match.save();
 
     }
 
-            
     async finishMatchById(id: number, matchInfo: MatchPointsDto): Promise<void> {
         const match = await this.matchModel.findByPk(id, {
             include: [
@@ -436,10 +486,12 @@ export class MatchesService {
             if (winnerId == match.idPlayer1) {
                 match.player1.wins += 1;
                 match.player2.defeats += 1;
+                match.player1.user.franciscoins += this.price;
             }
             else {
                 match.player2.wins += 1;
                 match.player1.defeats += 1;
+                match.player2.user.franciscoins += this.price;
             }
 
             match.winnerId = winnerId;
@@ -570,12 +622,17 @@ export class MatchesService {
             if (matchInfo.winner == matchInfo.player1) {
                 challenger1.wins += 1;
                 challenger2.defeats += 1;
+                challenger1.user.franciscoins += this.price;
             }
             else {
                 challenger2.wins += 1;
                 challenger1.defeats += 1;
+                challenger2.user.franciscoins += this.price;
             }
         }
+
+        challenger1.user.save();
+        challenger2.user.save();
 
         return this.matchModel.create({
             idPlayer1: challenger1,

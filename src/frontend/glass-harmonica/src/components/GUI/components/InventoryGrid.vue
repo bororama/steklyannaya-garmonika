@@ -47,7 +47,11 @@ export default {
         r.json().then((answer) => {
           for (const chat in answer) {
             let c = answer[chat]
-            let rosary = generate_rosary(globalThis.id, answer[chat].id)
+            let rosary
+            if (c.isLocked)
+                rosary = generate_padlock(generate_rosary(globalThis.id, answer[chat].id))
+            else 
+                rosary = generate_rosary(globalThis.id, answer[chat].id)
             for (const u in c.users) {
               console.log(c.users[u])
               if (globalThis.id == c.users[u].id) {

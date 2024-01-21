@@ -136,7 +136,11 @@ export default defineComponent({
       }))
     },
     spectate () {
-      this.$emit('start_match')
+      const match : any = {
+        "match_id": this.player_data.matchRoomId
+      }
+      console.log(match)
+      this.$emit('start_match', match)
     },
     update_user_status (new_status : string) {
       this.online_status = new_status

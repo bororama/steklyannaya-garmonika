@@ -6,7 +6,7 @@
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" @start_match="go_to_pong_match" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
     </div>
-     <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match"/>
+    <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match"/>
     <AlreadyConnected v-if="already_connected"/>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
@@ -91,6 +91,7 @@ export default defineComponent({
       this.already_connected = true
     },
     go_to_pong_match (match_data) {
+      console.log(match_data)
       this.close_inventory()
       this.room_id = match_data.match_id
       this.match_mode = match_data.mode

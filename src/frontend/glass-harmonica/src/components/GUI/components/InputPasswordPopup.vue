@@ -11,14 +11,17 @@
 </template>
 
 <script>
+
+import {backend, postRequestParams }
 export default {
-	props: ['target', 'sender'],
+	props: ['chat_id'],
 	data: () => ({
 		password_component: ""
 	}),
 	methods:{
-		unlock() {
-			this.$emit('unlock_password', this.password_component);
+		unlock() { //TODO password
+          fetch (backend + '/chats/' + this.chat_id + '/unlock/' + globalThis.id, postRequestParams)
+	      this.$emit('unlock_password', this.password_component);
 		}
 	}
 }

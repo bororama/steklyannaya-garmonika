@@ -43,15 +43,21 @@ export class Match {
   }
 
   recordOnDB(){
-    if (this.scores[0].score > this.scores[1].score)
-    {
-        this.matchesService.finishMatchByRoom(this.pongRoomId, 'player1', this.scores[0].score, this.scores[1].score)
-        console.log("player 1 wins.");
-    }
-    else
-    {
-        this.matchesService.finishMatchByRoom(this.pongRoomId, 'player2', this.scores[0].score, this.scores[1].score)
-        console.log("player 2 wins.");
+    try {
+        if (this.scores[0].score > this.scores[1].score)
+        {
+          console.log("WINS PLAYER 1")
+            this.matchesService.finishMatchByRoom(this.pongRoomId, 'player1', this.scores[0].score, this.scores[1].score)
+            console.log("player 1 wins.");
+        }
+        else
+        {
+          console.log("WINS PLAYER 2")
+            this.matchesService.finishMatchByRoom(this.pongRoomId, 'player2', this.scores[0].score, this.scores[1].score)
+            console.log("player 2 wins.");
+        }
+    } catch (e) {
+        console.error(e.message);
     }
   };
 

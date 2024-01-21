@@ -18,11 +18,11 @@ export default defineComponent({
   },
   methods: {
     getStatus () {
-      fetch(backend + '/users/connect_status/' + this.username).then((a) => {
-        a.text().then((answer) => {
-          if (answer == 'metaversing')
+      fetch(backend + '/players/' + this.username, getRequestParams).then((a) => {
+        a.json().then((answer) => {
+          if (answer.status == 'online')
             this.online_status = 'online'
-          else if (answer == 'matching')
+          else if (answer.status == 'inMatch')
             this.online_status = 'in_match'
           else
             this.online_status = 'disconnected'
