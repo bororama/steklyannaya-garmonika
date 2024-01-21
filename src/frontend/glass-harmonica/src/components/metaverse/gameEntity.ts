@@ -183,12 +183,18 @@ export class GameEntity extends TransformNode {
     }
 
     private _determineBubbleFontSize(r : BoundingRect) {
-        const canvas  = super.getScene().getEngine().getRenderingCanvas();
-        const boundingRectArea : number = r.width * r.height;
-        const canvasArea : number = canvas!.clientWidth * canvas!.clientHeight;
-        const proportion : number = boundingRectArea / canvasArea;
-        const fontSize : number = clamp(1024 * ((proportion) - Math.pow(proportion / 2, 2)), 8, 22);
-        this._messageText.fontSize = fontSize;
+        const localPlayer  = this._scene.getMeshByName("outer");
+        /* not too based, but it's more consistent */
+        const distanceToPlayer : number = Vector3.Distance(localPlayer!.position, this.mesh.position);
+        this._messageText.fontSize = Math.max(16 - Math.floor(distanceToPlayer / 6), 2);
+
+        /* this is the based way */
+        //const canvas  = super.getScene().getEngine().getRenderingCanvas();
+        //const boundingRectArea : number = r.width * r.height;
+        //const canvasArea : number = canvas!.clientWidth * canvas!.clientHeight;
+        //const proportion : number = boundingRectArea / canvasArea;
+        //const fontSize : number = clamp(1024 * ((proportion) - Math.pow(proportion / 2, 2)), 8, 22);
+        //this._messageText.fontSize = fontSize;
     }
 
     private _getClientRectFromMesh(): BoundingRect {
