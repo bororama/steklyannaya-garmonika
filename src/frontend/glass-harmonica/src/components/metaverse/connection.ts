@@ -42,8 +42,8 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 
 	metaSocket.on('connect', () => {
 		//setTimeout( () => {
-			console.log("CONNECTION REQUESTED")
-			metaSocket.emit('userData', { id : globalThis.id, name : globalThis.username});
+			//why is globalThis.id a number??????
+			metaSocket.emit('userData', { id : globalThis.id + '', name : globalThis.username});
 		//}, 1)
 	});
 	

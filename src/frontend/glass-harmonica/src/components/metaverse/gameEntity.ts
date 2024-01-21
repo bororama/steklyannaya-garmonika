@@ -148,13 +148,16 @@ export class GameEntity extends TransformNode {
     }
 
     say(message : string) {
+        this._bubbleTexture.removeControl(this._bubble);
+        this._bubble.removeControl(this._messageText);
         this._bubble.alpha = 1.0;
         const r : BoundingRect = this._getClientRectFromMesh();
         this._determineBubblePosition(r);
         this._determineBubbleFontSize(r);
+        this._messageText.textWrapping = 1;
         this._messageText.text = message;
         this._messageText.color = "black";
-        this._bubble.removeControl(this._messageText);
+        this._bubble.adaptHeightToChildren = true;
         this._bubble.addControl(this._messageText);
         let context = this._bubbleTexture.getContext();
         this._bubble.width = (clamp((context.measureText(message).width + (this._messageText.fontSizeInPixels * 3)), 64, 1024).toString() + "px");
@@ -182,7 +185,7 @@ export class GameEntity extends TransformNode {
         const boundingRectArea : number = r.width * r.height;
         const canvasArea : number = canvas!.clientWidth * canvas!.clientHeight;
         const proportion : number = boundingRectArea / canvasArea;
-        const fontSize : number = clamp(8192 * ((proportion) - Math.pow(proportion / 2, 2)), 6, 22);
+        const fontSize : number = clamp(1024 * ((proportion) - Math.pow(proportion / 2, 2)), 2, 18);
         this._messageText.fontSize = fontSize;
     }
 

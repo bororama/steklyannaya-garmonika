@@ -61,16 +61,17 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
        return p.socket === socket;
     });
 
-    const newUser : User = { id: payload.id, name : payload.name };
+    const newUser : User = { id:  payload.id, name : payload.name };
     const newPlayer : Player = { user : newUser, position : [0,0,0], rotation : [0,0,0,1.0], state : 0};
     liveClients[clientIndex].player = newPlayer;
     let i = 0;
-    console.log("--------");
-    for (let p of liveClients) {
-      console.log(i, "] p of livePlayers : ", p.player, " id : ", p.socket.id);
-      i++;
-    }
-    console.log("--------");
+
+    //console.log("--------");
+    //for (let p of liveClients) {
+    // console.log(i, "] p of livePlayers : ", p.player, " id : ", p.socket.id);
+    // i++;
+    //}
+    //console.log("--------");
     const livePlayers = liveClients.map((c: LiveClient) => {
       return c.player;
 		});
@@ -131,14 +132,8 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   
   kickFromMetaverse(id : string ) {
-    console.log("KIIIIIIIIIIICK");
     const bannedClient = liveClients.find( (c) => {
-      console.log("id : ", id);
-      console.log("c : ", c.player);
-      console.log("c.player.user.id === id>>", c.player.user.id === id);
-      console.log("c.player.user.id", c.player.user.id);
-      console.log("id", id);
-      return c.player.user.id == id;
+      return c.player.user.id === id;
     });
     console.log("KICKING ", bannedClient);
     if (bannedClient) {

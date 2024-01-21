@@ -70,7 +70,7 @@ class GameWorld {
         this._livePlayers = new Array();
         this._environment = null;
         this._yellowDevilName = 'فرانسيسكو خيسوس دي جاتا وفالديس';
-        //Events for debugging only
+        //Events for debugging
         window.addEventListener("keydown", (ev) => {
             // Shift+ctrl+I
             if (ev.shiftKey && ev.ctrlKey && ev.keyCode === 73) {
@@ -81,9 +81,13 @@ class GameWorld {
                 }
             }
 
-            else if( ev.key == "l") {
+            else if( ev.key === "l") {
                 console.log("Player position : ",
                 `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
+            }
+
+            else if ( ev.key === "R") {
+                this._player!.mesh.position = Vector3.Zero();
             }
         });
     }
@@ -149,9 +153,10 @@ class GameWorld {
         });
         this._popUpLabel = new TextBlock();
         this._popUpLabel.text = 'This is a pop-up!';
-        this._popUpLabel.fontSize = 20;
+        this._popUpLabel.fontSize = 10;
         this._popUpLabel.height = '100px';
         this._popUpLabel.width = '300px';
+        this._popUpLabel.textWrapping = 1;
         this._popUpLabel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
 
         this._popUpStack.addControl(this._popUpLabel);
@@ -221,8 +226,6 @@ class GameWorld {
     applyRemotePlayerUpdate(p: PlayerData) {
 
         let player = this._findLivePlayer(p.user.id);
-        console.log("livePlayers >>", this._livePlayers);
-        console.log("UPDATING : ", player);
         player?.updateMesh(
             new Vector3(p.position[0], p.position[1], p.position[2]),
             new Quaternion(p.rotation[0], p.rotation[1], p.rotation[2], p.rotation[3]),
@@ -437,6 +440,7 @@ class GameWorld {
         return {
             mesh: outer as Mesh,
             animationGroups: importedMesh.animationGroups,
+            popUpCallback : this.showPopUp,
         }
     }
 }
