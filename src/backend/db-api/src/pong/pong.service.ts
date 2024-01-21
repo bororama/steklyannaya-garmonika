@@ -50,17 +50,17 @@ export class PongService {
           console.log(data)
           console.log(data.token)
 
-          //try {
-          //  payload = jwt.verify(data.token, 'TODO the REAL secret');
-          //} catch (e) {
-          //  socket.disconnect(false);
-          //}
-//
-          //console.log(payload);
-//
-          //if (!this.verifyPlayer(payload.username, data.pongRoomId)) {
-          //  socket.disconnect(false);
-          //}
+          try {
+            payload = jwt.verify(data.token, 'TODO the REAL secret');
+          } catch (e) {
+            socket.disconnect(false);
+          }
+
+          console.log(payload);
+
+          if (!this.verifyPlayer(payload.username, data.pongRoomId)) {
+            socket.disconnect(false);
+          }
 
           let match: Match | undefined;
           console.log(data.pongRoomId + " received pongRoomId");
