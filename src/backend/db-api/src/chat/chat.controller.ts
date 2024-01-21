@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { ChatService } from './services/chat.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateChatDto } from './dto/create-chat.dto';
@@ -24,58 +24,65 @@ export class ChatController {
         return this.chatService.findAll();
     }
 
-    @Post(':chatId/getMessages/:idOrUsername')
-    @ApiBody({ description: 'password', required: false, type: 'string' })
-    getChatMessages(@Param('idOrUsername') user: string, @Param('chatId') chatId: number, @Body('password') password?: string): Promise<Message[]> {
-        return this.chatService.getNewMessages(user, chatId, password);
+    @Get(':chatId/getMessages/:idOrUsername')
+    @ApiOperation({
+        summary: 'Get messages new messages in this chat',
+        description: 'This endpoint will send you a list of messasges of a user that belong to this chat.'
+    })
+    getChatMessages(@Param('idOrUsername') user: string, @Param('chatId') chatId: number): Promise<Message[]> {
+        return this.chatService.getNewMessages(user, chatId);
     }
 
-    @Post(':id/users')
-    @ApiBody({required: false, type: CreateChatDto})
+    // TODO: Use authentication to check if the user that tries to get this info can see it.
+    @Get(':id/users')
     @ApiOperation({
         summary: 'Get users in this chat',
-        description: 'This endpoint will send you a list of users that belong to this chat. Password may be required.'
+        description: 'This endpoint will send you a list of users that belong to this chat.'
     })
-    async getChatUsers(@Param('id', ParseIntPipe) id: number, @Body() credentials?: CreateChatDto): Promise<ChatUserDto[]> {
+    async getChatUsers(@Param('id', ParseIntPipe) id: number): Promise<ChatUserDto[]> {
         const chat: Chat = await this.chatService.findOne(id);
         if (chat  == null) {
             throw new BadRequestException('Chat doesn\'t exists');
         }
-        this.chatService.validatePassword(chat, credentials?.password)
-        const users = await this.chatService.getChatUsers(id);
-        console.log("Got users");
+        if (chat.password || chat.isPrivateChat) {
+            throw new ForbiddenException('Can see the members of this chat unless you belong to it');
+        }
+        const users = await this.chatService.getChatUsers(id).then();
         const bans = await this.chatService.getBansMembers(id, users);
         console.log("Got banned users");
         return users.map(u => new ChatUserDto(u, bans?.find(b => b.userId == u.userId) !== undefined));
     }
 
+    // TODO: Should be available only if the chat is not locked to you
     @Post(':id/admins')
-    @ApiBody({required: false, type: CreateChatDto})
     @ApiOperation({
         summary: 'Get the administators of this chat',
         description: 'This endpoint will send you a list of users that moderate this chat. Password may be required.'
     })
-    async getAdmins(@Param('id', ParseIntPipe) id: number, @Body() credentials?: CreateChatDto): Promise<ChatUserDto[]> {
+    async getAdmins(@Param('id', ParseIntPipe) id: number): Promise<ChatUserDto[]> {
         const chat: Chat = await this.chatService.findOne(id);
         if (chat  == null) {
             throw new BadRequestException('Chat doesn\'t exists');
         }
-        this.chatService.validatePassword(chat, credentials?.password)
+
+        if (chat.password || chat.isPrivateChat) {
+            throw new ForbiddenException('Can see the members of this chat unless you belong to it');
+        }
         return this.chatService.getAdmins(+id).then(users => users.map(u => new ChatUserDto(u, false)));
     }
 
+    // TODO: Should be available only if the chat is not locked to you
     @Post(':id/bans')
     @ApiBody({required: false, type: CreateChatDto})
     @ApiOperation({
         summary: 'Get the banned users of this chat',
-        description: 'This endpoint will send you a list of users are banned in this chat. Password may be required.'
+        description: 'This endpoint will send you a list of users are banned in this chat.'
     })
-    async getBanned(@Param('id', ParseIntPipe) id: number, @Body() credentials?: CreateChatDto): Promise<PublicUserDto[]> {
+    async getBanned(@Param('id', ParseIntPipe) id: number): Promise<PublicUserDto[]> {
         const chat: Chat = await this.chatService.findOne(id);
         if (chat  == null) {
             throw new BadRequestException('Chat doesn\'t exists');
         }
-        this.chatService.validatePassword(chat, credentials?.password)
         return this.chatService.getBans(+id).then(users => users.map(u => new PublicUserDto(u.user)));
     }
 
@@ -90,20 +97,18 @@ export class ChatController {
     }
 
     @Post(':id/join/:user')
-    @ApiBody({required: false, type: CreateChatDto})
     @ApiOperation({
         summary: 'Add a user to a chat room',
-        description: 'This endpoint will add a user to the indicated chat room by its id. This operation may require a password.'
+        description: 'This endpoint will add a user to the indicated chat room by its id.'
     })
-    async joinChat(@Param('user') user: string, @Param('id') id: number, @Body() createChatDto?: CreateChatDto): Promise<void> {
+    async joinChat(@Param('user') user: string, @Param('id') id: number): Promise<ChatUserDto> {
         const chat: Chat = await this.chatService.findOne(id);
         if (!chat)
         {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        this.chatService.validatePassword(chat, createChatDto?.password);
-        return this.chatService.join(user, chat);
+        return this.chatService.join(user, chat).then(chatUser => new ChatUserDto(chatUser, false));
     }
 
     @Post(':id/setPassword')
@@ -135,15 +140,12 @@ export class ChatController {
     @Post(':id/sendMessage/:idOrUsername')
     @ApiBody({ description: 'message', required: true, type: SendMessageDto })
     async sendMessage(@Param('id', ParseIntPipe) id: number, @Param('idOrUsername') user: string, @Body() message: SendMessageDto): Promise<void> {
-        const chat = await this.chatService.findOne(id);
-        this.chatService.validatePassword(chat, message.password);
+        const chat: Chat = await this.chatService.findOne(id);
+        if (!chat) {
+            throw new BadRequestException('Chat doesn\'t exists');
+        }
 
-		if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
-		}
-
-        console.log(message);
-        return this.messageService.sendMessage(user, chat, message.message);
+        return this.chatService.sendMessageToChat(user, chat, message.message);
     }
     
     @Post(':id/admins/:admin/riseToAdmin/:user')
@@ -169,7 +171,7 @@ This only can be done by an operator'
     }
 
     @Post(':id/admins/:admin/ban/:user')
-    @ApiBody({required: false, type: CreateChatDto})
+    @ApiBody({required: false, type: 'number'})
     @ApiOperation({
         summary: 'Ban a user of a chat',
         description: 'This endpoint will ban any user of a chat. If the user was an Admin that privileges will be revoked.'
@@ -179,7 +181,6 @@ This only can be done by an operator'
     }
 
     @Post(':id/admins/:admin/unban/:user')
-    @ApiBody({required: false, type: CreateChatDto})
     @ApiOperation({
         summary: 'Unban a user of a chat',
         description: 'This endpoint will unban a user of a chat.'
@@ -208,6 +209,7 @@ This only can be done by an operator'
         return this.chatService.setMuteStatus(id, admin, user, false);
     }
     
+    // TODO: Check if requestes can do this
     @Delete(':id')
     @ApiBody({required: false, type: CreateChatDto})
     @ApiOperation({

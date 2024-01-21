@@ -32,7 +32,7 @@ export class PlayersController {
 
     @Get('/leaderboard')
     leaderBoard(): Promise<LeaderboardPlayerDto[]> {
-        return this.playerService.playerLeaderboard().then(players => players.map(p => new PlayerDto(p)));
+        return this.playerService.playerLeaderboard().then(players => players.map(p => new LeaderboardPlayerDto(p)));
     }
 
     @Get(':idOrUsername')

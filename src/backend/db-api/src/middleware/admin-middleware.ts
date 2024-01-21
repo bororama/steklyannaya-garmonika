@@ -14,8 +14,9 @@ export class AdminMiddleware implements NestMiddleware {
         // This should be change for the user id number located in the JWT Token
         userId = req.token_payload.username;
         Logger.debug("Admin middleware executed");
-        this.adminService.isAdmin(userId).then((answer) => {
-            if (answer) {
+        this.adminService.findOne(userId).then((answer) => {
+            if (answer != null && answer != undefined) {
+                req.requester_info = answer;
                 next();
             }
             else {

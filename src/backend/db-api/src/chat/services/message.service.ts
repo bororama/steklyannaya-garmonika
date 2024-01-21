@@ -5,6 +5,7 @@ import { Chat } from '../models/chat.model';
 import { Message } from '../models/message.model';
 import { Op } from 'sequelize';
 import { ChatUsers } from '../../chat-user/models/chatUsers.model';
+import { User } from '../../users/models/user.model';
 
 @Injectable()
 export class MessageService {
@@ -15,7 +16,7 @@ export class MessageService {
         private userService: UsersService,
     ) {}
 
-	async sendMessage(emitter: string, receptor: Chat, message: string): Promise<void> {
+	async sendMessageWithId(emitter: string, receptor: Chat, message: string): Promise<void> {
 		const user = await this.userService.userExists(emitter);
 		if (!user) {
             throw new BadRequestException("User doesn't exist");
@@ -23,6 +24,15 @@ export class MessageService {
 		
 		await this.messageModel.create({
 			senderId: user,
+			chatId: receptor.id,
+			sentDate: new Date(),
+			message: message
+		});
+	}
+
+	async sendMessage(emitter: User, receptor: Chat, message: string): Promise<void> {
+		await this.messageModel.create({
+			senderId: emitter.id,
 			chatId: receptor.id,
 			sentDate: new Date(),
 			message: message

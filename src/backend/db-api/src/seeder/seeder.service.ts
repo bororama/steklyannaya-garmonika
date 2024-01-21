@@ -16,22 +16,18 @@ export class SeederService {
             {
                 userName: "Miguel",
                 loginFt: "mmateo-t",
-                email: "mmateo-t@student.42madrid.com",
             },
             {
                 userName: "Javi",
                 loginFt: "javgonza",
-                email: "javgonza@student.42madrid.com",
             },
             {
                 userName: "Pablo",
                 loginFt: "pdiaz-pa",
-                email: "pdiaz-pa@student.42madrid.com",
             },
             {
                 userName: "Nico",
                 loginFt: "npinto-g",
-                email: "npinto-g@student.42madrid.com",
             }
         ]
 

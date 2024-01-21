@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Body } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req } from "@nestjs/common";
 import { UsersService } from "../services/users.service";
 import { ApiOperation, ApiTags, ApiBody } from "@nestjs/swagger";
 import { ChatDto } from "../../chat/dto/chat.dto";
@@ -129,8 +129,14 @@ export class UsersController {
       return { imagePath: file.path }
     }
 
+    @Post('/test')
+    async testMiddleware(@Req() request) {
+        console.log(request.requester_info.dataValues);
+    }
+
     @Delete('/:idOrUsername')
     delete(@Param('idOrUsername') user: string): Promise<void> {
         return this.usersService.remove(user);
     }
+
 }

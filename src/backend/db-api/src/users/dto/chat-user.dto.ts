@@ -6,6 +6,7 @@ export class ChatUserDto extends PublicUserDto {
     isMuted: boolean;
     isOwner: boolean;
     isBanned: boolean;
+    isLocked: boolean;
 
     constructor (chatInfo: ChatUsers, isBanned: boolean) {
         super(chatInfo.user);
@@ -13,5 +14,6 @@ export class ChatUserDto extends PublicUserDto {
         this.isMuted = chatInfo.isMuted;
         this.isOwner = chatInfo.isOwner;
         this.isBanned = isBanned;
+        this.isLocked = chatInfo.chatLocked;
     }
 }

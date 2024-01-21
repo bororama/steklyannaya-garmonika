@@ -138,7 +138,6 @@ export class AuthenticatorController {
        userName: register_info.username,
        loginFt: payload.login,
        profilePic: 'src/profile_pics/' + payload.login + '.png',
-       email: '',
      }
      let rval : any = await this.playerService.create(player)
      let answer : RegisterAnswerDto = {

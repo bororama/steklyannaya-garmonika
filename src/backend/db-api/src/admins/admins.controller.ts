@@ -28,7 +28,6 @@ export class AdminsController {
     async create(@Body() newAdmin: NewUser): Promise<UserDto> {
         const admin: Admin = await this.adminService.create(newAdmin); 
         const adminDto = new UserDto(admin.user);
-
         return adminDto;
     }
 

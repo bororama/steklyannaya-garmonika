@@ -260,8 +260,6 @@ export class MatchesService {
       match.save()
     }
 
-    // TODO: When the user status changes from a boolean to a enum with (online/offline/in-match) the user won't be able to
-    // create a new match if there is already in one
     async startMatch(player1: string, player2: string): Promise<void> {
         const challenger1 = await this.playerService.playerExists(player1);
         if (!challenger1) {
@@ -353,7 +351,6 @@ export class MatchesService {
         }
 
         match.endDate = new Date();
-        // TODO: Wins and defeats are not being saved
         if (matchInfo.winner !== undefined && matchInfo.winner !== null) {
             const winnerId = (await this.playerService.playerExists(matchInfo.winner))?.id;
             if (!winnerId) {

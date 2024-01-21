@@ -70,7 +70,6 @@ export class MatchesController {
         return new MatchAndUsersDto(match);
     }
 
-    // TODO: Should be deleted if it is not started after some time?
     @Post(":idOrUsername/challenge/:rival")
     async createTwoPlayerMatch(@Param('idOrUsername') player1: string, @Param('rival') player2: string): Promise<MatchAndUsersDto> {
         const match = await this.matchService.createMatch(player1, player2);

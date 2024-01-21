@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
 import { UsersService } from '../users/services/users.service'
-import { InjectModel } from '@nestjs/sequelize'
+import { ChatService } from '../chat/services/chat.service';
 
 @Injectable()
 export class TiendaService {
@@ -8,12 +8,17 @@ export class TiendaService {
   private readonly necklacePrice : number = 30;
 
   constructor (
-    private userService : UsersService
+    private readonly userService : UsersService,
+    private readonly chatService : ChatService
   ) {
   
   }
 
-  async buyPearl(user: string) : Promise<string> {
+  async buyPearl(userId: string) : Promise<string> {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new BadRequestException("User doesn\'t exist");
+    }
 
     const result :string = await this.userService.subtractCoins(user, this.pearlPrice);
 
@@ -24,12 +29,19 @@ export class TiendaService {
     return (result);
   }
 
-  async buyNecklace(user: string) : Promise<string> {
-    const result :string = await this.userService.subtractCoins(user, this.necklacePrice);
-
-    if (result == 'ok') {
-        this.userService.addNecklace(user, 1)
+  async buyNecklace(userId: string) : Promise<string> {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new BadRequestException("User doesn\'t exist");
     }
+
+    const chat = await this.chatService.createWithUser(user);
+    if (!chat)
+    {
+      return ('chat_creation_error');
+    }
+
+    const result :string = await this.userService.subtractCoins(user, this.necklacePrice);
 
     return (result);
   }

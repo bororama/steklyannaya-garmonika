@@ -1,4 +1,4 @@
-import { Module, ValidationPipe, forwardRef } from '@nestjs/common';
+import { Module, ValidationPipe, forwardRef, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './models/user.model';
 import { Player } from './models/player.model';
@@ -13,6 +13,9 @@ import { APP_PIPE } from '@nestjs/core';
 import { BansModule } from '../bans/bans.module';
 import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from '../chat/chat.module';
+import { AuthMiddleware } from 'src/middleware/auth-middleware';
+import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
+import { ConnectedMiddleware } from 'src/middleware/connected-middleware';
 
 @Module({
   imports: [SequelizeModule.forFeature([User, Player, Block, Friendship]), ChatUserModule, BansModule, ConfigModule, forwardRef(() => ChatModule)],
@@ -20,4 +23,10 @@ import { ChatModule } from '../chat/chat.module';
   controllers: [UsersController, PlayersController],
   exports: [UsersService, PlayersService]
 })
-export class UsersModule {}
+export class UsersModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware, AuthenticMiddleware, ConnectedMiddleware)
+        .forRoutes({ path: 'test', method: RequestMethod.POST })
+  }
+}

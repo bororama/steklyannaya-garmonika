@@ -362,14 +362,12 @@ export class PlayersService {
 
     playerLeaderboard(): Promise<Player[]> {
         return this.playerModel.findAll({
-            attributes: ['wins', 'defeats'],
             include: {
                 model: User,
-                attributes: ['userName']
+                attributes: ['userName', 'franciscoins', 'pearls'],
             },
             order: [
-                ['wins', 'DESC'],
-                ['defeats', 'ASC'],
+                ['user', 'pearls', 'DESC'],
             ]
         });
     }
