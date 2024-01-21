@@ -6,11 +6,15 @@
       <div class="items">
         <div class="item-container">
           <img src="../../../../public/items/perla.png" class="mini">
+          <div class="text">
             {{ player.pearls }}
           </div>
+        </div>
         <div class="item-container">
-          <img src="../../../../public/items/collar.png" class="mini">
-          {{ player.necklaces }}
+          <img src="../../../../public/items/franciscoin.png" class="mini">
+          <div class="text">
+            {{ player.franciscoins }}
+          </div>
         </div>
       </div>
       <hr>
@@ -49,8 +53,9 @@ export default {
 
 <style>
 
+
 .mini {
-  width: 60%;
+  width: 2vw;
   margin: 1.4em;
   border: solid;
   border-width: 4px;
@@ -60,6 +65,7 @@ export default {
 }
 
 .item-container {
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,7 +81,7 @@ export default {
   margin: 0 auto;
 }
 div {
-  margin: 10%;
+
 }
 
 .items{

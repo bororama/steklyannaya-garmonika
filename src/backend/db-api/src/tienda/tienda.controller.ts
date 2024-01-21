@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { Controller, ParseIntPipe, Get, Param, Post } from "@nestjs/common";
 import { TiendaService } from "./tienda.service"
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -21,7 +21,7 @@ export class TiendaController {
   }
 
   @Post("/giveCoins/:idOrUsername/:coins")
-  async giveCoins(@Param('idOrUsername') user : string, @Param('coins') coins : number) : Promise <string> {
+  async giveCoins(@Param('idOrUsername') user : string, @Param('coins', ParseIntPipe) coins : number) : Promise <string> {
     console.log(user)
     return this.tiendaService.giveCoins(user, coins);
   }
