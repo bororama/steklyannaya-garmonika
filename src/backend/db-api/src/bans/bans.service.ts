@@ -19,10 +19,10 @@ export class BansService {
         }).then(b => b != null && b != undefined);
     }
 
-    async banUser(player: Player, banner: Admin): Promise<void> {
+    async banUser(player: Player, banner?: Admin): Promise<void> {
         try {
             const result = await this.banModel.create({
-                adminId: banner.id,
+                adminId: banner?.id,
                 playerId: player.id,
             });
         }

@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { backend, getRequestParams, postRequestParams } from './connect_params'
+import { api_42, backend, getRequestParams, postRequestParams } from './connect_params'
 
 export default defineComponent({
   name: 'CookieChecker',
@@ -23,7 +23,7 @@ export default defineComponent({
   created () {
     const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.get('code') === null) {
-      window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-b16e1d817c759a4768523eda7110974f45570d769c4180e352137a7aeb4a5ee7&redirect_uri=http%3A%2F%2Flocalhost%3A5173&response_type=code'
+      window.location.href = api_42
     } else if (urlParams.get('code') !== null) {
       const code : any = urlParams.get('code')
       this.try_log(code)
@@ -52,10 +52,10 @@ export default defineComponent({
       })
     },
     try_log (code:string) {
-      fetch('http://localhost:3000/log/code/' + code).then((r) => {
+      fetch('http://localhost:3000/log/code/' + code, getRequestParams()).then((r) => {
         r.json().then((access) => {
           if (access.status === 'ko') {
-            window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-b16e1d817c759a4768523eda7110974f45570d769c4180e352137a7aeb4a5ee7&redirect_uri=http%3A%2F%2Flocalhost%3A5173&response_type=code'
+            window.location.href = 'api_42'
           } else if (access.status === 'needs_register') {
             this.$emit('register', access)
           } else if (access.status === 'success') {

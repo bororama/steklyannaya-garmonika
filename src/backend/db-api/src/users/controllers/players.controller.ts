@@ -27,19 +27,18 @@ export class PlayersController {
         console.log(requester);
         return isNaN(+userId)
         ? requester.userName == userId 
-        :  requester.id != +userId ;
+        :  requester.id == +userId ;
     }
 
     @Get()
     async findAll(): Promise<PlayerDto[]> {
         const players: Player[] = await this.playerService.findAll();
-        const playerDtos: PlayerDto[] = players.map((player) => {
-            const playerDto = new PlayerDto(player);
+        return Promise.all(players.map(async(player) => {
+            const isAdmin = await this.adminService.isAdmin(player.id);
+            const playerDto = new PlayerDto(player, isAdmin);
 
             return playerDto;
-        });
-
-        return playerDtos;
+        }));
     }
 
     @Get('/leaderboard')

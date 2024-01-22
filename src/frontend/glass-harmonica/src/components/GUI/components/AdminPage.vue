@@ -36,7 +36,7 @@ export default defineComponent({
     }
   },
   created() {
-    fetch(backend + '/users', getRequestParams()).then((a) => {
+    fetch(backend + '/players', getRequestParams()).then((a) => {
       a.json().then((users) => {
         for (const user in users) {
           let u = users[user]

@@ -64,7 +64,7 @@ export default defineComponent({
 
 .username_input {
   resize: none;
-  height: 1.5em;
+  height: 3em;
   width: 10em;
   border: solid;
   border-color: var(--border_color);

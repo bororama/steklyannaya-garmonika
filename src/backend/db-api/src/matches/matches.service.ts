@@ -238,19 +238,13 @@ export class MatchesService {
 
     // TODO: When the user status changes from a boolean to a enum with (online/offline/in-match) the user won't be able to
     // join a match if it is already in one.
-    async joinMatch(player: string, id: number): Promise<Match> {
+    async joinMatch(player: string, roomId: number): Promise<Match> {
         const user = await this.playerService.playerExists(player);
         if (!user) {
             throw new BadRequestException("Player doesn't exist");
         }
         
-        const match = await this.matchModel.findByPk(id, {
-            include: {
-                model: Player,
-                attributes: ['id', 'userName'],
-                as: 'player1'
-            }
-        });
+        const match = await this.getByRoomId(roomId);
         if (!match) {
             throw new BadRequestException("Match doesn't exist");
         }

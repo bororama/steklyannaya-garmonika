@@ -22,7 +22,7 @@ import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
 export class AdminsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
      consumer
-       .apply(AuthMiddleware, AdminMiddleware)
+       .apply(AuthMiddleware, AuthenticMiddleware, AdminMiddleware)
        .forRoutes(AdminsController);
   }
 }

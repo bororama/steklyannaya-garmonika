@@ -329,7 +329,7 @@ export class ChatService {
         if (!userChatRelation) {
             throw new ForbiddenException('User doesn\'t belong to chat');
         }
-        else if (userChatRelation) {
+        else if (userChatRelation.isOwner) {
             throw new ForbiddenException('You can\'t change the chat owner privileges');
         }
 

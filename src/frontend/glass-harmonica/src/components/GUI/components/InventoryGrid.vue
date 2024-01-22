@@ -16,6 +16,7 @@ import InventoryItem from './InventoryItem.vue'
 import generate_pearl from '../generate_pearl.js'
 import generate_rosary from '../generate_rosary.js'
 import generate_rose from '../generate_rose.ts'
+import generate_padlock from '../generate_padlock.js'
 import break_pearl from '../break_pearl.js'
 import { backend, getRequestParams, postRequestParams } from './connect_params'
 
@@ -45,28 +46,31 @@ export default {
     created() {
       fetch(backend + '/' + globalThis.id + '/chats', getRequestParams()).then((r) => {
         r.json().then((answer) => {
+          console.log(answer)
           for (const chat in answer) {
             let c = answer[chat]
             let rosary
+            let blocked = false
             rosary = generate_rosary(globalThis.id, answer[chat].id)
             for (const u in c.users) {
-              console.log(c.users[u])
               if (globalThis.id == c.users[u].id) {
+                console.log(c.users[u])
                 rosary.is_owner = c.users[u].isOwner
                 rosary.is_admin = c.users[u].isAdmin
+                blocked = c.users[u].isLocked
               }
             }
-            if (c.isLocked)
+            if (blocked)
                 rosary = generate_padlock(rosary)
             this.groups.push(rosary)
           }
         })
       })
-      fetch(backend + '/' + globalThis.id + '/blocks').then((r) => {
+      fetch(backend + '/' + globalThis.id + '/blocks', getRequestParams()).then((r) => {
         r.json().then((answer) => {
             for (const blocked in answer)
                 this.blocks.push(break_pearl(generate_pearl(globalThis.id, answer[blocked].name)))
-            fetch(backend + '/players/' + globalThis.id + '/getFrienshipRequests').then((r) => {
+            fetch(backend + '/players/' + globalThis.id + '/getFrienshipRequests', getRequestParams()).then((r) => {
               r.json().then((answer) => {
                 for (const friend in answer) {
                   let is_blocked = false
@@ -80,9 +84,9 @@ export default {
                 }
               })
             })
-            fetch(backend + '/players/' + globalThis.id + '/getFriends').then((r) => {
+            fetch(backend + '/players/' + globalThis.id + '/getFriends', getRequestParams()).then((r) => {
               r.json().then((friends) => {
-                fetch (backend + '/matches/' + globalThis.id).then((r) => {
+                fetch (backend + '/matches/' + globalThis.id, getRequestParams()).then((r) => {
                   r.json().then((matches) => {
                     for (const friend in friends) {
                       let is_blocked = false

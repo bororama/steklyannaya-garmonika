@@ -86,6 +86,9 @@ export default {
 			} else if (action == "add_password") {
 				this.active_interaction='setting_password'
 				this.close_drop();
+            } else if (action == "remove_password") {
+				this.active_interaction='unlocking_password'
+				this.close_drop();
 			} else if (action == "enter_password") {
 				this.active_interaction='unlocking_padlock'
 				this.close_drop();
@@ -138,7 +141,8 @@ export default {
                 mode: 'cors',
                 headers: {
                   "Content-Type": "application/json",
-                  'Accept': 'application/json'
+                  'Accept': 'application/json',
+                   Authorization: "Bearer " + globalThis.logToken
                 },
                 body: JSON.stringify({password})
             }).then((r) => {
@@ -147,19 +151,20 @@ export default {
 			this.item = generate_padlock(this.item);
 		},
 		unlock_password(password) {
+          console.log("YEEEEE")
             try {
-              fetch(backend + "/chats/"+ this.item.locked_item.chat_id + "/unsetPassword", {
+              fetch(backend + "/chats/"+ this.item.chat_id + "/unsetPassword", {
                   method: 'POST',
                   mode: 'cors',
                   headers: {
                     "Content-Type": "application/json",
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    Authorization: "Bearer " + globalThis.logToken
                   },
                   body: JSON.stringify({password})
                 }).then((r) => {
                     if (r.status == 201)
                     {
-                        this.item = this.item.locked_item;
                         this.active_interaction = 'none';
                     }
                 });
@@ -174,7 +179,8 @@ export default {
                   mode: 'cors',
                   headers: {
                     "Content-Type": "application/json",
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    Authorization: "Bearer " + globalThis.logToken
                   },
                   body: JSON.stringify({password})
                 }).then((r) => {

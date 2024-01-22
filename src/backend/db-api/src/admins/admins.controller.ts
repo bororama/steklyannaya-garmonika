@@ -66,12 +66,7 @@ export class AdminsController {
             throw new BadRequestException("Player doesn't exist");
         }
 
-        const admin = await this.adminService.findOne(banner);
-        if (!admin) {
-            throw new BadRequestException("Admin doesn't exist");
-        }
-
-        await this.banService.banUser(player, admin);
+        await this.banService.banUser(player, null);
         this.metaverseGateway.kickFromMetaverse(player.id + '');
     }
 

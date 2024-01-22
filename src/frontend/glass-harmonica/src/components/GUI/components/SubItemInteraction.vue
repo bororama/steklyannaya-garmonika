@@ -64,7 +64,6 @@ export default {
 				if (!this.check_is_admin(member))
 					this.$emit('make_admin', member)
 			} else if (this.interaction == 'unmaking_admin') {
-				if (this.check_is_admin(member))
 					this.$emit('unmake_admin', member)
 			} else if (this.interaction == 'kicking_member') {
 				if (member != this.item.sender)

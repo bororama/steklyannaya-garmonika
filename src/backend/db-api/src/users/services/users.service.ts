@@ -252,7 +252,7 @@ export class UsersService {
         }
 
         return Promise.all(user.chats.map(async chat => {
-            const users = chat.password ? null : await this.chatUsersModel.findAll({
+            const users = await this.chatUsersModel.findAll({
                 where: { chatId: chat.id },
                 include: { model: User }
             });

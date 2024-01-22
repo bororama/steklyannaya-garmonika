@@ -1,8 +1,10 @@
 <template>
     <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse" @already_connected="go_to_alredy_connected_page"/>
     <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
+    <!-- REGISTER PROFILE PAGE -->
     <ProfilePage v-if="profile_state == 'registering'" :display_status="profile_state" :auto_image="auto_image" :register_token="register_token" @successful_register="go_to_metaverse"/>
     <div class="overlay" v-if="showing_profile_image">
+        <!-- RAYS IN METAVERSE PROFILE PAGE -->
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" @start_match="go_to_pong_match" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
     </div>

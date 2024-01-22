@@ -77,6 +77,9 @@ export default defineComponent({
                 formData.append('image', this.image)
                 fetch(backend + '/users/' + this.username + '/uploadProfilePic', {
                   method: 'POST',
+                  headers: {
+                    Authorization: "Bearer " + registerAnswer.meta_token
+                  },
                   body: formData
                 })
             }
@@ -99,7 +102,10 @@ export default defineComponent({
         formData.append('image', new_image)
         fetch(backend + '/users/' + globalThis.id + '/uploadProfilePic', {
           method: 'POST',
-          body: formData
+          headers: {
+            Authorization: "Bearer " + globalThis.logToken
+          },
+          body: formData,
         })
       } else {
         console.log(new_image)

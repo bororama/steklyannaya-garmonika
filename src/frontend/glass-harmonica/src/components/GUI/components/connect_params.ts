@@ -1,33 +1,6 @@
 export const backend = 'http://localhost:3000'
 
-//export const postRequestParams : any = {
-//  method: 'POST',
-//  mode: 'cors',
-//  headers: {
-//    'Content-Type': 'application/json',
-//    Accept: 'application/json'
-//  },
-//  body: JSON.stringify({})
-//}
-//
-//export const deleteRequestParams : any = {
-//  method: 'DELETE',
-//  mode: 'cors',
-//  headers: {
-//    'Content-Type': 'application/json',
-//    Accept: 'application/json'
-//  },
-//  body: JSON.stringify({})
-//}
-//
-//export const getRequestParams : any = {
-//  method: 'GET',
-//  mode: 'cors',
-//  headers: {
-//    'Content-Type': 'application/json',
-//    Accept: 'application/json'
-//  }
-//}
+export const api_42 = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-b16e1d817c759a4768523eda7110974f45570d769c4180e352137a7aeb4a5ee7&redirect_uri=http%3A%2F%2Flocalhost%3A5173&response_type=code'
 
 export function postRequestParams() {
     return ({

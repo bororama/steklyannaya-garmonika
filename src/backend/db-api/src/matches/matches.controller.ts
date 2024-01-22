@@ -35,17 +35,6 @@ export class MatchesController {
         return this.matchService.startMatchById(matchId);
     }
 
-    @Post(':idOrUsername/joinMatch/:id')
-    joinMatch(@Param('id', ParseIntPipe) matchId: number, @Param('idOrUsername') user: string): Promise<MatchDto> {
-        return this.matchService.joinMatch(user, matchId).then(match => {
-            const matchDto = new MatchDto ();
-            matchDto.player1 = match.player1.user.userName;
-            matchDto.player2 = user;
-            matchDto.startDate = match.startDate;
-            return matchDto;
-        });
-    }
-
     @Post("startMatch")
     @ApiBody({ type: MatchPlayersDto, required: true })
     startMatch(@Body('matchInfo', new ValidationPipe()) matchInfo: MatchPlayersDto): Promise<void> {

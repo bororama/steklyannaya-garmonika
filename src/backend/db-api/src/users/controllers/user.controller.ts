@@ -16,7 +16,7 @@ export class UsersController {
     checkIfAuthorized(requester: User, userId: string) {
         return isNaN(+userId)
         ? requester.userName == userId 
-        :  requester.id != +userId ;
+        :  requester.id == +userId ;
     }
 
     @Get("/users")
@@ -159,6 +159,8 @@ export class UsersController {
       })
     }))
     async uploadProfilePic(@Req() request, @UploadedFile() file, @Param('idOrUsername') userId : string) {
+        console.log(request.requester_info.dataValues)
+        console.log(userId)
         if (!this.checkIfAuthorized(request.requester_info.dataValues, userId)) {
             throw new UnauthorizedException("Private information");
         }

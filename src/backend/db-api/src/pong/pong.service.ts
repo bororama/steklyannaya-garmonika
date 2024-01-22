@@ -62,11 +62,19 @@ export class PongService {
           }
 
           let match: Match | undefined;
-          console.log(data.pongRoomId + " received pongRoomId");
+          console.log(data.pongRoomId + " received pongRoomId"); // TODO Revisar iteracion matches
           for (const existingMatch of this.matches) {
             if (this.connectionConditions(existingMatch, data)) {
               console.log('Existing match found.');
               match = existingMatch;
+              if (match.pongRoomId == -2)
+              {
+                console.log("SECOND PLAYER")
+                console.log(match.provisionalRoomId)
+                console.log(payload.username)
+                this.matchesService.joinMatch(payload.username, match.provisionalRoomId)
+                match.pongRoomId = match.provisionalRoomId
+              }
               socket.join(existingMatch.matchIndex.toString());
               break;
             }
@@ -78,7 +86,10 @@ export class PongService {
             match.matchIndex = this.matches.indexOf(match); 
             socket.join(match.matchIndex.toString());
             match.pongRoomId = data.pongRoomId;
+            console.log("FIRST PLAYER")
+            match.createMatchInDB(payload);
           }
+
           const paddleIndex = match.paddles.length;
           this.connectedUsers[playerId] = { match, paddleIndex };
           socket.emit('matchInfo', {

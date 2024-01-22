@@ -92,7 +92,7 @@ export default defineComponent({
 .fa_code_input {
     resize: none;
     width: 6em;
-    height: 1.5em;
+    height: 2.5em;
     border: solid;
     border-color: var(--border_color);
     border-radius: 6px;

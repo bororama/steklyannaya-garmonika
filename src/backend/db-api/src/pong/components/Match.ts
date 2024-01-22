@@ -24,6 +24,7 @@ export class Match {
   isGameInProgress : number;
   matchIndex: number;
   pongRoomId: number;
+  provisionalRoomId: number;
 
   constructor(width: number, height: number, mode: number, private matchesService: MatchesService) {
     this.config = new BackendConfig(width, height);
@@ -69,6 +70,14 @@ export class Match {
     if (this.isGameInProgress === Constants.MATCH_IN_PROGRESS) {
       this.matchesService.startMatchByRoom(this.pongRoomId)
       this.gameLoop(io);
+    }
+  }
+
+  async createMatchInDB(payload: any) {
+    if (this.pongRoomId == -2) {
+      let dbMatch = await this.matchesService.createMatch(payload.username)
+      this.provisionalRoomId = dbMatch.roomId
+      console.log(this.provisionalRoomId)
     }
   }
 

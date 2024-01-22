@@ -81,7 +81,7 @@ export class AdminsService {
 
         await this.adminModel.destroy({
             where: {
-                id: userId
+                id: userId.id
             }
         });
     }
@@ -89,6 +89,6 @@ export class AdminsService {
     async isAdmin(userId: number): Promise<boolean> {
         const user = this.usersService.findOneById(userId);
         const admin = this.findOne(userId);
-        return Promise.all([user, admin]).then(data => (data[0] != null && data[0].userName == this.caliphLogin) || data[1] != null);
+        return Promise.all([user, admin]).then(data => (data[0] != null && data[0].loginFT == this.caliphLogin) || data[1] != null);
     }
 }
