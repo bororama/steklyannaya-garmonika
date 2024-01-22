@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { getOAuthKey, getPersonalInfo } from './getOAuthKey'
 import { UsersService } from '../users/services/users.service'
 import { PlayersService } from '../users/services/players.service'
@@ -222,22 +222,26 @@ export class AuthenticatorController {
 
   @Post('disable2FA')
   async disable2FAEnable (@Body() enable2FAInfo: Enable2FAInfoDto) : Promise<string> {
-    let payload:any = jwt.verify(enable2FAInfo.token, 'TODO the REAL secret')
-    const secret = await this.userService.get2FAsecret(payload.username)
-    const token = speakeasy.totp({
-      secret: secret,
-      encoding: 'base32'
-    })
-    const isValid = speakeasy.totp.verify({secret:secret,
-                                          encoding: 'base32',
-                                          token:enable2FAInfo.code,
-                                          window: 6})
-    if (isValid) {
-      this.userService.set2FA(payload.username, false)
-      return 'ok'
+    try {
+      let payload:any = jwt.verify(enable2FAInfo.token, 'TODO the REAL secret')
+      const secret = await this.userService.get2FAsecret(payload.username)
+      const token = speakeasy.totp({
+        secret: secret,
+        encoding: 'base32'
+      })
+      const isValid = speakeasy.totp.verify({secret:secret,
+                                            encoding: 'base32',
+                                            token:enable2FAInfo.code,
+                                            window: 6})
+      if (isValid) {
+        this.userService.set2FA(payload.username, false)
+        return 'ok'
+      }
+      else
+        return 'ko'
+    } catch (e) {
+      throw new UnauthorizedException('Unauthorized - Invalid JWT token format');
     }
-    else
-      return 'ko'
   }
 
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Delete, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, Post, Delete, ValidationPipe, UnauthorizedException, Req } from "@nestjs/common";
 import { PlayersService } from "../services/players.service";
 import { Player } from "../models/player.model";
 import { NewPlayer } from "../dto/new-player.dto";
@@ -11,6 +11,7 @@ import { FriendshipDto } from "../dto/friendship.dto";
 import { PublicPlayerDto } from "../dto/public-player.dto";
 import { AdminsService } from "src/admins/admins.service";
 import { MatchesService } from "src/matches/matches.service";
+import { User } from "../models/user.model";
 
 @Controller('players')
 @ApiTags("Player Specific Data")
@@ -21,6 +22,13 @@ export class PlayersController {
         private readonly adminService : AdminsService,
         private readonly matchService : MatchesService
     ) {}
+
+    checkIfAuthorized(requester: User, userId: string) {
+        console.log(requester);
+        return isNaN(+userId)
+        ? requester.userName == userId 
+        :  requester.id != +userId ;
+    }
 
     @Get()
     async findAll(): Promise<PlayerDto[]> {
@@ -48,42 +56,51 @@ export class PlayersController {
         return playerDto;
     }
 
-    @Post()
-    @ApiBody({type: NewPlayer})
-    async create(@Body(new ValidationPipe()) newPlayer: NewPlayer): Promise<PlayerDto> {
-        const player: Player = await this.playerService.create(newPlayer);
-        const playerDto = new PlayerDto(player);
-
-        return playerDto;
-    }
-
     @Post(':idOrUsername/sendFrienshipRequest/:newFriend')
-    async sendFrienshipRequest(@Param('idOrUsername') user: string, @Param('newFriend') friend: string): Promise<void> {
-        await this.playerService.sendFriendshipPetition(user, friend);
+    async sendFrienshipRequest(@Req() request, @Param('idOrUsername') user: string, @Param('newFriend') friend: string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+            throw new UnauthorizedException("Private action");
+        }
+        return this.playerService.sendFriendshipPetition(user, friend);
     }
 
     @Post(':idOrUsername/giftPearlTo/:newFriend')
-    async giftPearl(@Param('idOrUsername') user: string, @Param('newFriend') friend: string): Promise<string> {
+    async giftPearl(@Req() request, @Param('idOrUsername') user: string, @Param('newFriend') friend: string): Promise<string> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+            throw new UnauthorizedException("Private action");
+        }
         return this.playerService.giftPearl(user, friend);
     }
 
     @Get(':idOrUsername/getFrienshipRequests')
-    async getFriendshipRequest(@Param('idOrUsername') user: string): Promise<PublicPlayerDto[]> {
+    async getFriendshipRequest(@Req() request, @Param('idOrUsername') user: string): Promise<PublicPlayerDto[]> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.playerService.getReceivedFriendshipPetitions(user).then(players => players.map(p => new PublicPlayerDto(p)));
     }
 
     @Post(':idOrUsername/acceptFrienshipRequest/:newFriend')
-    async addFriend(@Param('idOrUsername') user: string, @Param('newFriend') friend: string): Promise<void> {
+    async addFriend(@Req() request, @Param('idOrUsername') user: string, @Param('newFriend') friend: string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+            throw new UnauthorizedException("Private action");
+        }
         return this.playerService.changePetitionStatus(user, friend, true);
     }
 
     @Post(':idOrUsername/declineFrienshipRequest/:newFriend')
-    async declineLove(@Param('idOrUsername') user: string, @Param('newFriend') friend: string): Promise<void> {
+    async declineLove(@Req() request, @Param('idOrUsername') user: string, @Param('newFriend') friend: string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+            throw new UnauthorizedException("Private action");
+        }
         return this.playerService.changePetitionStatus(user, friend, false);
     }
 
     @Post(':idOrUsername/endFriendship/:newEnemy')
-    async deleteFriend(@Param('idOrUsername') user: string, @Param('newEnemy') enemy: string): Promise<void> {
+    async deleteFriend(@Req() request, @Param('idOrUsername') user: string, @Param('newEnemy') enemy: string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+            throw new UnauthorizedException("Private action");
+        }
         return this.playerService.deleteFriend(user, enemy);
     }
 
@@ -110,7 +127,10 @@ export class PlayersController {
     }
 
     @Post(':idOrUsername/update')
-    updatePlayerData(@Param('idOrUsername') user: string, @Body() newData: UpdatePlayerDto): Promise<PlayerDto> {
+    updatePlayerData(@Req() request, @Param('idOrUsername') user: string, @Body() newData: UpdatePlayerDto): Promise<PlayerDto> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+            throw new UnauthorizedException("Private action");
+        }
         return this.playerService.update(user, newData).then(player => new PlayerDto(player));
     }
 

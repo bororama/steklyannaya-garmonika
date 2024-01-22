@@ -37,6 +37,6 @@ export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware, AuthenticMiddleware, ConnectedMiddleware)
-        .forRoutes({ path: 'test', method: RequestMethod.POST })
+        .forRoutes(UsersController, PlayersController)
   }
 }

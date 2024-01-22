@@ -1,6 +1,7 @@
-import { Controller, ParseIntPipe, Get, Param, Post } from "@nestjs/common";
+import { Controller, ParseIntPipe, Get, Param, Post, Req, UnauthorizedException } from "@nestjs/common";
 import { TiendaService } from "./tienda.service"
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { User } from "src/users/models/user.model";
 
 
 @ApiTags('Shop')
@@ -10,19 +11,27 @@ export class TiendaController {
       private readonly tiendaService : TiendaService
     ) {}
 
+    checkIfAuthorized(requester: User, userId: string) {
+      console.log(requester);
+      return isNaN(+userId)
+      ? requester.userName == userId 
+      :  requester.id != +userId ;
+  }
+
   @Post("/buyPearl/:idOrUsername")
-  async buyPearl(@Param('idOrUsername') user : string) : Promise<string> {
+  async buyPearl(@Req() request, @Param('idOrUsername') user : string) : Promise<string> {
+    if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+      throw new UnauthorizedException("Private action");
+    }
     return this.tiendaService.buyPearl(user);
   }
 
   @Post("/buyNecklace/:idOrUsername")
-  async buyNecklace(@Param('idOrUsername') user : string) : Promise<string> {
+  async buyNecklace(@Req() request, @Param('idOrUsername') user : string) : Promise<string> {
+    if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
+      throw new UnauthorizedException("Private action");
+    }
     return this.tiendaService.buyNecklace(user);
   }
 
-  @Post("/giveCoins/:idOrUsername/:coins")
-  async giveCoins(@Param('idOrUsername') user : string, @Param('coins', ParseIntPipe) coins : number) : Promise <string> {
-    console.log(user)
-    return this.tiendaService.giveCoins(user, coins);
-  }
 }

@@ -8,6 +8,7 @@ import { ChatUsers } from '../../chat-user/models/chatUsers.model';
 import { ChatDto } from '../../chat/dto/chat.dto';
 import { UpdatePlayerDto } from '../dto/player-update.dto';
 import { UserStatus } from '../dto/user-status.enum';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UsersService {
@@ -224,7 +225,9 @@ export class UsersService {
     async getOnlineUsers(): Promise<User[]> {
         return this.userModel.findAll({
             where: {
-                connected: true
+                status: {
+                    [Op.ne]: UserStatus.offline
+                }
             }
         });
     }

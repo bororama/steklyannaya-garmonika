@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "../services/users.service";
 import { ApiOperation, ApiTags, ApiBody } from "@nestjs/swagger";
 import { ChatDto } from "../../chat/dto/chat.dto";
@@ -13,7 +13,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class UsersController {
     constructor (private readonly usersService: UsersService) {}
 
-    // Debug endpoint. Shall be removed
+    checkIfAuthorized(requester: User, userId: string) {
+        return isNaN(+userId)
+        ? requester.userName == userId 
+        :  requester.id != +userId ;
+    }
+
     @Get("/users")
     findAll(): Promise<User[]> {
         return this.usersService.findAll();
@@ -33,7 +38,10 @@ export class UsersController {
     @ApiOperation({
         summary: "Get the blocked users by given user"
     })
-    async getBlockedUsers(@Param('idOrUsername') idOrUsername:string): Promise<PublicUserDto[]> {
+    async getBlockedUsers(@Req() request, @Param('idOrUsername') idOrUsername:string): Promise<PublicUserDto[]> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.getBlockedUsers(idOrUsername)
             .then(users => users
                 .map(u => new PublicUserDto(u)));
@@ -43,20 +51,29 @@ export class UsersController {
     @ApiOperation({
         summary: "Get the chat rooms where this user belongs"
     })
-    async getUserChats(@Param('idOrUsername') idOrUsername:string): Promise<ChatDto[]> {
+    async getUserChats(@Req() request, @Param('idOrUsername') idOrUsername:string): Promise<ChatDto[]> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.getUserChats(idOrUsername);
     }
 
     @Get('changeUsername/:idOrUsername/:newUsername')
-    changeUsername(@Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : void {
-      this.usersService.changeUsername(idOrUsername, newUsername)
+    changeUsername(@Req() request, @Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : void {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
+            throw new UnauthorizedException("Private information");
+        }
+        this.usersService.changeUsername(idOrUsername, newUsername)
     }
 
     @Post(':fortyTwoLogin/sign-in')
     @ApiOperation({
         summary: "Get the user data associated to the given 42 Login and set this user as online"
     })
-    async signIn(@Param('fortyTwoLogin') loginFt:string): Promise<UserDto> {
+    async signIn(@Req() request, @Param('fortyTwoLogin') loginFt:string): Promise<UserDto> {
+        if (request.requester_info.dataValues.loginFT != loginFt) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.signIn(loginFt).then(u => new UserDto(u));
     }
 
@@ -64,7 +81,10 @@ export class UsersController {
     @ApiOperation({
         summary: "Change the user status to online"
     })
-    markUserAsConnected(@Param('idOrUsername') idOrUsername:string): Promise<void> {
+    markUserAsConnected(@Req() request, @Param('idOrUsername') idOrUsername:string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.setOnlineStatus(idOrUsername, true);
     }
 
@@ -72,7 +92,10 @@ export class UsersController {
     @ApiOperation({
         summary: "Change the user status to offline"
     })
-    markUserAsDisconnected(@Param('idOrUsername') idOrUsername:string): Promise<void> {
+    markUserAsDisconnected(@Req() request, @Param('idOrUsername') idOrUsername:string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.setOnlineStatus(idOrUsername, false);
     }
 
@@ -80,7 +103,10 @@ export class UsersController {
     @ApiOperation({
         summary: "Enable the 2FA for a user"
     })
-    async enableUser2FA(@Param('idOrUsername') idOrUsername:string): Promise<void> {
+    async enableUser2FA(@Req() request, @Param('idOrUsername') idOrUsername:string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.set2FA(idOrUsername, true);
     }
 
@@ -88,7 +114,10 @@ export class UsersController {
     @ApiOperation({
         summary: "Disable the 2FA for a user"
     })
-    async disableUser2FA(@Param('idOrUsername') idOrUsername:string): Promise<void> {
+    async disableUser2FA(@Req() request, @Param('idOrUsername') idOrUsername:string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.set2FA(idOrUsername, false);
     }
 
@@ -96,7 +125,10 @@ export class UsersController {
     @ApiOperation({
         summary: "The given user will block another user"
     })
-    async blockUser(@Param('idOrUsername') blocker: string, @Param('blockedUser') blocked: string): Promise<void> {
+    async blockUser(@Req() request, @Param('idOrUsername') blocker: string, @Param('blockedUser') blocked: string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, blocker)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.blockUser(blocker, blocked);
     }
 
@@ -104,7 +136,10 @@ export class UsersController {
     @ApiOperation({
         summary: "The given user will unblock another user"
     })
-    async unblockUser(@Param('idOrUsername') blocker: string, @Param('blockedUser') blocked: string): Promise<void> {
+    async unblockUser(@Req() request, @Param('idOrUsername') blocker: string, @Param('blockedUser') blocked: string): Promise<void> {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, blocker)) {
+            throw new UnauthorizedException("Private information");
+        }
         return this.usersService.unblockUser(blocker, blocked);
     }
 
@@ -123,20 +158,17 @@ export class UsersController {
         }
       })
     }))
-    async uploadProfilePic(@UploadedFile() file, @Param('idOrUsername') userId : string) {
-      console.log(file.path)
-      this.usersService.setUserProfilePic(userId, file.path)
-      return { imagePath: file.path }
+    async uploadProfilePic(@Req() request, @UploadedFile() file, @Param('idOrUsername') userId : string) {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, userId)) {
+            throw new UnauthorizedException("Private information");
+        }
+        this.usersService.setUserProfilePic(userId, file.path)
+        return { imagePath: file.path }
     }
 
     @Post('/test')
     async testMiddleware(@Req() request) {
         console.log(request.requester_info.dataValues);
-    }
-
-    @Delete('/:idOrUsername')
-    delete(@Param('idOrUsername') user: string): Promise<void> {
-        return this.usersService.remove(user);
     }
 
 }

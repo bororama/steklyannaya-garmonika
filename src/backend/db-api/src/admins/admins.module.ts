@@ -11,6 +11,7 @@ import { AdminMiddleware } from '../middleware/admin-middleware';
 import { AuthMiddleware } from '../middleware/auth-middleware';
 import { ConfigModule } from '@nestjs/config';
 import { MetaverseModule } from 'src/meta/metaverse.module';
+import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
 
 @Module({
   imports: [SequelizeModule.forFeature([Admin, Ban]), forwardRef(() => UsersModule), BansModule, ChatModule, ConfigModule, forwardRef(() => MetaverseModule)],
@@ -20,8 +21,8 @@ import { MetaverseModule } from 'src/meta/metaverse.module';
 })
 export class AdminsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-//      consumer
-//        .apply(AuthMiddleware, AdminMiddleware)
-//        .forRoutes(AdminsController);
+     consumer
+       .apply(AuthMiddleware, AdminMiddleware)
+       .forRoutes(AdminsController);
   }
 }
