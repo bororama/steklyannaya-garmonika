@@ -1,7 +1,7 @@
 services:
   backend:
     build:
-      context: ./src/backend
+      context: ./srcs/backend
       dockerfile: Dockerfile
     container_name: backend
     tty: true
@@ -14,10 +14,10 @@ services:
       - "CALIPH_USER=${CALIPH_USER}"
     volumes:
       - type: bind
-        source: ./src/backend/db-api/src
+        source: ./srcs/backend/db-api/src
         target: /app/src
       - type: bind
-        source: ./src/shared
+        source: ./srcs/shared
         target: /app/src/meta/shared
     networks:
       - database_network
@@ -28,7 +28,7 @@ services:
       - 777:777
   frontend:
     build:
-      context: ./src/frontend
+      context: ./srcs/frontend
       dockerfile: Dockerfile
     container_name: frontend
     tty: true
@@ -37,10 +37,10 @@ services:
       VITE_HOST_IP: ${IP:-host.docker.internal}
     volumes:
       - type: bind
-        source: ./src/frontend
+        source: ./srcs/frontend
         target: /app
       - type: bind
-        source: ./src/shared
+        source: ./srcs/shared
         target: /app/glass-harmonica/src/components/metaverse/shared
     networks:
       - fullstack_network
@@ -77,7 +77,7 @@ services:
 
   pixelizer:
     build:
-      context: ./src/pixelizer
+      context: ./srcs/pixelizer
       dockerfile: Dockerfile
     image: ft_transcendence/meta_face_demaker
     container_name: meta_face_demaker
