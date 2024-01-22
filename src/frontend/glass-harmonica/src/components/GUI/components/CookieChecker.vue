@@ -31,7 +31,7 @@ export default defineComponent({
   },
   methods: {
     send_with_code () {
-      const myData :any = postRequestParams
+      const myData :any = postRequestParams()
       myData.body = JSON.stringify({
         fa_token: this.fa_token,
         code: this.code2fa,

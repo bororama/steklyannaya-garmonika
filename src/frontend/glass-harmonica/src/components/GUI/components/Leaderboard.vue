@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     getLeaderboard() {
-      fetch(backend + '/players/leaderboard', getRequestParams).then((answer) => {
+      fetch(backend + '/players/leaderboard', getRequestParams()).then((answer) => {
       answer.text().then((data) => {
         const obj = JSON.parse(data);
         this.leaderboard = obj;

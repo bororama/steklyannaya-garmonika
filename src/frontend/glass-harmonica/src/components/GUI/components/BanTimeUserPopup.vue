@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     ban () {
-      let param = postRequestParams
+      let param = postRequestParams()
       param.body = JSON.stringify({
         "time": this.minutes
       })

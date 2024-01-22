@@ -17,7 +17,7 @@
 
 import { defineComponent } from 'vue'
 import QRNotReceived from '../assets/QR_no_recibido.png'
-import { backend, postRequestParams, getRequestParams } from './connect_params.ts'
+import { backend, postRequestParams } from './connect_params.ts'
 
 export default defineComponent({
   name: 'Enabler2FA',
@@ -44,7 +44,7 @@ export default defineComponent({
       })
     },
     confirm_enable () {
-      const data = postRequestParams
+      const data = postRequestParams()
       data.body = JSON.stringify({
         token: globalThis.logToken,
         code: this.input_code
@@ -61,7 +61,7 @@ export default defineComponent({
       })
     },
     disable2fa () {
-      const data = postRequestParams
+      const data = postRequestParams()
       data.body = JSON.stringify({
         token: globalThis.logToken,
         code: this.input_code

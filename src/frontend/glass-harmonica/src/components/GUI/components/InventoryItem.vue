@@ -12,7 +12,7 @@
 			<li v-for="(option, index) in item.options" :key="index" class="dropdown_option" @click="act(option.action)">{{ option.text }}</li>
 		</ul>
 	</div>
-	<SubItemInteraction @close_interaction="close_sub_item_interaction" @set_password="set_password" @unlock_password="unlock_password" @make_admin="make_admin" @unmake_admin="unmake_admin" @kick_member="kick_member" @stop_user_display="stop_displaying_user" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}" :interaction="this.active_interaction" :item="this.item" :userId="userId"/>
+	<SubItemInteraction @close_interaction="close_sub_item_interaction" @set_password="set_password" @unlock_password="unlock_password" @make_admin="make_admin" @unmake_admin="unmake_admin" @kick_member="kick_member" @stop_user_display="stop_displaying_user" @go_to_pong_match="(param) => {$emit('go_to_pong_match', param)}" @unlock_padlock="unlock_padlock" :interaction="this.active_interaction" :item="this.item" :userId="userId"/>
 </div>
 
 </template>
@@ -68,7 +68,7 @@ export default {
 			} else if (action == "ban") {
 				if (this.item.item_type == "pearl")
                 {
-                    fetch(backend + '/' + globalThis.id + '/blocks/' + this.item.target, postRequestParams);
+                    fetch(backend + '/' + globalThis.id + '/blocks/' + this.item.target, postRequestParams());
 					this.item = break_pearl(this.item);
                 }
 				else
@@ -77,7 +77,7 @@ export default {
 			} else if (action == "unban") {
 				if (this.item.item_type == "broken_pearl")
                 {
-                    fetch(backend + '/' + globalThis.id + '/blocks/' + this.item.target, deleteRequestParams);
+                    fetch(backend + '/' + globalThis.id + '/blocks/' + this.item.target, deleteRequestParams());
 					this.item = repair_pearl(this.item);
                 }
 				else
@@ -87,7 +87,7 @@ export default {
 				this.active_interaction='setting_password'
 				this.close_drop();
 			} else if (action == "enter_password") {
-				this.active_interaction='unlocking_password'
+				this.active_interaction='unlocking_padlock'
 				this.close_drop();
 			} else if (action == "display_members") {
 				this.active_interaction='displaying_members'
@@ -110,11 +110,11 @@ export default {
               this.active_interaction = "user_display";
               this.close_drop();
             } else if (action == "accept_friendship") {
-              fetch(backend + '/players/' + globalThis.id + '/acceptFrienshipRequest/' + this.item.sender, postRequestParams);
+              fetch(backend + '/players/' + globalThis.id + '/acceptFrienshipRequest/' + this.item.sender, postRequestParams());
               this.close_drop();
               this.$emit('close_inventory')
             } else if (action == "reject_friendship") {
-              fetch(backend + '/players/' + globalThis.id + '/declineFrienshipRequest/' + this.item.sender, postRequestParams);
+              fetch(backend + '/players/' + globalThis.id + '/declineFrienshipRequest/' + this.item.sender, postRequestParams());
               this.close_drop();
             } else if (action == "go_to_pong_match") {
               this.$emit('go_to_pong_match', {match_id: this.item.match_id, mode: 0})
@@ -144,11 +144,32 @@ export default {
             }).then((r) => {
               console.log(r);
              });
-			this.item = generate_padlock(this.item, password);
+			this.item = generate_padlock(this.item);
 		},
 		unlock_password(password) {
             try {
-              fetch(backend + "/chats/"+ this.item.locked_item.chat_id + "/users", {
+              fetch(backend + "/chats/"+ this.item.locked_item.chat_id + "/unsetPassword", {
+                  method: 'POST',
+                  mode: 'cors',
+                  headers: {
+                    "Content-Type": "application/json",
+                    'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({password})
+                }).then((r) => {
+                    if (r.status == 201)
+                    {
+                        this.item = this.item.locked_item;
+                        this.active_interaction = 'none';
+                    }
+                });
+            } catch (e) {
+              console.log(e);
+            }
+		},
+		unlock_padlock(password) {
+            try {
+              fetch(backend + "/chats/"+ this.item.locked_item.chat_id + "/unlock/" + globalThis.id, {
                   method: 'POST',
                   mode: 'cors',
                   headers: {
@@ -168,12 +189,11 @@ export default {
             }
 		},
 		make_admin(member) {
-            fetch(backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/riseToAdmin/' + member, postRequestParams); 
+            fetch(backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/riseToAdmin/' + member, postRequestParams()); 
 			this.active_interaction = 'none';
 		},
 		unmake_admin(member) {
-            fetch(backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/revokeAdmin/' + member, postRequestParams); 
-			//TODO inform server of change
+            fetch(backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/revokeAdmin/' + member, postRequestParams()); 
 			for (var i in this.item.admins) {
 				var a = this.item.admins[i];
 				if (a == member)
@@ -182,7 +202,7 @@ export default {
 			this.active_interaction = 'none';
 		},
 		kick_member(member) {
-            fetch(backend + "/chats/" + member + "/" + this.item.chat_id, deleteRequestParams); 
+            fetch(backend + "/chats/" + member + "/" + this.item.chat_id, deleteRequestParams()); 
 			for (var i in this.item.target) {
 				if (this.item.target[i] == member)
 					this.item.target.splice(i, 1);

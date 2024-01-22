@@ -25,7 +25,7 @@ export default defineComponent({
   methods: {
     setStats () {
       /* TODO request stats to server */
-      fetch(backend + '/players/' + this.username, getRequestParams).then((r) => {
+      fetch(backend + '/players/' + this.username, getRequestParams()).then((r) => {
         r.json().then((data) => {
           this.won = data.wins
           this.lost = data.defeats

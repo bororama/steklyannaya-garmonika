@@ -27,15 +27,15 @@ export default defineComponent({
   },
   methods: {
     make_admin () {
-      fetch (backend + '/admins/chatOptions/' + this.chatId + '/raiseToAdmin/' + this.user.id, postRequestParams)
+      fetch (backend + '/admins/chatOptions/' + this.chatId + '/raiseToAdmin/' + this.user.id, postRequestParams())
       this.admin = true
     },
     demote_admin () {
-      fetch (backend + '/admins/chatOptions/' + this.chatId + '/revokeAdmin/' + this.user.id, postRequestParams)
+      fetch (backend + '/admins/chatOptions/' + this.chatId + '/revokeAdmin/' + this.user.id, postRequestParams())
       this.admin = false
     },
     kick_user () {
-      fetch (backend + '/chats/' + this.user.id + '/' + this.chatId, deleteRequestParams)
+      fetch (backend + '/chats/' + this.user.id + '/' + this.chatId, deleteRequestParams())
       this.kicked = true
     }
   }

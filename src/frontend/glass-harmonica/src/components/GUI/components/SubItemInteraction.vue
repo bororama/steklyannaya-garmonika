@@ -4,6 +4,7 @@
 		<SendMessagePopup @close_interaction="close" :chat_id="item.chat_id" :sender="item.sender" v-if="this.interaction == 'sending_message'"/>
 		<SetPasswordPopup @close_interaction="close" @set_password="set_password" v-if="this.interaction == 'setting_password'"/>
 		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_password" v-if="this.interaction == 'unlocking_password'"/>
+		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_padlock" v-if="this.interaction == 'unlocking_padlock'"/>
 		<ViewMembersPopup @close_interaction="close" @user_interact="user_interact" :members="users_in_chat" v-if="this.interaction == 'displaying_members' || this.interaction == 'making_admin' || this.interaction == 'unmaking_admin' || this.interaction == 'kicking_member'"/>
         <AddMemberPopup v-if="this.interaction == 'adding_member'" :chat_id="item.chat_id" @close_interaction="close"/>
         <BanTimeUserPopup v-if="this.interaction == 'time_banning'" :chat_id="item.chat_id" @close_interaction="close"/>
@@ -54,6 +55,9 @@ export default {
 		unlock_password(password) {
 			this.$emit('unlock_password', password)
 		},
+		unlock_padlock(password) {
+			this.$emit('unlock_padlock', password)
+		},
 		user_interact(member) {
 			if (this.interaction == 'making_admin')
 			{
@@ -86,7 +90,7 @@ export default {
         getUsersInChat(id) {
           if (this.item.item_type == "rosary")
           {
-            fetch(backend+ "/chats/"+ id +"/users", getRequestParams).then((response) => {
+            fetch(backend+ "/chats/"+ id +"/users", getRequestParams()).then((response) => {
                 response.json().then( (r) => {
                   this.users_in_chat = r;
                 });

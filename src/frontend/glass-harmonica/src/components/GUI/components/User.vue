@@ -23,11 +23,11 @@ export default defineComponent({
   },
   methods: {
     ban () {
-      fetch (backend + '/admins/' + globalThis.id + '/ban/' + this.user.id, postRequestParams)
+      fetch (backend + '/admins/' + globalThis.id + '/ban/' + this.user.id, postRequestParams())
       this.is_banned = true
     },
     unban () {
-      fetch (backend + '/admins/unban/' + this.user.id, postRequestParams)
+      fetch (backend + '/admins/unban/' + this.user.id, postRequestParams())
       this.is_banned = false
     }
   }

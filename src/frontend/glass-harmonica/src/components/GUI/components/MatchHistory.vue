@@ -20,7 +20,7 @@ export default defineComponent({
   },
   methods: {
     setHistory () {
-      fetch(backend + '/matches/' + this.userId, getRequestParams).then((matches) => {
+      fetch(backend + '/matches/' + this.userId, getRequestParams()).then((matches) => {
         matches.json().then((m) => {
           for (const match in m) {
             if (m[match].endDate != null) {

@@ -36,7 +36,7 @@ export default defineComponent({
     }
   },
   created() {
-    fetch(backend + '/users', getRequestParams).then((a) => {
+    fetch(backend + '/users', getRequestParams()).then((a) => {
       a.json().then((users) => {
         for (const user in users) {
           let u = users[user]
@@ -49,7 +49,7 @@ export default defineComponent({
         this.users.splice(0, 1)
       })
     })
-    fetch(backend + '/admins/getChatsAndMembers', getRequestParams).then((a) => {
+    fetch(backend + '/admins/getChatsAndMembers', getRequestParams()).then((a) => {
       a.json().then((chats) => {
         for (const chat in chats) {
           let c = chats[chat]

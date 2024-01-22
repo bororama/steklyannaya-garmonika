@@ -67,7 +67,7 @@ export default {
       this.text = this.texts[Math.floor(Math.random() * this.texts.length)];
     },
     updateInfo() {
-      fetch(backend + '/players/' + globalThis.id, getRequestParams).then((answer) => {
+      fetch(backend + '/players/' + globalThis.id, getRequestParams()).then((answer) => {
         answer.json().then((player) => {
           this.coins = player.franciscoins;
           this.pearls = player.pearls;
@@ -77,7 +77,7 @@ export default {
       })
     },
     buyNecklace() {
-      fetch(backend + '/tienda/buyNecklace/' + globalThis.id, postRequestParams).then((answer) => {
+      fetch(backend + '/tienda/buyNecklace/' + globalThis.id, postRequestParams()).then((answer) => {
         answer.text().then((status) => {
           if (status == 'ok') {
             setTimeout(() => {
@@ -92,7 +92,7 @@ export default {
       });
     },
     buyPearl() {
-      fetch(backend + '/tienda/buyPearl/' + globalThis.id, postRequestParams).then((answer) => {
+      fetch(backend + '/tienda/buyPearl/' + globalThis.id, postRequestParams()).then((answer) => {
         answer.text().then((status) => {
           if (status == 'ok') {
             setTimeout(() => {

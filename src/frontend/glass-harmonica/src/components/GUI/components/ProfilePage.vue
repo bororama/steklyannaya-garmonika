@@ -63,7 +63,7 @@ export default defineComponent({
   },
   methods: {
     registerUser () {
-      const myData : any = postRequestParams
+      const myData : any = postRequestParams()
       myData.body = JSON.stringify({
         username: this.username,
         register_token: this.register_token
@@ -88,7 +88,7 @@ export default defineComponent({
     changeUsername (newUsername : string) {
       if (this.display_status != 'registering')
       {
-        fetch(backend + '/changeUsername/' + this.username + '/' + newUsername, getRequestParams)
+        fetch(backend + '/changeUsername/' + this.username + '/' + newUsername, getRequestParams())
       }
       this.username = newUsername
     },
@@ -107,7 +107,7 @@ export default defineComponent({
       }
     },
     befriend () {
-      fetch (backend + '/players/' + globalThis.id + '/giftPearlTo/' + this.userId, postRequestParams).then((r) => {
+      fetch (backend + '/players/' + globalThis.id + '/giftPearlTo/' + this.userId, postRequestParams()).then((r) => {
         r.text().then((a) => {
           if (a === 'not_enough_pearls') {
             this.not_enough_pearls = true
@@ -118,18 +118,18 @@ export default defineComponent({
       })
     },
     block() {
-      fetch (backend + '/' + globalThis.id + '/blocks/' + this.userId, postRequestParams).then((r) => {
+      fetch (backend + '/' + globalThis.id + '/blocks/' + this.userId, postRequestParams()).then((r) => {
         this.is_blocked = true
       })
     },
     match () {
-      fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams).then((a) => a.json().then((created_match) => {
+      fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
         created_match.match_id = created_match.roomId;
         this.$emit('start_match', created_match)
       }))
     },
     match_boundless () {
-      fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams).then((a) => a.json().then((created_match) => {
+      fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
         created_match.match_id = created_match.roomId;
         created_match.boundless = true
         this.$emit('start_match', created_match)
@@ -152,7 +152,7 @@ export default defineComponent({
   created () {
     if (globalThis.logToken != undefined && this.userId === undefined)
     {
-      const myData : any = getRequestParams
+      const myData : any = getRequestParams()
       fetch(backend + '/log/me/' + globalThis.logToken, myData).then((a) => {
         a.json().then((player) => {
           globalThis.id = player.id
@@ -165,7 +165,7 @@ export default defineComponent({
         })
       })
     } else if (this.userId !== undefined) {
-      const myData : any = getRequestParams
+      const myData : any = getRequestParams()
       this.matchUserId = this.userId
       fetch (backend + '/players/' + this.userId, myData).then((a) => {
         a.json().then((player) => {
@@ -177,7 +177,7 @@ export default defineComponent({
                   this.is_friend = true
             })
           })
-          fetch (backend + '/players/' + globalThis.id + '/getFrienshipRequests', getRequestParams).then((a) => {
+          fetch (backend + '/players/' + globalThis.id + '/getFrienshipRequests', getRequestParams()).then((a) => {
             a.json().then((pfriends) => {
               for (const f in pfriends) {
                 if (pfriends[f].id == this.userId || pfriends[f].name == this.userId)

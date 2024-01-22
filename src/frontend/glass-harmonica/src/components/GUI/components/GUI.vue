@@ -5,8 +5,8 @@
     <div class="overlay" v-if="showing_profile_image">
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" @start_match="go_to_pong_match" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
-        <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match"/>
     </div>
+    <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match"/>
     <Shop v-if="in_store" @closeShop="closeShop"/>
     <AlreadyConnected v-if="false"/>
   	<router-view></router-view>
@@ -80,7 +80,7 @@ export default defineComponent({
       this.profile_state = 'registering'
     },
     go_to_metaverse (logToken : string) {
-      fetch (backend + '/log/me/' + logToken, getRequestParams).then((a) => {
+      fetch (backend + '/log/me/' + logToken, getRequestParams()).then((a) => {
         a.json().then((player) => {
           globalThis.id = player.id
           globalThis.my_data = player
@@ -93,21 +93,15 @@ export default defineComponent({
       })
     },
     metaProfileHandler (profile) {
-<<<<<<< HEAD
-=======
-//    router.push('profile_page/' + profile.name)
->>>>>>> 686fe3d66c20858e13afacbed2a9e1d74ebb7005
       this.meta_colleague_id = profile.name
       this.showing_profile_image = true
     },
     storeHandler () {
-      console.log("STORRRRrrrE");
       this.in_store = true;
     },
     close_profile() {
       this.showing_profile_image = false
     },
-<<<<<<< HEAD
     go_to_alredy_connected_page () {
       this.already_connected = true
     },
@@ -117,10 +111,9 @@ export default defineComponent({
       this.room_id = match_data.match_id
       this.match_mode = match_data.mode
       this.in_match = true
-=======
+    },
     closeShop() {
       this.in_store = false;
->>>>>>> 686fe3d66c20858e13afacbed2a9e1d74ebb7005
     }
   }
 })

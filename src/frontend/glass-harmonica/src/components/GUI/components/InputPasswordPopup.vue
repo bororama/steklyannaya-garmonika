@@ -12,15 +12,14 @@
 
 <script>
 
-import {backend, postRequestParams }
+import {backend, postRequestParams } from './connect_params.ts'
 export default {
 	props: ['chat_id'],
 	data: () => ({
 		password_component: ""
 	}),
 	methods:{
-		unlock() { //TODO password
-          fetch (backend + '/chats/' + this.chat_id + '/unlock/' + globalThis.id, postRequestParams)
+		unlock() {
 	      this.$emit('unlock_password', this.password_component);
 		}
 	}

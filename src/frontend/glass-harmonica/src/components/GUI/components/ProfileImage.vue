@@ -39,7 +39,7 @@ export default defineComponent({
       let received_image = false
       while (received_image == false) {
         await new Promise( f=> setTimeout(f, 1000))
-        fetch(backend + this.auto_image_path, getRequestParams).then((a) => {
+        fetch(backend + this.auto_image_path, getRequestParams()).then((a) => {
           if (a.status != 404)
           {
             received_image = true

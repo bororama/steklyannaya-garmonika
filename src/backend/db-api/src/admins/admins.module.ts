@@ -13,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MetaverseModule } from 'src/meta/metaverse.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Admin, Ban]), forwardRef(() => UsersModule), BansModule, ChatModule, ConfigModule, MetaverseModule],
+  imports: [SequelizeModule.forFeature([Admin, Ban]), forwardRef(() => UsersModule), BansModule, ChatModule, ConfigModule, forwardRef(() => MetaverseModule)],
   controllers: [AdminsController],
   providers: [AdminsService],
   exports: [AdminsService]

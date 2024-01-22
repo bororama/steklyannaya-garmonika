@@ -1,4 +1,4 @@
-export default function generate_padlock(locked_item, password) {
+export default function generate_padlock(locked_item) {
 	return (
 	{
 		"item_type": "padlock",

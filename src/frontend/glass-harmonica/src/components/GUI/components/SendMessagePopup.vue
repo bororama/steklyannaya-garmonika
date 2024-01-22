@@ -20,7 +20,7 @@ export default {
 	}),
 	methods:{
 		send_message() {
-            let param = postRequestParams
+            let param = postRequestParams()
 
             param.body = JSON.stringify({
               "message": this.message_text_component

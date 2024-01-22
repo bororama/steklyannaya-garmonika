@@ -43,15 +43,12 @@ export default {
         }
 	},
     created() {
-      fetch(backend + '/' + globalThis.id + '/chats', getRequestParams).then((r) => {
+      fetch(backend + '/' + globalThis.id + '/chats', getRequestParams()).then((r) => {
         r.json().then((answer) => {
           for (const chat in answer) {
             let c = answer[chat]
             let rosary
-            if (c.isLocked)
-                rosary = generate_padlock(generate_rosary(globalThis.id, answer[chat].id))
-            else 
-                rosary = generate_rosary(globalThis.id, answer[chat].id)
+            rosary = generate_rosary(globalThis.id, answer[chat].id)
             for (const u in c.users) {
               console.log(c.users[u])
               if (globalThis.id == c.users[u].id) {
@@ -59,6 +56,8 @@ export default {
                 rosary.is_admin = c.users[u].isAdmin
               }
             }
+            if (c.isLocked)
+                rosary = generate_padlock(rosary)
             this.groups.push(rosary)
           }
         })
