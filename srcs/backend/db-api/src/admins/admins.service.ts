@@ -48,11 +48,12 @@ export class AdminsService {
                 if (validationError.type == 'unique violation') {
                     throw new BadRequestException("User already exists");
                 } else {
-                    throw new BadRequestException('Other validation error:', validationError.message);
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
                 }
                 });
             } else {
-                console.error('Error:', error);
+                Logger.warn('Error:', error);
                 throw new BadRequestException("There was an error");
             }
         }

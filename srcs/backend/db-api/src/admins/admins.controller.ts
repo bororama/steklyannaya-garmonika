@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Logger } from "@nestjs/common";
 import { AdminsService } from "./admins.service";
 import { Admin } from "./admin.model";
 import { UserDto } from "../users/dto/user.dto";
@@ -44,11 +44,12 @@ export class AdminsController {
                 if (validationError.type == 'unique violation') {
                     throw new BadRequestException("User is already an admin");
                 } else {
-                    throw new BadRequestException('Other validation error:', validationError.message);
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
                 }
                 });
             } else {
-                console.error('Error:', error);
+                Logger.warn('Error:', error);
                 throw new BadRequestException("There was an error");
             }
         }

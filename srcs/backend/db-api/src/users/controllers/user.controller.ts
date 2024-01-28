@@ -58,7 +58,7 @@ export class UsersController {
         return this.usersService.getUserChats(idOrUsername);
     }
 
-    @Get('changeUsername/:idOrUsername/:newUsername')
+    @Post('changeUsername/:idOrUsername/:newUsername')
     changeUsername(@Req() request, @Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : void {
         if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
             throw new UnauthorizedException("Private information");

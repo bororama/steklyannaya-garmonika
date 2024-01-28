@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Chat } from '../models/chat.model';
@@ -195,11 +195,12 @@ export class ChatService {
                 if (validationError.type == 'unique violation') {
                     throw new BadRequestException("User is alredy on this chat");
                 } else {
-                    throw new BadRequestException('Other validation error:', validationError.message);
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
                 }
                 });
             } else {
-                console.error('Error:', error);
+                Logger.warn('Error:', error);
                 throw new BadRequestException("There was an error");
             }
         }

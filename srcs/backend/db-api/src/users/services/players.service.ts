@@ -108,11 +108,12 @@ export class PlayersService {
                 if (validationError.type == 'unique violation') {
                     throw new BadRequestException("User is already exists");
                 } else {
-                    throw new BadRequestException('Other validation error:', validationError.message);
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
                 }
                 });
             } else {
-                console.error('Error:', error);
+                Logger.warn('Error:', error);
                 throw new BadRequestException("There was an error");
             }
         }
@@ -173,12 +174,19 @@ export class PlayersService {
             });
         }
         catch (error) {
-            if (error.name == "SequelizeUniqueConstraintError") {
-                throw new BadRequestException("Already friends");
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                    throw new BadRequestException("Frienship petition already sent");
+                } else {
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
+                }
+                });
+            } else {
+                Logger.warn('Error:', error);
+                throw new BadRequestException("There was an error");
             }
-
-            Logger.error(error);
-            throw new InternalServerErrorException('Could not send request');
         }
     }
 
@@ -207,12 +215,19 @@ export class PlayersService {
             });
         }
         catch (error) {
-            if (error.name == "SequelizeUniqueConstraintError") {
-                throw new BadRequestException(error.message);
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                throw new BadRequestException("Frienship petition already sent");
+                } else {
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
+                }
+                });
+            } else {
+                Logger.warn('Error:', error);
+                throw new BadRequestException("There was an error");
             }
-
-            Logger.error(error);
-            throw new InternalServerErrorException('Could not send request');
         }
     }
 
