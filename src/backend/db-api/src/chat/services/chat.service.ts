@@ -292,6 +292,36 @@ export class ChatService {
         return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
     }
 
+    async isAdminId(userId: number, chatId:number): Promise<boolean> {
+        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
+            where: {
+                userId: userId,
+                chatId: chatId,
+            },
+        });
+        if (!userChatRelation)
+        {
+            throw new BadRequestException('Requester doesn\'t belong to chat');
+        }
+
+        return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
+    }
+
+    async isOwnerId(userId: number, chatId:number): Promise<boolean> {
+        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
+            where: {
+                userId: userId,
+                chatId: chatId,
+            },
+        });
+        if (!userChatRelation)
+        {
+            throw new BadRequestException('Requester doesn\'t belong to chat');
+        }
+
+        return (userChatRelation.isOwner);
+    }
+
     async changePrivileges(id: number, chatAdmin: string, user: string, admin: boolean): Promise<void> {
         const chat: Chat = await this.chatModel.findOne({
             attributes: ['id'],
@@ -717,6 +747,16 @@ export class ChatService {
 
         chatUserRelation.chatLocked = false;
         return chatUserRelation.save().then();
+    }
+
+    async isChatLocked(chat: Chat, user: User): Promise<boolean> {
+        const userChatRelation = await this.chatUserModel.findOne({
+            where: {
+                chatId: chat.id,
+                userId: user.id
+            }
+        });
+        return !userChatRelation || userChatRelation?.chatLocked;
     }
 
 }

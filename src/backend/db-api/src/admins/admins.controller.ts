@@ -185,6 +185,16 @@ export class AdminsController {
         return this.chatService.changeMuteStatus(chat, user, false);
     }
 
+    @Post('/chatOptions/:chatId/kick/:usernameOrId')
+    async kickUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
+        const chat = await this.chatService.findOne(id);
+        if (!chat) {
+            throw new BadRequestException("Chat doesn't exist");
+        }
+
+        return this.chatService.leave(user, chat.id);
+    }
+
     // This must be the last function declared in the controller.
     // Otherwise the other Get functions won't work lmao.
     @Get('/:id')

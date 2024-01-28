@@ -27,7 +27,7 @@ export class PlayersController {
         console.log(requester);
         return isNaN(+userId)
         ? requester.userName == userId 
-        :  requester.id != +userId ;
+        :  requester.id == +userId ;
     }
 
     @Get()

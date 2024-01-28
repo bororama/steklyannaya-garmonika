@@ -16,7 +16,7 @@ export class UsersController {
     checkIfAuthorized(requester: User, userId: string) {
         return isNaN(+userId)
         ? requester.userName == userId 
-        :  requester.id != +userId ;
+        :  requester.id == +userId ;
     }
 
     @Get("/users")

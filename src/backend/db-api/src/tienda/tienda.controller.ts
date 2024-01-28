@@ -15,7 +15,7 @@ export class TiendaController {
       console.log(requester);
       return isNaN(+userId)
       ? requester.userName == userId 
-      :  requester.id != +userId ;
+      :  requester.id == +userId ;
   }
 
   @Post("/buyPearl/:idOrUsername")
