@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, ForbiddenException, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { getOAuthKey, getPersonalInfo } from './getOAuthKey'
+import { FtOauthService } from './getOAuthKey';
 import { UsersService } from '../users/services/users.service'
 import { PlayersService } from '../users/services/players.service'
 import { NewPlayer } from '../users/dto/new-player.dto'
@@ -14,8 +14,6 @@ import { ApiBody } from "@nestjs/swagger"
 import * as net from "net"
 import axios from "axios"
 import * as fs from "fs"
-
-import { authenticator, totp } from 'otplib'
 import * as qrcode from "qrcode"
 import * as speakeasy from "speakeasy"
 import { AdminsService } from 'src/admins/admins.service';
@@ -29,7 +27,8 @@ export class AuthenticatorController {
     private readonly userService : UsersService,
     private readonly playerService : PlayersService,
     private readonly adminService : AdminsService,
-    private readonly banService : BansService
+    private readonly banService : BansService,
+    private readonly ftAuthService: FtOauthService,
   ) {}
 
   @Get('code/:code')
@@ -77,10 +76,10 @@ export class AuthenticatorController {
   }
 
   async tryCode(code) {
-      const log_attempt = await getOAuthKey(code);
+      const log_attempt = await this.ftAuthService.getOAuthKey(code);
       if (log_attempt.status != 'ko')
       {
-          const personal = await getPersonalInfo(log_attempt.token)
+          const personal = await this.ftAuthService.getPersonalInfo(log_attempt.token)
 
           let user : any;
           try {

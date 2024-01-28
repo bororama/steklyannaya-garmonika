@@ -10,7 +10,6 @@ import { Ban } from "../../bans/ban.model";
 import { UpdatePlayerDto } from "../dto/player-update.dto";
 import { UserStatus } from "../dto/user-status.enum";
 import { ChatService } from "../../chat/services/chat.service";
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PlayersService {
@@ -21,7 +20,6 @@ export class PlayersService {
         private playerModel: typeof Player,
         @InjectModel(Friendship)
         private friendshipModel: typeof Friendship,
-        private appConfig: ConfigService
     ) {}
 
     async findAll(): Promise<Player []> {
