@@ -12,7 +12,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import UserChannel from './UserChannel.vue'
-import { backend, deleteRequestParams } from './connect_params'
+import { deleteRequestParams } from './connect_params'
 
 export default defineComponent({
   name: 'ChannelAdmin',
@@ -31,7 +31,7 @@ export default defineComponent({
       this.is_open = !this.is_open
     },
     delete_chan () {
-      fetch (backend + '/chats/' + this.channel.id, deleteRequestParams())
+      fetch (globalThis.backend + '/chats/' + this.channel.id, deleteRequestParams())
       this.deleted = true
     }
   }

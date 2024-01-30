@@ -23,7 +23,6 @@
 import { io, Socket } from "socket.io-client";
 import { defineComponent } from "vue";
 import { FrontendConfig } from "./FrontendConfig";
-import { backend } from './connect_params.ts'
 
 export default defineComponent({
   name: "PongGame",
@@ -48,7 +47,7 @@ export default defineComponent({
   },
   created() {
     if (!this.socket) {
-      this.socket = io(backend + "/pong", { path: "/socket.io" });
+      this.socket = io(globalThis.backend + "/pong", { path: "/socket.io" });
       this.socket.on("connect_error", (error: any) => {
         console.error("Error de conexión:", error);
       });

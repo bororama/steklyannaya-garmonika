@@ -10,7 +10,7 @@
 
 import { defineComponent } from 'vue'
 import OneStat from './OneStat.vue'
-import { backend, getRequestParams } from './connect_params'
+import { getRequestParams } from './connect_params'
 
 export default defineComponent({
   name: 'MatchHistory',
@@ -20,7 +20,7 @@ export default defineComponent({
   },
   methods: {
     setHistory () {
-      fetch(backend + '/matches/' + this.userId, getRequestParams()).then((matches) => {
+      fetch(globalThis.backend + '/matches/' + this.userId, getRequestParams()).then((matches) => {
         matches.json().then((m) => {
           for (const match in m) {
             if (m[match].endDate != null) {

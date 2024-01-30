@@ -10,7 +10,7 @@
 import { defineComponent } from 'vue'
 import defaultAvatar from '../assets/hourglass.gif'
 import EditField from './EditField.vue'
-import { backend, postRequestParams, getRequestParams} from './connect_params'
+import { postRequestParams, getRequestParams} from './connect_params'
 
 export default defineComponent({
   name: 'ProfileImage',
@@ -27,7 +27,7 @@ export default defineComponent({
   },
   created () {
     if (this.path !== undefined) {
-      this.image = backend + '/' + this.path
+      this.image = globalThis.backend + '/' + this.path
     }
     if (this.auto_image) {
       let received_image = false
@@ -39,12 +39,12 @@ export default defineComponent({
       let received_image = false
       while (received_image == false) {
         await new Promise( f=> setTimeout(f, 1000))
-        fetch(backend + this.auto_image_path, getRequestParams()).then((a) => {
+        fetch(globalThis.backend + this.auto_image_path, getRequestParams()).then((a) => {
           if (a.status != 404)
           {
             received_image = true
-            //setTimeout(f => {this.image = backend + this.auto_image_path}, 1000)
-            setTimeout(f => {this.image = backend + this.auto_image_path}, 200)
+            //setTimeout(f => {this.image = globalThis.backend + this.auto_image_path}, 1000)
+            setTimeout(f => {this.image = globalThis.backend + this.auto_image_path}, 200)
             this.$emit('auto_image_loaded')
           }
         }).catch((e) => {

@@ -21,7 +21,7 @@
 import { defineComponent } from 'vue'
 import User from './User.vue'
 import Channel from './Channel.vue'
-import {backend, getRequestParams} from './connect_params'
+import {getRequestParams} from './connect_params'
 
 export default defineComponent({
   name: 'AdminPage',
@@ -36,11 +36,11 @@ export default defineComponent({
     }
   },
   created() {
-    fetch(backend + '/players', getRequestParams()).then((a) => {
+    fetch(globalThis.backend + '/players', getRequestParams()).then((a) => {
       a.json().then((users) => {
         for (const user in users) {
           let u = users[user]
-          fetch (backend + '/players/' + u.id + '/banned').then((a) => {
+          fetch (globalThis.backend + '/players/' + u.id + '/banned').then((a) => {
             a.text().then((isBanned) => {
                 this.users.push(u)
             })
@@ -49,7 +49,7 @@ export default defineComponent({
         this.users.splice(0, 1)
       })
     })
-    fetch(backend + '/admins/getChatsAndMembers', getRequestParams()).then((a) => {
+    fetch(globalThis.backend + '/admins/getChatsAndMembers', getRequestParams()).then((a) => {
       a.json().then((chats) => {
         for (const chat in chats) {
           let c = chats[chat]

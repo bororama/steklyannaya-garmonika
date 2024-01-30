@@ -26,7 +26,7 @@ import Metaverse from '../../Metaverse.vue'
 import MetaOverlay from './MetaOverlay.vue'
 import ProfilePage from './ProfilePage.vue'
 import PongGame from './PongGame.vue'
-import { backend, getRequestParams } from './connect_params.ts'
+import { getRequestParams } from './connect_params.ts'
 import Home from '../../Home.vue'
 import Shop from './Shop.vue'
 import Leaderboard from './Leaderboard.vue'
@@ -82,7 +82,7 @@ export default defineComponent({
       this.profile_state = 'registering'
     },
     go_to_metaverse (logToken : string) {
-      fetch (backend + '/log/me/' + logToken, getRequestParams()).then((a) => {
+      fetch (globalThis.backend + '/log/me/' + logToken, getRequestParams()).then((a) => {
         a.json().then((player) => {
           globalThis.id = player.id
           globalThis.my_data = player

@@ -12,6 +12,9 @@ services:
       - "POSTGRES_USER=${POSTGRES_USER}"
       - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
       - "CALIPH_USER=${CALIPH_USER}"
+      - "UID=${UID}"
+      - "SECRET=${SECRET}"
+      - "HOST=${HOST}"
     volumes:
       - type: bind
         source: ./srcs/backend/db-api/src
@@ -35,6 +38,9 @@ services:
     restart: always
     environment:
       VITE_HOST_IP: ${IP:-host.docker.internal}
+      UID: ${UID}
+      SECRET: ${SECRET}
+      HOST: ${HOST}
     volumes:
       - type: bind
         source: ./srcs/frontend

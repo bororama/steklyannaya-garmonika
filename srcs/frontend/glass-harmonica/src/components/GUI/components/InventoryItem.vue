@@ -26,7 +26,7 @@ import generate_padlock from '../generate_padlock.js'
 import SubItemInteraction from './SubItemInteraction.vue'
 import break_rosary from '../break_rosary.js'
 import repair_rosary from '../repair_rosary.js'
-import {backend, getRequestParams, postRequestParams, deleteRequestParams} from './connect_params'
+import {getRequestParams, postRequestParams, deleteRequestParams} from './connect_params'
 import fondo from '../assets/fondo_objeto.png'
 
 export default {
@@ -68,7 +68,7 @@ export default {
 			} else if (action == "ban") {
 				if (this.item.item_type == "pearl")
                 {
-                    fetch(backend + '/' + globalThis.id + '/blocks/' + this.item.target, postRequestParams());
+                    fetch(globalThis.backend + '/' + globalThis.id + '/blocks/' + this.item.target, postRequestParams());
 					this.item = break_pearl(this.item);
                 }
 				else
@@ -77,7 +77,7 @@ export default {
 			} else if (action == "unban") {
 				if (this.item.item_type == "broken_pearl")
                 {
-                    fetch(backend + '/' + globalThis.id + '/blocks/' + this.item.target, deleteRequestParams());
+                    fetch(globalThis.backend + '/' + globalThis.id + '/blocks/' + this.item.target, deleteRequestParams());
 					this.item = repair_pearl(this.item);
                 }
 				else
@@ -113,11 +113,11 @@ export default {
               this.active_interaction = "user_display";
               this.close_drop();
             } else if (action == "accept_friendship") {
-              fetch(backend + '/players/' + globalThis.id + '/acceptFrienshipRequest/' + this.item.sender, postRequestParams());
+              fetch(globalThis.backend + '/players/' + globalThis.id + '/acceptFrienshipRequest/' + this.item.sender, postRequestParams());
               this.close_drop();
               this.$emit('close_inventory')
             } else if (action == "reject_friendship") {
-              fetch(backend + '/players/' + globalThis.id + '/declineFrienshipRequest/' + this.item.sender, postRequestParams());
+              fetch(globalThis.backend + '/players/' + globalThis.id + '/declineFrienshipRequest/' + this.item.sender, postRequestParams());
               this.close_drop();
             } else if (action == "go_to_pong_match") {
               this.$emit('go_to_pong_match', {match_id: this.item.match_id, mode: 0})
@@ -136,7 +136,7 @@ export default {
 			this.active_interaction = 'none';
 		},
 		set_password(password) {
-            fetch(backend+ "/chats/"+ this.item.chat_id + "/setPassword", {
+            fetch(globalThis.backend+ "/chats/"+ this.item.chat_id + "/setPassword", {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
@@ -153,7 +153,7 @@ export default {
 		unlock_password(password) {
           console.log("YEEEEE")
             try {
-              fetch(backend + "/chats/"+ this.item.chat_id + "/unsetPassword", {
+              fetch(globalThis.backend + "/chats/"+ this.item.chat_id + "/unsetPassword", {
                   method: 'POST',
                   mode: 'cors',
                   headers: {
@@ -174,7 +174,7 @@ export default {
 		},
 		unlock_padlock(password) {
             try {
-              fetch(backend + "/chats/"+ this.item.locked_item.chat_id + "/unlock/" + globalThis.id, {
+              fetch(globalThis.backend + "/chats/"+ this.item.locked_item.chat_id + "/unlock/" + globalThis.id, {
                   method: 'POST',
                   mode: 'cors',
                   headers: {
@@ -195,11 +195,11 @@ export default {
             }
 		},
 		make_admin(member) {
-            fetch(backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/riseToAdmin/' + member, postRequestParams()); 
+            fetch(globalThis.backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/riseToAdmin/' + member, postRequestParams()); 
 			this.active_interaction = 'none';
 		},
 		unmake_admin(member) {
-            fetch(backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/revokeAdmin/' + member, postRequestParams()); 
+            fetch(globalThis.backend + "/chats/" + this.item.chat_id + "/admins/" + globalThis.id + '/revokeAdmin/' + member, postRequestParams()); 
 			for (var i in this.item.admins) {
 				var a = this.item.admins[i];
 				if (a == member)
@@ -208,7 +208,7 @@ export default {
 			this.active_interaction = 'none';
 		},
 		kick_member(member) {
-            fetch(backend + "/chats/" + member + "/" + this.item.chat_id, deleteRequestParams()); 
+            fetch(globalThis.backend + "/chats/" + member + "/" + this.item.chat_id, deleteRequestParams()); 
 			for (var i in this.item.target) {
 				if (this.item.target[i] == member)
 					this.item.target.splice(i, 1);

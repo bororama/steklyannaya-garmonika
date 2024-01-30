@@ -12,7 +12,7 @@
 
 <script>
 
-import { backend, postRequestParams } from './connect_params'
+import { postRequestParams } from './connect_params'
 export default {
 	props: ['chat_id', 'sender'],
 	data: () => ({
@@ -25,7 +25,7 @@ export default {
             param.body = JSON.stringify({
               "message": this.message_text_component
             })
-            fetch (backend + '/chats/' + this.chat_id + '/sendMessage/' + this.sender, param)
+            fetch (globalThis.backend + '/chats/' + this.chat_id + '/sendMessage/' + this.sender, param)
 			this.$emit('close_interaction');
 		}
 	}

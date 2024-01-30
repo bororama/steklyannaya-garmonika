@@ -18,7 +18,7 @@ function initializeSocket(hostAddress : string) : Socket {
   return io<ServerToClientEvents, ClientToServerEvents>(hostAddress);
 }
 
-const hostAddress = `http://c2r15s5:777`;
+const hostAddress = `http://${process.env.HOST}:777`;
 const metaSocket = initializeSocket(hostAddress, );
 const vueEmitter = defineEmits(['profileRequest', 'storeRequest']);
 const match = ref(false);

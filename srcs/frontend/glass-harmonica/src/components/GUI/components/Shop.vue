@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { backend, getRequestParams, postRequestParams } from './connect_params'
+import { getRequestParams, postRequestParams } from './connect_params'
 
 export default {
   name: "Shop",
@@ -67,7 +67,7 @@ export default {
     },
     updateInfo() {
       console.log("IDDDDDDD" + globalThis.id)
-      fetch(backend + '/players/' + globalThis.id, getRequestParams()).then((answer) => {
+      fetch(globalThis.backend + '/players/' + globalThis.id, getRequestParams()).then((answer) => {
         answer.json().then((player) => {
           this.coins = player.franciscoins;
           this.pearls = player.pearls;
@@ -77,7 +77,7 @@ export default {
       })
     },
     buyNecklace() {
-      fetch(backend + '/tienda/buyNecklace/' + globalThis.id, postRequestParams()).then((answer) => {
+      fetch(globalThis.backend + '/tienda/buyNecklace/' + globalThis.id, postRequestParams()).then((answer) => {
         answer.text().then((status) => {
           if (status == 'ok') {
             setTimeout(() => {
@@ -92,7 +92,7 @@ export default {
       });
     },
     buyPearl() {
-      fetch(backend + '/tienda/buyPearl/' + globalThis.id, postRequestParams()).then((answer) => {
+      fetch(globalThis.backend + '/tienda/buyPearl/' + globalThis.id, postRequestParams()).then((answer) => {
         answer.text().then((status) => {
           if (status == 'ok') {
             setTimeout(() => {
