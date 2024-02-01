@@ -17,7 +17,10 @@ const liveClients : Array<LiveClient> = Array();
 
 @WebSocketGateway(777,{
   cors: {
-    origin: '*',
+    'origin': ['http://' + process.env.HOST + ':5173', 'http://localhost:5173'],
+    'methods': 'GET,POST,DELETE',
+    'preflightContinue': false,
+    'credentials': false,
   },
 })
 
