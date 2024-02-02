@@ -6,6 +6,5 @@ RUN n 16
 WORKDIR /app/glass-harmonica
 COPY ./glass-harmonica/package*.json ./
 RUN npm i
-RUN npm install vite
 
 CMD [ "npm", "run", "dev" ]
