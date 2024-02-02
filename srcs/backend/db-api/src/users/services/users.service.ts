@@ -125,6 +125,12 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException('User doesn\'t exists');
         }
+
+        if (user.userName == newUsername)
+        {
+            throw new BadRequestException('User already use this Name');
+        }
+
         user.userName = newUsername;
         try {
             await user.save();
