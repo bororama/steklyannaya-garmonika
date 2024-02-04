@@ -43,8 +43,11 @@ services:
       HOST: ${HOST}
     volumes:
       - type: bind
-        source: ./srcs/frontend
-        target: /app
+        source: ./srcs/frontend/glass-harmonica/public
+        target: /app/glass-harmonica/public
+      - type: bind
+        source: ./srcs/frontend/glass-harmonica/src
+        target: /app/glass-harmonica/src
       - type: bind
         source: ./srcs/shared
         target: /app/glass-harmonica/src/components/metaverse/shared
