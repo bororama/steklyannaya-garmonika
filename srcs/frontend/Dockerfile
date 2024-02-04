@@ -1,11 +1,12 @@
 FROM debian:bullseye-slim
 RUN apt-get update && apt-get install -yq npm curl
 RUN npm i -g n
-RUN n 16
+RUN n 18
 
 WORKDIR /app/glass-harmonica
-COPY ./glass-harmonica/package*.json ./
+COPY ./glass-harmonica/*.json ./
+COPY ./glass-harmonica/*.ts ./
+COPY ./glass-harmonica/*.html ./
 RUN npm i
-RUN npm install vite
 
-CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "dev"]
