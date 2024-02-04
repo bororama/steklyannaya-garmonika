@@ -55,7 +55,7 @@ export class PlayersService {
             });
         }
 
-        return await this.playerModel.findOne({
+        return this.playerModel.findOne({
             include: {
                 model: User,
                 required: true,

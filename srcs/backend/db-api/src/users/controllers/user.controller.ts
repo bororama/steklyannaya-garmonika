@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req, UnauthorizedException } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req, UnauthorizedException, Logger } from "@nestjs/common";
 import { UsersService } from "../services/users.service";
 import { ApiOperation, ApiTags, ApiBody } from "@nestjs/swagger";
 import { ChatDto } from "../../chat/dto/chat.dto";
@@ -59,11 +59,11 @@ export class UsersController {
     }
 
     @Post('changeUsername/:idOrUsername/:newUsername')
-    changeUsername(@Req() request, @Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : void {
+    changeUsername(@Req() request, @Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : Promise<void> {
         if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
             throw new UnauthorizedException("Private information");
         }
-        this.usersService.changeUsername(idOrUsername, newUsername)
+        return this.usersService.changeUsername(idOrUsername, newUsername)
     }
 
     @Post(':fortyTwoLogin/sign-in')
@@ -159,8 +159,7 @@ export class UsersController {
       })
     }))
     async uploadProfilePic(@Req() request, @UploadedFile() file, @Param('idOrUsername') userId : string) {
-        console.log(request.requester_info.dataValues)
-        console.log(userId)
+		Logger.debug("Upload Profile Pic endpoint called");
         if (!this.checkIfAuthorized(request.requester_info.dataValues, userId)) {
             throw new UnauthorizedException("Private information");
         }
