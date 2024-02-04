@@ -36,7 +36,11 @@ import { MatchesModule } from 'src/matches/matches.module';
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(AuthMiddleware, AuthenticMiddleware, ConnectedMiddleware)
-        .forRoutes(UsersController, PlayersController)
+      .apply(AuthMiddleware, AuthenticMiddleware)
+          .forRoutes(UsersController, PlayersController)
+    consumer
+      .apply(ConnectedMiddleware)
+        .exclude('users/:idOrUsername/uploadProfilePic')
+          .forRoutes(UsersController, PlayersController)
   }
 }
