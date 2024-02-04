@@ -1,7 +1,7 @@
 <template>
 
 <div class="overlay">
-  <h1>ADMIN PAGE</h1>
+  <h1 style="font-family: 'joystix'">ADMIN PAGE</h1>
 
   <div class="admin_page_columns_container">
       <div class="admin_page_column" id="user_ban">
@@ -68,6 +68,7 @@ export default defineComponent({
 .admin_page_column {
   display: flex;
   flex-direction:column;
+  align-items: center;
   margin: 0 5%;
 }
 
@@ -77,6 +78,7 @@ export default defineComponent({
 
 .admin_page_columns_container {
   display: flex;
+  font-family: 'joystix';
 }
 
 </style>

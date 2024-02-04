@@ -2,10 +2,10 @@
 
 <div class="user_container">
     <p :class="{text_user: true, banned: is_banned}">{{user.name}}</p>
-    <button v-if="!is_banned" @click="ban">BAN</button>
-    <button v-if="is_banned" @click="unban">UNBAN</button>
-    <button v-if="!is_admin" @click="make_admin">MAKE ADMIN</button>
-    <button v-if="is_admin" @click="unmake_admin">DEMOTE ADMIN</button>
+    <button class="fa_button" v-if="!is_banned" @click="ban">BAN</button>
+    <button  class="fa_button" v-if="is_banned" @click="unban">UNBAN</button>
+    <button class="fa_button" v-if="!is_admin" @click="make_admin">MAKE ADMIN</button>
+    <button class="fa_button" v-if="is_admin" @click="unmake_admin">DEMOTE ADMIN</button>
 </div>
 
 </template>
