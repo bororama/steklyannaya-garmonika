@@ -35,14 +35,15 @@ export class TiendaService {
       throw new BadRequestException("User doesn\'t exist");
     }
 
-    const chat = await this.chatService.createWithUser(user);
-    if (!chat)
-    {
-      return ('chat_creation_error');
-    }
-
     const result :string = await this.userService.subtractCoins(user, this.necklacePrice);
-
+    if (result == 'ok'){
+      const chat = await this.chatService.createWithUser(user); 
+      if (!chat)
+      {
+        return ('chat_creation_error');
+      }
+  
+    }
     return (result);
   }
 
