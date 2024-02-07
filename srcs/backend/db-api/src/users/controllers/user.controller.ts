@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req, UnauthorizedException, Logger } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req, UnauthorizedException, Logger, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from "@nestjs/common";
 import { UsersService } from "../services/users.service";
 import { ApiOperation, ApiTags, ApiBody } from "@nestjs/swagger";
 import { ChatDto } from "../../chat/dto/chat.dto";
@@ -158,7 +158,16 @@ export class UsersController {
         }
       })
     }))
-    async uploadProfilePic(@Req() request, @UploadedFile() file, @Param('idOrUsername') userId : string) {
+    async uploadProfilePic(
+        @Req() request,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new FileTypeValidator({ fileType: ".(png|jpeg|jpg)" })
+                ]
+            })
+        ) file,
+        @Param('idOrUsername') userId : string) {
 		Logger.debug("Upload Profile Pic endpoint called");
         if (!this.checkIfAuthorized(request.requester_info.dataValues, userId)) {
             throw new UnauthorizedException("Private information");
