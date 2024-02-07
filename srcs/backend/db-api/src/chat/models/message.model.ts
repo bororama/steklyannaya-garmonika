@@ -15,7 +15,7 @@ export class Message extends Model {
 	@Column
 	senderId: number;
 
-	@ForeignKey(() => User)
+	@ForeignKey(() => Chat)
 	@Column
 	chatId: number;
 
@@ -25,9 +25,9 @@ export class Message extends Model {
 	@Column
 	message: string;
 
-	@BelongsTo(() => User, 'senderId')
+	@BelongsTo(() => User, { onDelete: 'CASCADE'})
 	sender: User;
 
-	@BelongsTo(() => Chat, 'chatId')
+	@BelongsTo(() => Chat)
 	chat: Chat;
 }

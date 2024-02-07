@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express'
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,8 +16,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  const configService = app.get<ConfigService>(ConfigService);
+  const host = configService.get('HOST').toLowerCase();
+
   app.enableCors({
-    'origin': ['http://' + process.env.HOST + ':5173', 'http://localhost:5173'],
+    'origin': ['http://' + host + ':5173', 'http://localhost:5173'],
     'methods': 'GET,POST,DELETE',
     'preflightContinue': false,
     'credentials': true,
