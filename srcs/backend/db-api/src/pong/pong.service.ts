@@ -5,14 +5,18 @@ import { Match as MatchModel } from 'src/matches/models/match.model';
 import { MatchesService } from '../matches/matches.service'
 import { Constants } from './components/Match';
 import * as jwt from 'jsonwebtoken';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PongService {
-
-    private matches: Match[] = [];
-    private connectedUsers: { [socketId: string]: { match: Match; paddleIndex: number } } = {};
+  private readonly jwt_log_secret : string = this.configService.get('JWT_LOG_SECRET');
+  private matches: Match[] = [];
+  private connectedUsers: { [socketId: string]: { match: Match; paddleIndex: number } } = {};
   
-  constructor(private matchesService: MatchesService) {}
+  constructor(
+    private readonly matchesService: MatchesService,
+    private readonly configService: ConfigService
+    ) {}
   private connectionConditions(existingMatch, data: any){
     if (data.pongRoomId === -2){
       console.log("public match");
@@ -50,7 +54,7 @@ export class PongService {
           console.log(data.token)
 
           try {
-            payload = jwt.verify(data.token, 'TODO the REAL secret');
+            payload = jwt.verify(data.token, this.jwt_log_secret);
           } catch (e) {
             socket.disconnect(false);
           }

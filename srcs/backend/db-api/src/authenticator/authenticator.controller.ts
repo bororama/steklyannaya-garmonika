@@ -14,21 +14,14 @@ import * as speakeasy from "speakeasy"
 import { AdminsService } from 'src/admins/admins.service';
 import { Player } from 'src/users/models/player.model';
 import { AuthenticatorService } from './authenticator.service';
-import { ConfigService } from '@nestjs/config';
 
 @Controller('log')
 export class AuthenticatorController {
-
-  private readonly jwt_log_secret : string = this.configService.get('JWT_LOG_SECRET');
-  private readonly jwt_2fa_secret : string = this.configService.get('JWT_2FA_SECRET');
-  private readonly jwt_register_secret : string = this.configService.get('JWT_REGISTER_SECRET');
-
   constructor (
     private readonly userService : UsersService,
     private readonly playerService : PlayersService,
     private readonly adminService : AdminsService,
     private readonly authService: AuthenticatorService,
-    private readonly configService: ConfigService
   ) {}
 
   @Get('code/:code')
@@ -43,7 +36,7 @@ export class AuthenticatorController {
   async getLogTokenFromFa(@Body() fa_info : FaInfoDto) : Promise<any> { 
     let payload:any
     try {
-      payload = jwt.verify(fa_info.fa_token, this.jwt_2fa_secret)
+      payload = jwt.verify(fa_info.fa_token, this.authService.jwt_2fa_secret)
     }
     catch {
       throw new UnauthorizedException('Unauthorized - Invalid JWT token');
@@ -65,7 +58,7 @@ export class AuthenticatorController {
         status: ''
     }
     if (isValid) {
-      data.token = jwt.sign({login: payload.login, username: payload.username}, this.jwt_log_secret)
+      data.token = jwt.sign({login: payload.login, username: payload.username}, this.authService.jwt_log_secret)
       data.status = 'ok'
     }
     else
@@ -77,7 +70,7 @@ export class AuthenticatorController {
   @ApiBody({type: RegisterInfoDto, required:true})
   async registerUser(@Body() register_info : RegisterInfoDto) : Promise<RegisterAnswerDto> {
     try {
-        let payload:any = jwt.verify(register_info.register_token, this.jwt_register_secret)
+        let payload:any = jwt.verify(register_info.register_token, this.authService.jwt_register_secret)
         const player : NewPlayer = {
           userName: register_info.username,
           loginFt: payload.login,
@@ -86,7 +79,7 @@ export class AuthenticatorController {
         let rval : any = await this.playerService.create(player)
         let answer : RegisterAnswerDto = {
             status:'ok',
-            meta_token: jwt.sign({username: rval.id}, this.jwt_log_secret)
+            meta_token: jwt.sign({username: rval.id}, this.authService.jwt_log_secret)
         }
         return (answer)
       }
@@ -113,7 +106,7 @@ export class AuthenticatorController {
   async getMyData(@Param('token') token :string) : Promise<PlayerDto> {
     let payload : any;
     try {
-      payload = jwt.verify(token, this.jwt_log_secret)
+      payload = jwt.verify(token, this.authService.jwt_log_secret)
     }
     catch {
       throw new UnauthorizedException('Unauthorized - Invalid JWT token');
@@ -127,12 +120,12 @@ export class AuthenticatorController {
   async generate2FAsecret (@Param('token') token : string) : Promise<Generate2FASecretAnswerDto> {
     let payload : any;
     try {
-      payload = jwt.verify(token, this.jwt_log_secret);
+      payload = jwt.verify(token, this.authService.jwt_log_secret);
     }
     catch {
       throw new UnauthorizedException('Unauthorized - Invalid JWT token');
     }
-    const enable2FA_token : string = jwt.sign({username: payload.username}, this.jwt_2fa_secret)
+    const enable2FA_token : string = jwt.sign({username: payload.username}, this.authService.jwt_2fa_secret)
     const qr : string = await this.authService.get2FACode(payload.username);
 
     const answer :  Generate2FASecretAnswerDto = {
@@ -146,7 +139,7 @@ export class AuthenticatorController {
   async confirm2FAEnable (@Body() enable2FAInfo: Enable2FAInfoDto) : Promise<string> {
     let payload : any;
     try {
-      payload = jwt.verify(enable2FAInfo.token, this.jwt_log_secret)
+      payload = jwt.verify(enable2FAInfo.token, this.authService.jwt_log_secret)
     }
     catch {
       throw new UnauthorizedException('Unauthorized - Invalid JWT token');
@@ -171,7 +164,7 @@ export class AuthenticatorController {
   @Post('disable2FA')
   async disable2FAEnable (@Body() enable2FAInfo: Enable2FAInfoDto) : Promise<string> {
     try {
-      let payload:any = jwt.verify(enable2FAInfo.token, this.jwt_log_secret)
+      let payload:any = jwt.verify(enable2FAInfo.token, this.authService.jwt_log_secret)
       const secret = await this.userService.get2FAsecret(payload.username)
       const token = speakeasy.totp({
         secret: secret,

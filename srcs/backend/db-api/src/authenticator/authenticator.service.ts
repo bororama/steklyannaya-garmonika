@@ -9,13 +9,18 @@ import * as speakeasy from "speakeasy"
 import { BansService } from 'src/bans/bans.service';
 import { UsersService } from 'src/users/services/users.service';
 import { Logger } from "@nestjs/common";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthenticatorService {
+	public readonly jwt_log_secret : string = this.configService.get('JWT_LOG_SECRET');
+	public readonly jwt_2fa_secret : string = this.configService.get('JWT_2FA_SECRET');
+	public readonly jwt_register_secret : string = this.configService.get('JWT_REGISTER_SECRET');
 	constructor(
 		private readonly userService : UsersService,
 		private readonly banService : BansService,
-		private readonly ftAuthService: FtOauthService
+		private readonly ftAuthService: FtOauthService,
+		private readonly configService: ConfigService
 	) {}
 
 	async pixelizeAndStoreProfileImage(login: string, image_raw:any) {
@@ -64,18 +69,18 @@ export class AuthenticatorService {
 				user = await this.userService.signIn(personal.login);
 				if (user.has2FA) {
 					log_attempt.status = 'needs_2fa'
-					log_attempt.fa_token = jwt.sign({login: personal.login, username: user.dataValues.id}, 'TODO FA LOG TOKEN')
+					log_attempt.fa_token = jwt.sign({login: personal.login, username: user.dataValues.id}, this.jwt_2fa_secret)
 				} else {
 					log_attempt.status = 'success'
 					if (await this.banService.isBannedById(user.dataValues.id))
 					{
 						throw new ForbiddenException('You\'re banned');
 					}
-					log_attempt.log_token = jwt.sign({login: personal.login, username: user.dataValues.id}, 'TODO the REAL secret')
+					log_attempt.log_token = jwt.sign({login: personal.login, username: user.dataValues.id}, this.jwt_log_secret)
 				}
 			} catch (e) {
 				log_attempt.status = 'needs_register';
-				log_attempt.register_token = jwt.sign({login: personal.login}, 'TODO change SUPER SECRET')
+				log_attempt.register_token = jwt.sign({login: personal.login}, this.jwt_register_secret)
 				this.pixelizeImage(personal.image.link, personal.login)
 			}
 			const return_tok = {status: log_attempt.status, register_token: log_attempt.register_token, log_token: log_attempt.log_token, fa_token: log_attempt.fa_token, auto_image:'/src/profile_pics/' + personal.login + '.png'}
