@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe, ForbiddenException, BadRequestException, Req, UnauthorizedException } from '@nestjs/common';
 import { ChatService } from './services/chat.service';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatDto } from './dto/chat.dto';
 import { Chat } from './models/chat.model';
@@ -10,6 +10,7 @@ import { Message } from './models/message.model';
 import { PublicUserDto } from '../users/dto/public-user.dto';
 import { User } from 'src/users/models/user.model';
 
+@ApiBearerAuth()
 @Controller('chats')
 @ApiTags("Chats")
 export class ChatController {
