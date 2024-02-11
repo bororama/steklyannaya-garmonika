@@ -11,6 +11,7 @@ async function bootstrap() {
     .setTitle('ft_transcendence DB API Doc')
     .setDescription('API Specification for the Database API for the ft_transcendence project')
     .setVersion('0.1.1')
+    .addBearerAuth()
     .build();
     
   const document = SwaggerModule.createDocument(app, config);

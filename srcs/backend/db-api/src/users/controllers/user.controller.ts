@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req, UnauthorizedException, Logger, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from "@nestjs/common";
 import { UsersService } from "../services/users.service";
-import { ApiOperation, ApiTags, ApiBody } from "@nestjs/swagger";
+import { ApiOperation, ApiTags, ApiBody, ApiBearerAuth } from "@nestjs/swagger";
 import { ChatDto } from "../../chat/dto/chat.dto";
 import { User } from "../models/user.model";
 import { PublicUserDto } from "../dto/public-user.dto";
@@ -8,6 +8,7 @@ import { UserDto } from "../dto/user.dto";
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiBearerAuth()
 @Controller()
 @ApiTags("User General Data")
 export class UsersController {
