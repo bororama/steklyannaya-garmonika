@@ -8,14 +8,6 @@
 		<ViewMembersPopup @close_interaction="close" @user_interact="user_interact" :members="users_in_chat" v-if="this.interaction == 'displaying_members' || this.interaction == 'making_admin' || this.interaction == 'unmaking_admin' || this.interaction == 'kicking_member'"/>
         <AddMemberPopup v-if="this.interaction == 'adding_member'" :chat_id="item.chat_id" @close_interaction="close"/>
         <BanTimeUserPopup v-if="this.interaction == 'time_banning'" :chat_id="item.chat_id" @close_interaction="close"/>
-        <div  v-if="displaying_profile" class="overlay">
-            <button @click="closeProfile">Close Profile</button>
-            <ProfilePage display_status="profile_display" :userId="display_userId" @start_match="(param) => $emit('go_to_pong_match', param)"/>
-        </div>
-        <div  v-if="this.interaction == 'user_display'" class="overlay">
-            <button @click="stop_user_display">Close Profile</button>
-            <ProfilePage  display_status="profile_display" :userId="userId" @start_match="(param) => $emit('go_to_pong_match', param)"/>
-        </div>
 	</div>
 </template>
 

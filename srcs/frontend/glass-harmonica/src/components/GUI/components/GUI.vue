@@ -1,8 +1,5 @@
 <template>
     <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse" @already_connected="go_to_alredy_connected_page"/>
-    <ATalkWithGod @god_finished_speaking="start_register" v-if="listening_to_god"/>
-    <!-- REGISTER PROFILE PAGE -->
-    <ProfilePage v-if="profile_state == 'registering'" :display_status="profile_state" :auto_image="auto_image" :register_token="register_token" @successful_register="go_to_metaverse"/>
     <div class="overlay" v-if="showing_profile_image">
         <!-- RAYS IN METAVERSE PROFILE PAGE -->
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" @start_match="go_to_pong_match" :unmatchable="true"/>
@@ -71,6 +68,8 @@ export default defineComponent({
   },
   methods: {
     listen_to_god(access: any) {
+      console.log ({auto_image: access.auto_image, register_token:access.register_token})
+      this.$router.push({path: '/register', query: {auto_image: access.auto_image, register_token:access.register_token}})
       this.listening_to_god = true
       this.access = access
     },

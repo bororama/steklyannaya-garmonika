@@ -15,6 +15,10 @@
   color: white;
 }
 
+body {
+  margin: 0;
+}
+
 </style>
 
 <template>

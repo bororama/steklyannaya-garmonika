@@ -125,6 +125,10 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException('User doesn\'t exists');
         }
+        const target = await this.findOne(newUsername);
+        if (target) {
+            throw new BadRequestException('Username taken');
+        }
         user.userName = newUsername;
         await user.save()
     }

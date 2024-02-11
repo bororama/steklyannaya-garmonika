@@ -1,6 +1,6 @@
-export const backend = 'http://c2r15s5:3000'
+export const backend = 'http://localhost:3000'
 
-export const api_42 = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-b16e1d817c759a4768523eda7110974f45570d769c4180e352137a7aeb4a5ee7&redirect_uri=http%3A%2F%2Fc2r15s5%3A5173&response_type=code'
+export const api_42 = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-b16e1d817c759a4768523eda7110974f45570d769c4180e352137a7aeb4a5ee7&redirect_uri=http%3A%2F%2Fc1r8s6.42madrid.com%3A5173&response_type=code'
 
 export function postRequestParams() {
     return ({

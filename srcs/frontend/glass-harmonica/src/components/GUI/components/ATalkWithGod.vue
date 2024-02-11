@@ -20,6 +20,7 @@ export default defineComponent({
   },
   created() {
     this.letGodSpeak()
+    console.log("LETTING SPEAK")
   },
   methods: {
     async letGodSpeak() {
@@ -29,6 +30,7 @@ export default defineComponent({
         await new Promise(f => setTimeout(f, 5000))
       }
       this.text_enabled = false;
+      console.log("EMIT")
       this.$emit('god_finished_speaking')
     }
   }

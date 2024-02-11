@@ -59,11 +59,11 @@ export class UsersController {
     }
 
     @Get('changeUsername/:idOrUsername/:newUsername')
-    changeUsername(@Req() request, @Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : void {
+    async changeUsername(@Req() request, @Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : Promise<void> {
         if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
             throw new UnauthorizedException("Private information");
         }
-        this.usersService.changeUsername(idOrUsername, newUsername)
+        await this.usersService.changeUsername(idOrUsername, newUsername)
     }
 
     @Post(':fortyTwoLogin/sign-in')
@@ -162,6 +162,7 @@ export class UsersController {
         console.log(request.requester_info.dataValues)
         console.log(userId)
         if (!this.checkIfAuthorized(request.requester_info.dataValues, userId)) {
+            console.log("Unauthorized");
             throw new UnauthorizedException("Private information");
         }
         this.usersService.setUserProfilePic(userId, file.path)

@@ -22,6 +22,7 @@ async function bootstrap() {
   };
 
   app.enableCors(corsOptions);
+  app.use(express.json({limit: '50mb'}))
 
   app.use('/src/profile_pics', express.static('/app/src/profile_pics'))
 

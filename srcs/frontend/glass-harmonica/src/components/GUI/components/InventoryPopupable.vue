@@ -1,8 +1,11 @@
 <template>
+<div class="overlay">
 <InventoryGrid  @change_active_description="change_active_description" @go_to_pong_match="(param) => {console.log('GRID'); console.log(param); $emit('go_to_pong_match', param)}" @close_inventory="close_inventory"/>
 <SendMessagePopup :target="message_login" :sender="message_sender" v-if="message_popup" @close="disable_message_popup"/>
 <ViewMessagesPopup :target="message_login" :messages="view_messages" v-if="view_messages_popup" @close="disable_view_messages_popup"/>
 <InformationPopup class="info_popup" :info_text="this.active_description"/>
+<router-view></router-view>
+</div>
 </template>
 
 <script>

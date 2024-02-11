@@ -11,7 +11,7 @@
                 <Username :username="this.username" :editable="display_status == 'registering' || display_status == 'my_profile'" @change_username="changeUsername"/>
                 <div class="float_left">
                     <Enabler2FA v-if="display_status != 'registering' && display_status != 'profile_display'"/>
-                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && !is_friend && !is_potential_friend" @click="befriend">Befriend</button>
+                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && !is_friend && !is_potential_friend" @click="befriend">Sneak Pearl</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked" @click="block">Block</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online' && !unmatchable" @click="match">Match</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online' && !unmatchable" @click="match_boundless">Boundless</button>
@@ -21,6 +21,7 @@
             <h3 v-if="not_enough_pearls">Not enough pearls</h3>
         </div>
     </div>
+    <h3 class="edit_error_field" v-if="already_registered">Username already in use</h3>
     <button class='fa_button' v-if="display_status == 'registering' && can_register" @click="registerUser">Descend to جَيَّان</button>
 
 </template>
@@ -58,7 +59,8 @@ export default defineComponent({
       online_status: 'disconnected',
       matchUserId: '0',
       can_register: false,
-      not_enough_pearls: false
+      not_enough_pearls: false,
+      already_registered: false
     })
   },
   methods: {
@@ -66,32 +68,44 @@ export default defineComponent({
       const myData : any = postRequestParams()
       myData.body = JSON.stringify({
         username: this.username,
-        register_token: this.register_token
+        register_token: this.register_token,
       })
       fetch(backend + '/log/register', myData).then((r) => {
-        r.json().then((registerAnswer) => {
-          if (registerAnswer.status === 'ok') {
-            if (this.image != 'no_image')
-            {
-                const formData = new FormData()
-                formData.append('image', this.image)
-                fetch(backend + '/users/' + this.username + '/uploadProfilePic', {
-                  method: 'POST',
-                  headers: {
-                    Authorization: "Bearer " + registerAnswer.meta_token
-                  },
-                  body: formData
-                })
+        if (r.status == 400) {
+           this.already_registered = true
+        } else {
+          r.json().then((registerAnswer) => {
+            if (registerAnswer.status === 'ok') {
+              globalThis.logToken = registerAnswer.meta_token
+              console.log(globalThis.logToken )
+              if (this.image != 'no_image')
+              {
+                  const formData = new FormData()
+                  console.log(this.image)
+                  formData.append('image', this.image)
+                  let param = postRequestParams()
+                  param.body = formData
+                  param.headers = {
+                      Authorization: 'Bearer ' + globalThis.logToken
+                  }
+                  fetch(backend + '/users/' + this.username  + '/uploadProfilePic', param)
+                  this.$emit('successful_register', registerAnswer.meta_token)
+              } else {
+                  this.$emit('successful_register', registerAnswer.meta_token)
+              }
             }
-            this.$emit('successful_register', registerAnswer.meta_token)
-          }
-        })
+          })
+        }
       })
     },
     changeUsername (newUsername : string) {
       if (this.display_status != 'registering')
       {
-        fetch(backend + '/changeUsername/' + this.username + '/' + newUsername, getRequestParams())
+        fetch(backend + '/changeUsername/' + this.username + '/' + newUsername, getRequestParams()).then((a) => {
+          if (a.status == 400) {
+            this.already_registered = true
+          }
+        })
       }
       this.username = newUsername
     },
@@ -99,16 +113,16 @@ export default defineComponent({
       if (this.display_status != 'registering')
       {
         const formData = new FormData()
-        formData.append('image', new_image)
-        fetch(backend + '/users/' + globalThis.id + '/uploadProfilePic', {
-          method: 'POST',
-          headers: {
-            Authorization: "Bearer " + globalThis.logToken
-          },
-          body: formData,
-        })
-      } else {
         console.log(new_image)
+        formData.append('image', new_image)
+        let param = postRequestParams()
+        param.body = formData
+        param.headers = {
+          Authorization: 'Bearer ' + globalThis.logToken
+        }
+        console.log(param)
+        fetch(backend + '/users/' + globalThis.id + '/uploadProfilePic', param)
+      } else {
         this.image = new_image
       }
     },
@@ -130,18 +144,12 @@ export default defineComponent({
     },
     match () {
       fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
-        console.log("NORMAL")
-        created_match.match_id = created_match.roomId;
-        created_match.boundless = false
-        this.$emit('start_match', created_match)
+        this.$router.push({path: '/pong_match', query:{mode:1, id:created_match.match_id}})
       }))
     },
     match_boundless () {
       fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
-        console.log("BOUNDLESS")
-        created_match.match_id = created_match.roomId;
-        created_match.boundless = true
-        this.$emit('start_match', created_match)
+        this.$router.push({path: '/pong_match', query:{mode:2, id:created_match.match_id}})
       }))
     },
     spectate () {

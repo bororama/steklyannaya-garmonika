@@ -26,6 +26,7 @@ export default defineComponent({
       window.location.href = api_42
     } else if (urlParams.get('code') !== null) {
       const code : any = urlParams.get('code')
+      window.history.replaceState({}, document.title, "/")
       this.try_log(code)
     }
   },

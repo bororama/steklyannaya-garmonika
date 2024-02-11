@@ -154,7 +154,7 @@ export class AuthenticatorController {
         let rval : any = await this.playerService.create(player)
         let answer : RegisterAnswerDto = {
             status:'ok',
-            meta_token: jwt.sign({username: rval.id}, 'TODO the REAL secret')
+            meta_token: jwt.sign({username: rval.dataValues.id}, 'TODO the REAL secret')
         }
         return (answer)
       }
