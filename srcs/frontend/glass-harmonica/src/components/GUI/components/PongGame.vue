@@ -27,9 +27,9 @@ import { FrontendConfig } from "./FrontendConfig";
 export default defineComponent({
   name: "PongGame",
   props: {
-    modo: Number, // Define el prop "modo" que recibirá el componente
+    modo: Number,
     pongRoomId: Number,
-    isGameInProgress: Number, //deprecated
+    isGameInProgress: Number, 
     metaSocket: Socket || undefined,
   },
   data() {
