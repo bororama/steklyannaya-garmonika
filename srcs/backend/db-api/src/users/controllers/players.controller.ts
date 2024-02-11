@@ -1,9 +1,8 @@
 import { BadRequestException, Body, Controller, Get, Param, Post, Delete, ValidationPipe, UnauthorizedException, Req } from "@nestjs/common";
 import { PlayersService } from "../services/players.service";
 import { Player } from "../models/player.model";
-import { NewPlayer } from "../dto/new-player.dto";
 import { PlayerDto } from "../dto/player.dto";
-import { ApiBody, ApiTags } from "@nestjs/swagger";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { BansService } from "../../bans/bans.service";
 import { UpdatePlayerDto } from "../dto/player-update.dto";
 import { LeaderboardPlayerDto } from "../dto/leaderboard-player.dto";
@@ -13,6 +12,7 @@ import { AdminsService } from "src/admins/admins.service";
 import { MatchesService } from "src/matches/matches.service";
 import { User } from "../models/user.model";
 
+@ApiBearerAuth()
 @Controller('players')
 @ApiTags("Player Specific Data")
 export class PlayersController {
