@@ -15,12 +15,13 @@ export class PongService {
   constructor(private matchesService: MatchesService) {}
   private connectionConditions(existingMatch, data: any){
     if (data.pongRoomId === -2){
-      console.log("public match");
+      console.log("public match ", existingMatch, data);
       return(              
         existingMatch.paddles.length === 1 &&
         existingMatch.isGameInProgress !== Constants.MATCH_FAILED &&
         existingMatch.isGameInProgress !== Constants.MATCH_ENDED &&
-        existingMatch.collisionController.mode === data.mode);
+        existingMatch.collisionController.mode === data.mode) &&
+        existingMatch.pongRoomId === -2;
     }
     else{
       console.log("private match");
