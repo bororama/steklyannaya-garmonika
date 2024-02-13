@@ -167,7 +167,6 @@ export default {
   flex-direction: column;
 }
 
-
 .items>div {
   display: flex;
   flex-direction: column;

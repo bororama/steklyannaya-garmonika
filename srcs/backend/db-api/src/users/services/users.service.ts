@@ -331,7 +331,7 @@ export class UsersService {
             user.franciscoins -= quantity;
             await user.save();
             return ('ok');
-        }
+        }   
     }
 
     async addPearls(user: User, quantity: number) : Promise<string> {

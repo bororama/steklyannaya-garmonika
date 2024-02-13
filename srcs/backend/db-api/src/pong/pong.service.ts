@@ -19,12 +19,13 @@ export class PongService {
     ) {}
   private connectionConditions(existingMatch, data: any){
     if (data.pongRoomId === -2){
-      console.log("public match");
+      console.log("public match ", existingMatch, data);
       return(              
         existingMatch.paddles.length === 1 &&
         existingMatch.isGameInProgress !== Constants.MATCH_FAILED &&
         existingMatch.isGameInProgress !== Constants.MATCH_ENDED &&
-        existingMatch.collisionController.mode === data.mode);
+        existingMatch.collisionController.mode === data.mode) &&
+        existingMatch.pongRoomId === -2;
     }
     else{
       console.log("private match");
@@ -136,6 +137,16 @@ export class PongService {
           }
           if (match.paddles.length === 0) {
             const matchIndex = this.matches.indexOf(match);
+            console.log(matchIndex, "MATCHINDEXXXXXX")
+            if (match.isGameInProgress === Constants.MATCH_NOT_IN_PROGRESS){
+              console.log('Game never started. Deleting from DB', match.provisionalRoomId);
+              console.log('This is matchesService info:', this.matchesService)
+              console.log(match);
+              if (match.pongRoomId == -2)
+                this.matchesService.delete(match.provisionalRoomId);
+              else
+              this.matchesService.delete(match.pongRoomId);
+            }
             if (matchIndex !== -1) {
               this.matches.splice(matchIndex, 1);
               console.log('Match removed from matches array.');
