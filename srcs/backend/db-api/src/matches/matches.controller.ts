@@ -82,9 +82,4 @@ export class MatchesController {
     getMatchByRoomId(roomId: number): Promise<MatchAndUsersDto> {
         return this.matchService.getByRoomId(roomId).then(match => new MatchAndUsersDto(match));
     }
-
-    @Delete('/:idOrRoomId')
-    deleteMatch(@Param('idOrRoomId', ParseIntPipe) matchId: number): Promise<void> {
-        return this.matchService.delete(matchId);
-    }
 }

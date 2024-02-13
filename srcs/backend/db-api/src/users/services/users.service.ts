@@ -22,7 +22,9 @@ export class UsersService {
     ) {}
 
     async findAll(): Promise<User[]> {
-        return this.userModel.findAll();
+        return this.userModel.findAll({
+            attributes: { exclude: ['secret2FA', 'has2FA'] }
+        });
     }
 
     async findOne(user: string): Promise<User> {
