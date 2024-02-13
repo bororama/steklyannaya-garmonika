@@ -54,6 +54,8 @@ export default defineComponent({
           if (answer === 'ok') {
             this.not_enabled = false
             this.enabling = true
+            this.enabled = true
+            globalThis.has2FA = true
           } else if (answer === 'ko') {
             this.wrong_code = true
           }
@@ -71,6 +73,7 @@ export default defineComponent({
           if (answer === 'ok') {
             this.not_enabled = true
             this.enabled = false
+            globalThis.has2FA = false
           } else if (answer === 'ko') {
             this.wrong_code = true
           }
