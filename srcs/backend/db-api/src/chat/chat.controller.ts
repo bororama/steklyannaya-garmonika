@@ -303,14 +303,13 @@ This only can be done by an operator'
         return this.chatService.setMuteStatus(id, admin, user, false);
     }
     
-    // TODO: Check if requestes can do this
     @Delete(':id')
     @ApiBody({required: false, type: CreateChatDto})
     @ApiOperation({
         summary: 'Delete a chat room',
-        description: 'This endpoint will delete a chat room. This operation may require a password.'
+        description: 'This endpoint will delete a chat room.'
     })
-    async remove(@Req() request, @Param('id', ParseIntPipe) id: number, @Body() createChatDto?: CreateChatDto): Promise<void> {
+    async remove(@Req() request, @Param('id', ParseIntPipe) id: number): Promise<void> {
         const chat: Chat = await this.chatService.findOne(id);
         if (chat  == null) {
             throw new BadRequestException('Chat doesn\'t exists');
@@ -320,7 +319,6 @@ This only can be done by an operator'
             throw new ForbiddenException('You can\'t remove this chat');
         }
 
-        this.chatService.validatePassword(chat, createChatDto?.password)
         return this.chatService.remove(chat);
     }
 
