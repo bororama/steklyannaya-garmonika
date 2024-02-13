@@ -6,9 +6,10 @@ import { ChatModule } from '../chat/chat.module';
 import { AuthMiddleware } from 'src/middleware/auth-middleware';
 import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
 import { ConnectedMiddleware } from 'src/middleware/connected-middleware';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UsersModule, ChatModule, ],
+  imports: [UsersModule, ChatModule, ConfigModule],
   controllers: [TiendaController],
   providers: [TiendaService]
 })

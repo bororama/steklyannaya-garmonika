@@ -10,9 +10,10 @@ import { Message } from './models/message.model';
 import { AuthMiddleware } from 'src/middleware/auth-middleware';
 import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
 import { ConnectedMiddleware } from 'src/middleware/connected-middleware';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Chat, Message]), ChatUserModule, forwardRef(() => UsersModule)],
+  imports: [SequelizeModule.forFeature([Chat, Message]), ChatUserModule, forwardRef(() => UsersModule), ConfigModule],
   controllers: [ChatController],
   providers: [ChatService, MessageService],
   exports: [ChatService, MessageService]
