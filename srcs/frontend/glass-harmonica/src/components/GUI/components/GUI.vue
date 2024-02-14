@@ -5,28 +5,20 @@
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" @start_match="go_to_pong_match" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
     </div>
-    <PongGame v-if="in_match" :modo="match_mode" :pong-room-id="room_id" @match_finish="close_match" @closeGame="close_game"/>
     <Shop v-if="in_store" @closeShop="closeShop"/>
-    <AlreadyConnected v-if="false"/>
-  	<router-view></router-view>
+    <router-view></router-view>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
-
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import CookieChecker from './CookieChecker.vue'
-import ATalkWithGod from './ATalkWithGod.vue'
-import AlreadyConnected from './AlreadyConnected.vue'
 import Metaverse from '../../Metaverse.vue'
 import MetaOverlay from './MetaOverlay.vue'
 import ProfilePage from './ProfilePage.vue'
-import PongGame from './PongGame.vue'
 import { backend, getRequestParams } from './connect_params.ts'
-import Home from '../../Home.vue'
 import Shop from './Shop.vue'
-import Leaderboard from './Leaderboard.vue'
 import { Socket, io } from "socket.io-client";
 import {getRandomUsername, numberIsInRange} from './metaverse/utils';
 import { useRouter } from 'vue-router';
@@ -36,49 +28,25 @@ export default defineComponent({
   name: 'GUI',
   components: {
     CookieChecker,
-    ATalkWithGod,
-    AlreadyConnected,
     Metaverse,
     MetaOverlay,
     ProfilePage,
-    Home,
     Shop,
-    Leaderboard,
-    PongGame,
    },
   data () {
     return ({
-      profile_state: 'no',
       register_token: '',
       in_store: false,
       in_metaverse: false,
-      in_admin_page: false,
-      log_token: '',
       auto_image: '',
-      listening_to_god: false,
-      access: {register_token: '',
-                auto_image: ''},
       showing_profile_image: false,
       meta_colleague_id: '',
       already_connnected: false,
-      in_match: false,
-      room_id: 0,
-      match_mode: 0,
     })
   },
   methods: {
     listen_to_god(access: any) {
-      console.log ({auto_image: access.auto_image, register_token:access.register_token})
       this.$router.push({path: '/register', query: {auto_image: access.auto_image, register_token:access.register_token}})
-      this.listening_to_god = true
-      this.access = access
-    },
-    start_register () {
-      this.listening_to_god = false
-      this.register_token = this.access.register_token
-      console.log(this.register_token)
-      this.auto_image = this.access.auto_image
-      this.profile_state = 'registering'
     },
     go_to_metaverse (logToken : string) {
       fetch (backend + '/log/me/' + logToken, getRequestParams()).then((a) => {
@@ -89,7 +57,6 @@ export default defineComponent({
           globalThis.is_admin = player.isAdmin
           globalThis.logToken = logToken
           this.in_metaverse = true
-          this.log_token = logToken
         })
       })
     },
@@ -107,20 +74,16 @@ export default defineComponent({
       this.already_connected = true
     },
     go_to_pong_match (match_data) {
-      this.close_inventory()
+    /*  this.close_inventory()
       this.room_id = match_data.match_id
       if (match_data.boundless)
         this.match_mode = 1
       else
-        this.match_mode = 0
-      this.in_match = true
+        this.match_mode = 0*/
     },
     closeShop() {
       this.in_store = false;
     },
-    close_game () {
-      this.in_match = false;
-    }
   }
 })
 </script>

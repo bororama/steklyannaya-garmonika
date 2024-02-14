@@ -16,6 +16,8 @@ import RegisterPage from './components/GUI/components/RegisterPage.vue';
 import PersonalProfile from './components/GUI/components/PersonalProfile.vue';
 import ProfileDisplay from './components/GUI/components/ProfileDisplay.vue';
 import RoutablePong from './components/GUI/components/RoutablePong.vue';
+import { guard_against_not_logged } from './navigation_guards/is_logged.ts';
+import { guard_against_non_admins } from './navigation_guards/is_admin.ts';
 
 
 declare global {
@@ -35,32 +37,38 @@ const routes = [
 		children : [{
 			path: 'help',
 			name: 'help',
-			component : PongInstructions
+			component : PongInstructions,
+            beforeEnter: [guard_against_not_logged]
 		  },
           {
             path: 'profile_page',
             name: 'MyProfile',
-            component: PersonalProfile
+            component: PersonalProfile,
+            beforeEnter: [guard_against_not_logged]
           },
           {
             path: 'admin_page',
             name: 'AdminPage',
-            component: AdminPage
+            component: AdminPage,
+            beforeEnter: [guard_against_not_logged, guard_against_non_admins]
           },
           {
             path: 'leaderboard',
             name: 'Leaderboard',
-            component: Leaderboard
+            component: Leaderboard,
+            beforeEnter: [guard_against_not_logged]
           },
           {
             path: 'pong_match',
             name: 'RoutablePong',
-            component: RoutablePong
+            component: RoutablePong,
+            beforeEnter: [guard_against_not_logged]
           },
           {
             path: 'inventory',
             name: 'inventory',
             component: InventoryPopupable,
+            beforeEnter: [guard_against_not_logged],
             children: [{ 
                 path: 'pearl_close_up',
                 name: 'PearlCloseUpInventory',

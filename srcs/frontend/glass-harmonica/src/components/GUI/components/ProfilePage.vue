@@ -64,6 +64,20 @@ export default defineComponent({
     })
   },
   methods: {
+    async upload_and_emit(registerAnswer) {
+      console.log({tut: "Hola", yup: "Adios"})
+       const param = postRequestParams()
+       const formData = new FormData()
+       await formData.append('image', this.image)
+       globalThis.logToken = registerAnswer.meta_token
+       param.body = formData
+       param.headers = {
+           Authorization: 'Bearer ' + globalThis.logToken
+       }
+       console.log(param)
+       await fetch(backend + '/users/' + this.username  + '/uploadProfilePic', param)
+       this.$emit('successful_register', registerAnswer.meta_token)
+    },
     registerUser () {
       const myData : any = postRequestParams()
       myData.body = JSON.stringify({
@@ -77,19 +91,9 @@ export default defineComponent({
           r.json().then((registerAnswer) => {
             if (registerAnswer.status === 'ok') {
               globalThis.logToken = registerAnswer.meta_token
-              console.log(globalThis.logToken )
               if (this.image != 'no_image')
               {
-                  const formData = new FormData()
-                  console.log(this.image)
-                  formData.append('image', this.image)
-                  let param = postRequestParams()
-                  param.body = formData
-                  param.headers = {
-                      Authorization: 'Bearer ' + globalThis.logToken
-                  }
-                  fetch(backend + '/users/' + this.username  + '/uploadProfilePic', param)
-                  this.$emit('successful_register', registerAnswer.meta_token)
+                 this.upload_and_emit(registerAnswer);
               } else {
                   this.$emit('successful_register', registerAnswer.meta_token)
               }
@@ -108,6 +112,7 @@ export default defineComponent({
         })
       }
       this.username = newUsername
+      let param = postRequestParams()
     },
     changeImage(new_image:string) {
       if (this.display_status != 'registering')

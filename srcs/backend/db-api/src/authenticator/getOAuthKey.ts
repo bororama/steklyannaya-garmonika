@@ -16,7 +16,7 @@ export const getOAuthKey = async(code) => {
       fa_token: '',
       auto_image: ''
     }
-	const accessToken = await axios.post(tokenHost, 'grant_type=authorization_code'+'&client_id='+id+'&client_secret='+secret+'&code='+code+'&redirect_uri='+'http://c1r8s6.42madrid.com:5173'
+	const accessToken = await axios.post(tokenHost, 'grant_type=authorization_code'+'&client_id='+id+'&client_secret='+secret+'&code='+code+'&redirect_uri='+'http://c1r13s2.42madrid.com:5173'
 	).then((res) => {
         rvalue.status = 'ok'
         rvalue.token = res.data.access_token
