@@ -34,7 +34,7 @@ import ProfileImage from './ProfileImage.vue'
 import Username from './Username.vue'
 import MatchHistory from './MatchHistory.vue'
 import Enabler2FA from './Enabler2FA.vue'
-import { backend, postRequestParams, getRequestParams } from './connect_params'
+import { postRequestParams, getRequestParams } from './connect_params'
 
 export default defineComponent({
   name: 'ProfilePage',
@@ -105,7 +105,7 @@ export default defineComponent({
     changeUsername (newUsername : string) {
       if (this.display_status != 'registering')
       {
-        fetch(backend + '/changeUsername/' + this.username + '/' + newUsername, getRequestParams()).then((a) => {
+        fetch(backend + '/changeUsername/' + this.username + '/' + newUsername, postRequestParams()).then((a) => {
           if (a.status == 400) {
             this.already_registered = true
           }
@@ -132,7 +132,7 @@ export default defineComponent({
       }
     },
     befriend () {
-      fetch (backend + '/players/' + globalThis.id + '/giftPearlTo/' + this.userId, postRequestParams()).then((r) => {
+      fetch (globalThis.backend + '/players/' + globalThis.id + '/giftPearlTo/' + this.userId, postRequestParams()).then((r) => {
         r.text().then((a) => {
           if (a === 'not_enough_pearls') {
             this.not_enough_pearls = true
@@ -143,7 +143,7 @@ export default defineComponent({
       })
     },
     block() {
-      fetch (backend + '/' + globalThis.id + '/blocks/' + this.userId, postRequestParams()).then((r) => {
+      fetch (globalThis.backend + '/' + globalThis.id + '/blocks/' + this.userId, postRequestParams()).then((r) => {
         this.is_blocked = true
       })
     },
@@ -175,7 +175,7 @@ export default defineComponent({
     if (globalThis.logToken != undefined && this.userId === undefined)
     {
       const myData : any = getRequestParams()
-      fetch(backend + '/log/me/' + globalThis.logToken, myData).then((a) => {
+      fetch(globalThis.backend + '/log/me/' + globalThis.logToken, myData).then((a) => {
         a.json().then((player) => {
           globalThis.id = player.id
           globalThis.my_data = player
@@ -189,17 +189,17 @@ export default defineComponent({
     } else if (this.userId !== undefined) {
       const myData : any = getRequestParams()
       this.matchUserId = this.userId
-      fetch (backend + '/players/' + this.userId, myData).then((a) => {
+      fetch (globalThis.backend + '/players/' + this.userId, myData).then((a) => {
         a.json().then((player) => {
           this.player_data = player
           this.username = player.name
           this.is_friend = false
-          fetch (backend + '/players/' + globalThis.id + '/isFriend/' + this.userId, getRequestParams()).then((a) => {a.text().then((isFriend) => {
+          fetch (globalThis.backend + '/players/' + globalThis.id + '/isFriend/' + this.userId, getRequestParams()).then((a) => {a.text().then((isFriend) => {
                 if (isFriend == 'yes')
                   this.is_friend = true
             })
           })
-          fetch (backend + '/players/' + globalThis.id + '/getFrienshipRequests', getRequestParams()).then((a) => {
+          fetch (globalThis.backend + '/players/' + globalThis.id + '/getFrienshipRequests', getRequestParams()).then((a) => {
             a.json().then((pfriends) => {
               for (const f in pfriends) {
                 if (pfriends[f].id == this.userId || pfriends[f].name == this.userId)

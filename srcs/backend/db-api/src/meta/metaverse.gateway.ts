@@ -12,12 +12,17 @@ import { Logger } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
 import { ServerToClientEvents, ClientToServerEvents, Message, Player, LiveClient, User } from "./shared/meta.interface"
 import { UsersService } from '../users/services/users.service';
+import { ConfigService } from '@nestjs/config';
 
 const liveClients : Array<LiveClient> = Array();
+const host: string = new ConfigService().get('HOST').toLowerCase();
 
-@WebSocketGateway(777,{
+@WebSocketGateway(777, {
   cors: {
-    origin: '*',
+    'origin': ['http://' + host + ':5173', 'http://localhost:5173'],
+    'methods': 'GET,POST,DELETE',
+    'preflightContinue': false,
+    'credentials': false,
   },
 })
 

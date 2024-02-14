@@ -15,7 +15,7 @@ import { onMounted } from "@vue/runtime-core";
 const haiku = ref('');
 
 onMounted( async () => {
-    const response = await fetch (`http://c2r15s5:3000/meta/haiku`, {
+    const response = await fetch (`http://${process.env.HOST}:3000/meta/haiku`, {
         method : "GET",
     });
     haiku.value = await response.text();

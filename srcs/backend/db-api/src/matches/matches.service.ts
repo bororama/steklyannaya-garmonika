@@ -200,10 +200,14 @@ export class MatchesService {
             ]
         });
 
+        
         match.player1.user.status = UserStatus.online;
         await match.player1.user.save();
-        match.player2.user.status = UserStatus.online;
-        await match.player2.user.save();
+        if (match.player2 != null){
+            match.player2.user.status = UserStatus.online;
+            await match.player2.user.save();            
+        }
+
 
         return match.destroy().then();
     }

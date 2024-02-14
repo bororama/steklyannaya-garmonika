@@ -36,7 +36,7 @@
 
 <script>
 
-import { backend, getRequestParams } from './connect_params'
+import { getRequestParams } from './connect_params'
 
 export default {
   name: "Leaderboard",
@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     getLeaderboard() {
-      fetch(backend + '/players/leaderboard', getRequestParams()).then((answer) => {
+      fetch(globalThis.backend + '/players/leaderboard', getRequestParams()).then((answer) => {
       answer.text().then((data) => {
         const obj = JSON.parse(data);
         this.leaderboard = obj;

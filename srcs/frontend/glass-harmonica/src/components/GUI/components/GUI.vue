@@ -49,7 +49,7 @@ export default defineComponent({
       this.$router.push({path: '/register', query: {auto_image: access.auto_image, register_token:access.register_token}})
     },
     go_to_metaverse (logToken : string) {
-      fetch (backend + '/log/me/' + logToken, getRequestParams()).then((a) => {
+      fetch (globalThis.backend + '/log/me/' + logToken, getRequestParams()).then((a) => {
         a.json().then((player) => {
           globalThis.id = player.id
           globalThis.my_data = player

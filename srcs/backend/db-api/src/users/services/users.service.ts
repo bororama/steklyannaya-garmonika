@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from '../models/user.model';
 import { NewUser } from '../dto/new-user.dto';
@@ -22,7 +22,9 @@ export class UsersService {
     ) {}
 
     async findAll(): Promise<User[]> {
-        return this.userModel.findAll();
+        return this.userModel.findAll({
+            attributes: { exclude: ['secret2FA', 'has2FA'] }
+        });
     }
 
     async findOne(user: string): Promise<User> {
@@ -129,8 +131,31 @@ export class UsersService {
         if (target) {
             throw new BadRequestException('Username taken');
         }
+
+        if (user.userName == newUsername)
+        {
+            throw new BadRequestException('User already use this Name');
+        }
+
         user.userName = newUsername;
-        await user.save()
+        try {
+            await user.save();
+        }
+        catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                error.errors.forEach((validationError) => {
+                if (validationError.type == 'unique violation') {
+                    throw new BadRequestException("This User Name is already in use");
+                } else {
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
+                }
+                });
+            } else {
+                Logger.warn('Error:', error);
+                throw new BadRequestException("There was an error");
+            }
+        }
     }
 
     async set2FA(userId: string, status: boolean): Promise<void> {
@@ -201,11 +226,12 @@ export class UsersService {
                 if (validationError.type == 'unique violation') {
                     throw new BadRequestException("User is already blocked");
                 } else {
-                    throw new BadRequestException('Other validation error:', validationError.message);
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
                 }
                 });
             } else {
-                console.error('Error:', error);
+                Logger.warn('Error:', error);
                 throw new BadRequestException("There was an error");
             }
         }
@@ -311,7 +337,7 @@ export class UsersService {
             user.franciscoins -= quantity;
             await user.save();
             return ('ok');
-        }
+        }   
     }
 
     async addPearls(user: User, quantity: number) : Promise<string> {

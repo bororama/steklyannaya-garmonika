@@ -21,7 +21,7 @@
   
   <script>
   
-  import { backend, getRequestParams } from './connect_params'
+  import { getRequestParams } from './connect_params'
   
   export default {
     name: "PongInstructions"

@@ -14,7 +14,7 @@
 
 <script>
 
-import { backend, getRequestParams } from './connect_params'
+import { getRequestParams } from './connect_params'
 export default {
 	name: "ViewMessagesPopup",
 	props: ['chatId', 'user'],
@@ -36,7 +36,7 @@ export default {
 		},
 		getMessages() {
           console.log(this.chatId, this.user)
-          fetch (backend + '/chats/' +  this.chatId + '/getMessages/' + this.user, getRequestParams()).then((a) => {
+          fetch (globalThis.backend + '/chats/' +  this.chatId + '/getMessages/' + this.user, getRequestParams()).then((a) => {
             a.json().then((messages) => {
                for (const m in messages) {
                  this.messages.push(messages[m].message)

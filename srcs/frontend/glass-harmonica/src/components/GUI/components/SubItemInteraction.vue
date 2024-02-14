@@ -21,7 +21,7 @@ import ProfilePage from './ProfilePage.vue'
 import AddMemberPopup from './AddMemberPopup.vue'
 import BanTimeUserPopup from './BanTimeUserPopup.vue'
 
-import {backend, postRequestParams, getRequestParams} from './connect_params.ts' 
+import {postRequestParams, getRequestParams} from './connect_params.ts' 
 
 export default {
 	name: 'SubItemInteraction',
@@ -81,7 +81,7 @@ export default {
         getUsersInChat(id) {
           if (this.item.item_type == "rosary")
           {
-            fetch(backend+ "/chats/"+ id +"/users", getRequestParams()).then((response) => {
+            fetch(globalThis.backend+ "/chats/"+ id +"/users", getRequestParams()).then((response) => {
                 response.json().then( (r) => {
                   this.users_in_chat = r;
                 });

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import { Injectable, BadRequestException, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Ban } from "./ban.model";
 import { Player } from "../users/models/player.model";
@@ -46,11 +46,12 @@ export class BansService {
                 if (validationError.type == 'unique violation') {
                     throw new BadRequestException("User is already banned");
                 } else {
-                    throw new BadRequestException('Other validation error:', validationError.message);
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
                 }
                 });
             } else {
-                console.error('Error:', error);
+                Logger.warn('Error:', error);
                 throw new BadRequestException("There was an error");
             }
         }

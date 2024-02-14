@@ -1,6 +1,6 @@
-import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req, UnauthorizedException } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors, Req, UnauthorizedException, Logger, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from "@nestjs/common";
 import { UsersService } from "../services/users.service";
-import { ApiOperation, ApiTags, ApiBody } from "@nestjs/swagger";
+import { ApiOperation, ApiTags, ApiBody, ApiBearerAuth } from "@nestjs/swagger";
 import { ChatDto } from "../../chat/dto/chat.dto";
 import { User } from "../models/user.model";
 import { PublicUserDto } from "../dto/public-user.dto";
@@ -8,6 +8,7 @@ import { UserDto } from "../dto/user.dto";
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiBearerAuth()
 @Controller()
 @ApiTags("User General Data")
 export class UsersController {
@@ -58,12 +59,12 @@ export class UsersController {
         return this.usersService.getUserChats(idOrUsername);
     }
 
-    @Get('changeUsername/:idOrUsername/:newUsername')
-    async changeUsername(@Req() request, @Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : Promise<void> {
+    @Post('changeUsername/:idOrUsername/:newUsername')
+    changeUsername(@Req() request, @Param('idOrUsername') idOrUsername : string, @Param('newUsername') newUsername : string) : Promise<void> {
         if (!this.checkIfAuthorized(request.requester_info.dataValues, idOrUsername)) {
             throw new UnauthorizedException("Private information");
         }
-        await this.usersService.changeUsername(idOrUsername, newUsername)
+        return this.usersService.changeUsername(idOrUsername, newUsername)
     }
 
     @Post(':fortyTwoLogin/sign-in')
@@ -158,9 +159,17 @@ export class UsersController {
         }
       })
     }))
-    async uploadProfilePic(@Req() request, @UploadedFile() file, @Param('idOrUsername') userId : string) {
-        console.log(request.requester_info.dataValues)
-        console.log(userId)
+    async uploadProfilePic(
+        @Req() request,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new FileTypeValidator({ fileType: ".(png|jpeg|jpg)" })
+                ]
+            })
+        ) file,
+        @Param('idOrUsername') userId : string) {
+		Logger.debug("Upload Profile Pic endpoint called");
         if (!this.checkIfAuthorized(request.requester_info.dataValues, userId)) {
             console.log("Unauthorized");
             throw new UnauthorizedException("Private information");

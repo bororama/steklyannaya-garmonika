@@ -1,7 +1,7 @@
 <template>
 
 <div class="overlay">
-  <h1>ADMIN PAGE</h1>
+  <h1 style="font-family: 'joystix'">ADMIN PAGE</h1>
 
   <div class="admin_page_columns_container">
       <div class="admin_page_column" id="user_ban">
@@ -21,7 +21,7 @@
 import { defineComponent } from 'vue'
 import User from './User.vue'
 import Channel from './Channel.vue'
-import {backend, getRequestParams} from './connect_params'
+import {getRequestParams} from './connect_params'
 
 export default defineComponent({
   name: 'AdminPage',
@@ -36,11 +36,11 @@ export default defineComponent({
     }
   },
   created() {
-    fetch(backend + '/players', getRequestParams()).then((a) => {
+    fetch(globalThis.backend + '/players', getRequestParams()).then((a) => {
       a.json().then((users) => {
         for (const user in users) {
           let u = users[user]
-          fetch (backend + '/players/' + u.id + '/banned').then((a) => {
+          fetch (globalThis.backend + '/players/' + u.id + '/banned').then((a) => {
             a.text().then((isBanned) => {
                 this.users.push(u)
             })
@@ -49,7 +49,7 @@ export default defineComponent({
         this.users.splice(0, 1)
       })
     })
-    fetch(backend + '/admins/getChatsAndMembers', getRequestParams()).then((a) => {
+    fetch(globalThis.backend + '/admins/getChatsAndMembers', getRequestParams()).then((a) => {
       a.json().then((chats) => {
         for (const chat in chats) {
           let c = chats[chat]
@@ -68,6 +68,7 @@ export default defineComponent({
 .admin_page_column {
   display: flex;
   flex-direction:column;
+  align-items: center;
   margin: 0 5%;
 }
 
@@ -77,6 +78,7 @@ export default defineComponent({
 
 .admin_page_columns_container {
   display: flex;
+  font-family: 'joystix';
 }
 
 </style>

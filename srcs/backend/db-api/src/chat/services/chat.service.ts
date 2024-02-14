@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Chat } from '../models/chat.model';
@@ -195,11 +195,12 @@ export class ChatService {
                 if (validationError.type == 'unique violation') {
                     throw new BadRequestException("User is alredy on this chat");
                 } else {
-                    throw new BadRequestException('Other validation error:', validationError.message);
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
                 }
                 });
             } else {
-                console.error('Error:', error);
+                Logger.warn('Error:', error);
                 throw new BadRequestException("There was an error");
             }
         }
@@ -290,6 +291,36 @@ export class ChatService {
         }
 
         return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
+    }
+
+    async isAdminId(userId: number, chatId:number): Promise<boolean> {
+        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
+            where: {
+                userId: userId,
+                chatId: chatId,
+            },
+        });
+        if (!userChatRelation)
+        {
+            throw new BadRequestException('Requester doesn\'t belong to chat');
+        }
+
+        return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
+    }
+
+    async isOwnerId(userId: number, chatId:number): Promise<boolean> {
+        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
+            where: {
+                userId: userId,
+                chatId: chatId,
+            },
+        });
+        if (!userChatRelation)
+        {
+            throw new BadRequestException('Requester doesn\'t belong to chat');
+        }
+
+        return (userChatRelation.isOwner);
     }
 
     async changePrivileges(id: number, chatAdmin: string, user: string, admin: boolean): Promise<void> {
@@ -717,6 +748,16 @@ export class ChatService {
 
         chatUserRelation.chatLocked = false;
         return chatUserRelation.save().then();
+    }
+
+    async isChatLocked(chat: Chat, user: User): Promise<boolean> {
+        const userChatRelation = await this.chatUserModel.findOne({
+            where: {
+                chatId: chat.id,
+                userId: user.id
+            }
+        });
+        return !userChatRelation || userChatRelation?.chatLocked;
     }
 
 }

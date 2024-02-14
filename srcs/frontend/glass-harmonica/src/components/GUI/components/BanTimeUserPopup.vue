@@ -13,7 +13,7 @@
 
 <script lang="ts">
 
-import {backend, getRequestParams, postRequestParams} from './connect_params.ts'
+import {getRequestParams, postRequestParams} from './connect_params.ts'
 
 export default {
   name: 'BanTimeUser',
@@ -30,7 +30,7 @@ export default {
       param.body = JSON.stringify({
         "time": this.minutes
       })
-      fetch (backend + '/chats/' + this.chat_id + '/admins/' + globalThis.id + '/ban/' + this.candidate, param).then((a) => {
+      fetch (globalThis.backend + '/chats/' + this.chat_id + '/admins/' + globalThis.id + '/ban/' + this.candidate, param).then((a) => {
         console.log(a)
       })
     },

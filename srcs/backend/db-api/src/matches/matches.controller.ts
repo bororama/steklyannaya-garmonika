@@ -4,10 +4,11 @@ import { MatchesService } from './matches.service';
 import { MatchAndUsersDto } from './dtos/matchWithUsers.dto';
 import { EndMatchDto } from './dtos/endMatch.dto';
 import { MatchPlayersDto } from './dtos/matchPlayers.dto';
-import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { MatchDto } from './dtos/match.dto';
 import { MatchPointsDto } from './dtos/matchPoints.dto';
 
+@ApiBearerAuth()
 @Controller('matches')
 @ApiTags("Matches")
 export class MatchesController {
@@ -79,12 +80,7 @@ export class MatchesController {
     }
 
     @Get('/room/:roomId')
-    getMatchByRoomId(roomId: number): Promise<MatchAndUsersDto> {
+    getMatchByRoomId(@Param('roomId', new ParseIntPipe()) roomId: number): Promise<MatchAndUsersDto> {
         return this.matchService.getByRoomId(roomId).then(match => new MatchAndUsersDto(match));
-    }
-
-    @Delete('/:idOrRoomId')
-    deleteMatch(@Param('idOrRoomId', ParseIntPipe) matchId: number): Promise<void> {
-        return this.matchService.delete(matchId);
     }
 }

@@ -34,7 +34,7 @@ import { useRouter } from 'vue-router';
 
 
 //const router = useRouter();
-
+console.log("http://" + process.env.HOST + ":3000");
 
 
 </script>

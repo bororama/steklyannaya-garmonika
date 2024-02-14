@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { api_42, backend, getRequestParams, postRequestParams } from './connect_params'
+import { getRequestParams, postRequestParams } from './connect_params'
 
 export default defineComponent({
   name: 'CookieChecker',
@@ -17,13 +17,18 @@ export default defineComponent({
       needs2fa: false,
       code2fa: '',
       fa_token: '1234',
-      wrong_code: false
+      wrong_code: false,
+      api_42: 'https://api.intra.42.fr/oauth/authorize?client_id='
+                + process.env.UID
+                + '&redirect_uri=http%3A%2F%2F'
+                + process.env.HOST
+                + '%3A5173&response_type=code',
     })
   },
   created () {
     const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.get('code') === null) {
-      window.location.href = api_42
+      window.location.href = this.api_42
     } else if (urlParams.get('code') !== null) {
       const code : any = urlParams.get('code')
       window.history.replaceState({}, document.title, "/")
@@ -37,7 +42,7 @@ export default defineComponent({
         fa_token: this.fa_token,
         code: this.code2fa,
       })
-      fetch(backend + '/log/with_fa', myData).then((r) => {
+      fetch(globalThis.backend + '/log/with_fa', myData).then((r) => {
         r.json().then((answer) => {
           if (answer.status === 'ok') {
             globalThis.logToken = answer.token
@@ -53,7 +58,7 @@ export default defineComponent({
       })
     },
     try_log (code:string) {
-      fetch(backend + '/log/code/' + code, getRequestParams()).then((r) => {
+      fetch(globalThis.backend + '/log/code/' + code, getRequestParams()).then((r) => {
         r.json().then((access) => {
           if (access.status === 'ko') {
             window.location.href = 'api_42'

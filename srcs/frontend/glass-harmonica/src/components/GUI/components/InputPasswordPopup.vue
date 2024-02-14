@@ -12,7 +12,7 @@
 
 <script>
 
-import {backend, postRequestParams } from './connect_params.ts'
+import { postRequestParams } from './connect_params.ts'
 export default {
 	props: ['chat_id'],
 	data: () => ({

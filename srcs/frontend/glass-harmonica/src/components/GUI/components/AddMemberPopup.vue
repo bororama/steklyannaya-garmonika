@@ -9,7 +9,7 @@
 
 <script lang="ts">
 
-import {backend, getRequestParams, postRequestParams} from './connect_params.ts'
+import {getRequestParams, postRequestParams} from './connect_params.ts'
 
 export default {
   name: 'AddMemberPopup',
@@ -22,7 +22,7 @@ export default {
   },
   methods: {
     link_soul () {
-      fetch (backend + '/chats/' + this.chat_id + '/join/' + this.candidate, postRequestParams()).then((a) => {
+      fetch (globalThis.backend + '/chats/' + this.chat_id + '/join/' + this.candidate, postRequestParams()).then((a) => {
         if (a.status ==  400)
           this.user_does_not_exist = true
         else

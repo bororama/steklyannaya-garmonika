@@ -14,7 +14,7 @@
 <script lang="ts">
 
 import { defineComponent } from 'vue'
-import { backend, postRequestParams, deleteRequestParams} from './connect_params'
+import {postRequestParams, deleteRequestParams} from './connect_params'
 
 export default defineComponent({
   name: 'UserChannel',
@@ -27,15 +27,15 @@ export default defineComponent({
   },
   methods: {
     make_admin () {
-      fetch (backend + '/admins/chatOptions/' + this.chatId + '/raiseToAdmin/' + this.user.id, postRequestParams())
+      fetch (globalThis.backend + '/admins/chatOptions/' + this.chatId + '/raiseToAdmin/' + this.user.id, postRequestParams())
       this.admin = true
     },
     demote_admin () {
-      fetch (backend + '/admins/chatOptions/' + this.chatId + '/revokeAdmin/' + this.user.id, postRequestParams())
+      fetch (globalThis.backend + '/admins/chatOptions/' + this.chatId + '/revokeAdmin/' + this.user.id, postRequestParams())
       this.admin = false
     },
     kick_user () {
-      fetch (backend + '/chats/' + this.user.id + '/' + this.chatId, deleteRequestParams())
+      fetch (globalThis.backend + '/chats/' + this.user.id + '/' + this.chatId, deleteRequestParams())
       this.kicked = true
     }
   }

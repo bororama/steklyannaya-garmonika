@@ -5,7 +5,7 @@
 <script>
 import { defineComponent } from 'vue'
 import pearl from '../assets/perla.png'
-import {backend, getRequestParams} from './connect_params'
+import {getRequestParams} from './connect_params'
 
 export default defineComponent({
   name: 'StatusPearl',
@@ -18,7 +18,7 @@ export default defineComponent({
   },
   methods: {
     getStatus () {
-      fetch(backend + '/players/' + this.username, getRequestParams()).then((a) => {
+      fetch(globalThis.backend + '/players/' + this.username, getRequestParams()).then((a) => {
         a.json().then((answer) => {
           if (answer.status == 'online')
             this.online_status = 'online'

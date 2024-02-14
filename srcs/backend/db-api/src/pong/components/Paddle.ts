@@ -26,7 +26,7 @@ export class Paddle implements GameElement {
     this.sizex = sizex;
     this.sizey = sizey;
     this.direction = 999;
-    this.playerId = playerId; //ELCURRO
+    this.playerId = playerId;
   }
 
   update(config: BackendConfig) {

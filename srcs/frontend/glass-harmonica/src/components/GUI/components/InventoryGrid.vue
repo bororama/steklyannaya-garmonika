@@ -18,7 +18,7 @@ import generate_rosary from '../generate_rosary.js'
 import generate_rose from '../generate_rose.ts'
 import generate_padlock from '../generate_padlock.js'
 import break_pearl from '../break_pearl.js'
-import { backend, getRequestParams, postRequestParams } from './connect_params'
+import { getRequestParams, postRequestParams } from './connect_params'
 
 export default {
 	name: "InventoryGrid",

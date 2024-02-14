@@ -1,9 +1,9 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Logger } from "@nestjs/common";
 import { AdminsService } from "./admins.service";
 import { Admin } from "./admin.model";
 import { UserDto } from "../users/dto/user.dto";
 import { NewUser } from "../users/dto/new-user.dto";
-import { ApiTags, ApiBody } from "@nestjs/swagger";
+import { ApiTags, ApiBody, ApiBearerAuth } from "@nestjs/swagger";
 import { BansService } from "../bans/bans.service";
 import { PlayersService } from "../users/services/players.service";
 import { PlayerBanStatusDto } from "../users/dto/player-banstatus.dto";
@@ -15,6 +15,7 @@ import { ChatWithUsernamesDto } from "../chat/dto/chat-usernames.dto";
 import { PublicUserDto } from "../users/dto/public-user.dto";
 import { MetaverseGateway } from "src/meta/metaverse.gateway";
 
+@ApiBearerAuth()
 @Controller('admins')
 @ApiTags('Admins')
 export class AdminsController {
@@ -44,11 +45,12 @@ export class AdminsController {
                 if (validationError.type == 'unique violation') {
                     throw new BadRequestException("User is already an admin");
                 } else {
-                    throw new BadRequestException('Other validation error:', validationError.message);
+                    Logger.warn(`${validationError.type}: ${validationError.message}`);
+                    throw new BadRequestException("There was an error");
                 }
                 });
             } else {
-                console.error('Error:', error);
+                Logger.warn('Error:', error);
                 throw new BadRequestException("There was an error");
             }
         }
@@ -178,6 +180,16 @@ export class AdminsController {
             throw new BadRequestException("Chat doesn't exist");
         }
         return this.chatService.changeMuteStatus(chat, user, false);
+    }
+
+    @Post('/chatOptions/:chatId/kick/:usernameOrId')
+    async kickUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
+        const chat = await this.chatService.findOne(id);
+        if (!chat) {
+            throw new BadRequestException("Chat doesn't exist");
+        }
+
+        return this.chatService.leave(user, chat.id);
     }
 
     // This must be the last function declared in the controller.

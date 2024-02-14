@@ -27,6 +27,7 @@ declare global {
   var has2FA : boolean
   var my_data : any
   var is_admin : boolean;
+  var backend : string;
 }
 
 const routes = [
@@ -106,8 +107,8 @@ const router = createRouter(
 	}
 );
 
-globalThis.has2FA = false
-
+globalThis.has2FA = false;
+globalThis.backend = 'http://' + process.env.HOST + ':3000';
 
 const app = createApp(App);
 
