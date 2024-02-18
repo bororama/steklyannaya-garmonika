@@ -262,7 +262,7 @@ export class ChatService {
             }
         })
         if (!relation) {
-            throw new BadRequestException('User doesn\'t belong to this chat');
+            throw new ForbiddenException('User doesn\'t belong to this chat');
         }
 
         if (chat.users.length == 1 || relation.isOwner) {
@@ -287,7 +287,7 @@ export class ChatService {
         });
         if (!userChatRelation)
         {
-            throw new BadRequestException('Requester doesn\'t belong to chat');
+            throw new ForbiddenException('Requester doesn\'t belong to chat');
         }
 
         return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
@@ -302,7 +302,7 @@ export class ChatService {
         });
         if (!userChatRelation)
         {
-            throw new BadRequestException('Requester doesn\'t belong to chat');
+            throw new ForbiddenException('Requester doesn\'t belong to chat');
         }
 
         return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
@@ -317,7 +317,7 @@ export class ChatService {
         });
         if (!userChatRelation)
         {
-            throw new BadRequestException('Requester doesn\'t belong to chat');
+            throw new ForbiddenException('Requester doesn\'t belong to chat');
         }
 
         return (userChatRelation.isOwner);
@@ -647,7 +647,7 @@ export class ChatService {
 
         if (!chatRelation)
         {
-            throw new BadRequestException('User doesn\'t belong to that chat');
+            throw new ForbiddenException('User doesn\'t belong to that chat');
         }
 
         if (chatRelation.chatLocked) {
@@ -667,10 +667,6 @@ export class ChatService {
             throw new BadRequestException('User doesn\'t exist');
         }
 
-        if (await this.isBannedId(chat.id, user.id)) {
-            throw new ForbiddenException('User is banned from this chat');
-        }
-
         const chatRelation = await this.chatUserModel.findOne({
             where: {
                 userId: user.id,
@@ -680,11 +676,21 @@ export class ChatService {
 
         if (!chatRelation)
         {
-            throw new BadRequestException('User doesn\'t belong to that chat');
+            throw new ForbiddenException('User doesn\'t belong to that chat');
+        }
+
+        if (await this.isBannedId(chat.id, user.id))
+        {
+            throw new ForbiddenException('User is banned from this chat');
+        }
+
+        if (chatRelation.isMuted)
+        {
+            throw new ForbiddenException('User is muted in this chat');
         }
 
         if (chatRelation.chatLocked) {
-            throw new BadRequestException('Chat is locked for this user. Unlock it to be able to send messages.');
+            throw new ForbiddenException('Chat is locked for this user. Unlock it to be able to send messages.');
         }
 
         return this.messageService.sendMessage(user, chat, message);
@@ -708,7 +714,7 @@ export class ChatService {
         });
 
         if (!chatUserRelation) {
-            throw new BadRequestException('User doesn\'t belong to this chat');
+            throw new ForbiddenException('User doesn\'t belong to this chat');
         }
 
         if (chatUserRelation.isOwner || chatUserRelation.isAdmin) {
@@ -737,7 +743,7 @@ export class ChatService {
         });
 
         if (!chatUserRelation) {
-            throw new BadRequestException('User doesn\'t belong to this chat');
+            throw new ForbiddenException('User doesn\'t belong to this chat');
         }
 
         if (chatUserRelation.isOwner || chatUserRelation.isAdmin) {
@@ -759,5 +765,4 @@ export class ChatService {
         });
         return !userChatRelation || userChatRelation?.chatLocked;
     }
-
 }

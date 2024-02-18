@@ -8,8 +8,8 @@ import { UpdatePlayerDto } from "../dto/player-update.dto";
 import { LeaderboardPlayerDto } from "../dto/leaderboard-player.dto";
 import { FriendshipDto } from "../dto/friendship.dto";
 import { PublicPlayerDto } from "../dto/public-player.dto";
-import { AdminsService } from "src/admins/admins.service";
-import { MatchesService } from "src/matches/matches.service";
+import { AdminsService } from "../../admins/admins.service";
+import { MatchesService } from "../../matches/matches.service";
 import { User } from "../models/user.model";
 
 @ApiBearerAuth()

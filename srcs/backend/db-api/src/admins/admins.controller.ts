@@ -13,7 +13,7 @@ import { ChatService } from "../chat/services/chat.service";
 import { ChatUserDto } from "../users/dto/chat-user.dto";
 import { ChatWithUsernamesDto } from "../chat/dto/chat-usernames.dto";
 import { PublicUserDto } from "../users/dto/public-user.dto";
-import { MetaverseGateway } from "src/meta/metaverse.gateway";
+import { MetaverseGateway } from "../meta/metaverse.gateway";
 
 @ApiBearerAuth()
 @Controller('admins')

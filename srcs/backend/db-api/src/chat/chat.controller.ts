@@ -8,7 +8,7 @@ import { ChatUserDto } from '../users/dto/chat-user.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { Message } from './models/message.model';
 import { PublicUserDto } from '../users/dto/public-user.dto';
-import { User } from 'src/users/models/user.model';
+import { User } from '../users/models/user.model';
 
 @ApiBearerAuth()
 @Controller('chats')

@@ -10,8 +10,8 @@ import { ChatModule } from '../chat/chat.module';
 import { AdminMiddleware } from '../middleware/admin-middleware';
 import { AuthMiddleware } from '../middleware/auth-middleware';
 import { ConfigModule } from '@nestjs/config';
-import { MetaverseModule } from 'src/meta/metaverse.module';
-import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
+import { MetaverseModule } from '../meta/metaverse.module';
+import { AuthenticMiddleware } from '../middleware/authenticity-middleware';
 
 @Module({
   imports: [SequelizeModule.forFeature([Admin, Ban]), forwardRef(() => UsersModule), BansModule, ChatModule, ConfigModule, forwardRef(() => MetaverseModule)],

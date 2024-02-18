@@ -6,8 +6,8 @@ import axios from "axios"
 import * as fs from "fs"
 import * as qrcode from "qrcode"
 import * as speakeasy from "speakeasy"
-import { BansService } from 'src/bans/bans.service';
-import { UsersService } from 'src/users/services/users.service';
+import { BansService } from '../bans/bans.service';
+import { UsersService } from '../users/services/users.service';
 import { Logger } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
 

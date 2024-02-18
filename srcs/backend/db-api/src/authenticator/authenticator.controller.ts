@@ -11,8 +11,8 @@ import { Generate2FASecretAnswerDto } from './dtos/generate2FAsecret_answer-dto'
 import * as jwt from 'jsonwebtoken'
 import { ApiBody } from "@nestjs/swagger"
 import * as speakeasy from "speakeasy"
-import { AdminsService } from 'src/admins/admins.service';
-import { Player } from 'src/users/models/player.model';
+import { AdminsService } from '../admins/admins.service';
+import { Player } from '../users/models/player.model';
 import { AuthenticatorService } from './authenticator.service';
 
 @Controller('log')

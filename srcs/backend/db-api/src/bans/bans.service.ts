@@ -3,8 +3,8 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Ban } from "./ban.model";
 import { Player } from "../users/models/player.model";
 import { Admin } from "../admins/admin.model";
-import { UserStatus } from "src/users/dto/user-status.enum";
-import { UsersService } from "src/users/services/users.service";
+import { UserStatus } from "../users/dto/user-status.enum";
+import { UsersService } from "../users/services/users.service";
 
 @Injectable()
 export class BansService {

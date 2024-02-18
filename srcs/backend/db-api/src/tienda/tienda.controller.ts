@@ -1,7 +1,7 @@
 import { Controller, ParseIntPipe, Get, Param, Post, Req, UnauthorizedException } from "@nestjs/common";
 import { TiendaService } from "./tienda.service"
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { User } from "src/users/models/user.model";
+import { User } from "../users/models/user.model";
 
 @ApiBearerAuth()
 @ApiTags('Shop')
