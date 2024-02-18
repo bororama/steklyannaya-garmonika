@@ -112,6 +112,7 @@ export default defineComponent({
         })
       }
       this.username = newUsername
+      globalThis.username = newUsername
       let param = postRequestParams()
     },
     changeImage(new_image:string) {
@@ -194,6 +195,15 @@ export default defineComponent({
           this.player_data = player
           this.username = player.name
           this.is_friend = false
+          fetch (globalThis.backend + '/' + globalThis.id + '/blocks', getRequestParams()).then((a) => {
+            a.json().then((blocks) => {
+              for (const b in blocks)
+              {
+                if (blocks[b].username ==  player.username)
+                  this.is_blocked = true;
+              }
+            })
+          })
           fetch (globalThis.backend + '/players/' + globalThis.id + '/isFriend/' + this.userId, getRequestParams()).then((a) => {a.text().then((isFriend) => {
                 if (isFriend == 'yes')
                   this.is_friend = true
@@ -207,9 +217,9 @@ export default defineComponent({
                   this.is_potential_friend = true
                 }
               }
+              setTimeout(() => {this.loaded = true}, 10)
             })
           })
-          this.loaded = true
         })
       })
     } else {

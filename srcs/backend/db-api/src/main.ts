@@ -17,10 +17,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-<<<<<<< HEAD
-  app.enableCors(corsOptions);
   app.use(express.json({limit: '50mb'}))
-=======
   const configService = app.get<ConfigService>(ConfigService);
   const host = configService.get('HOST').toLowerCase();
 
@@ -30,7 +27,6 @@ async function bootstrap() {
     'preflightContinue': false,
     'credentials': true,
   });
->>>>>>> origin/quick_winning
 
   app.use('/src/profile_pics', express.static('/app/src/profile_pics'))
 

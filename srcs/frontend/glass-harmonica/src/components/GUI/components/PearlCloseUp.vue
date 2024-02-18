@@ -19,6 +19,7 @@ const route = useRoute()
 
 onMounted(() => {
   fetch(backend + '/players/' + route.query.id, getRequestParams()).then((a) => {
+    console.log(a.status)
     if (a.status == 200)
     {
       a.json().then((player) => {

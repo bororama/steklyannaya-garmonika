@@ -12,7 +12,7 @@
 			<li v-for="(option, index) in item.options" :key="index" class="dropdown_option" @click="act(option.action)">{{ option.text }}</li>
 		</ul>
 	</div>
-	<SubItemInteraction @close_interaction="close_sub_item_interaction" @set_password="set_password" @unlock_password="unlock_password" @make_admin="make_admin" @unmake_admin="unmake_admin" @kick_member="kick_member" @stop_user_display="stop_displaying_user" @unlock_padlock="unlock_padlock" :interaction="this.active_interaction" :item="item" :userId="userId"/>
+	<SubItemInteraction @close_interaction="close_sub_item_interaction" @set_password="set_password" @unlock_password="unlock_password" @make_admin="make_admin" @unmake_admin="unmake_admin" @kick_member="kick_member" @stop_user_display="stop_displaying_user" @unlock_padlock="unlock_padlock" :interaction="active_interaction" :item="item" :userId="userId"/>
 </div>
 
 </template>
@@ -116,7 +116,11 @@ async function act (action) {
          active_interaction.value = "user_display";
          close_drop();
        } else if (action == "look_at_pearl") {
+           router.push({path: '/inventory/pearl_close_up', query: {id: item.value.target}})
+       } else if (action == "look_at_rose") {
            router.push({path: '/inventory/pearl_close_up', query: {id: item.value.sender}})
+       } else if (action == "look_at_broken_pearl") {
+           router.push({path: '/inventory/pearl_close_up', query: {id: 'شيطان'}})
        } else if (action == "display_target") {
          router.push({path: '/inventory/profile_view', query:{id: item.value.target}})
            userId.value = item.value.target;

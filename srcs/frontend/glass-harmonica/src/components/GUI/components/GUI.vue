@@ -2,10 +2,10 @@
     <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse" @already_connected="go_to_alredy_connected_page"/>
     <div class="overlay" v-if="showing_profile_image">
         <!-- RAYS IN METAVERSE PROFILE PAGE -->
-        <ProfilePage display_status="profile_display" :userId="meta_colleague_id" @start_match="go_to_pong_match" :unmatchable="true"/>
+        <ProfilePage display_status="profile_display" :userId="meta_colleague_id" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
     </div>
-    <Shop v-if="in_store" @closeShop="closeShop"/>
+    <!--Shop v-if="in_store" @closeShop="closeShop"/-->
     <router-view></router-view>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
@@ -65,7 +65,7 @@ export default defineComponent({
       this.showing_profile_image = true
     },
     storeHandler () {
-      this.in_store = true;
+      this.$router.push('/shop')
     },
     close_profile() {
       this.showing_profile_image = false
@@ -73,16 +73,8 @@ export default defineComponent({
     go_to_alredy_connected_page () {
       this.already_connected = true
     },
-    go_to_pong_match (match_data) {
-    /*  this.close_inventory()
-      this.room_id = match_data.match_id
-      if (match_data.boundless)
-        this.match_mode = 1
-      else
-        this.match_mode = 0*/
-    },
     closeShop() {
-      this.in_store = false;
+      this.$router.push('/')
     },
   }
 })

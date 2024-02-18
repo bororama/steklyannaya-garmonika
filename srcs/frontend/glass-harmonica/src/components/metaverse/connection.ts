@@ -3,6 +3,7 @@ import { type User, type Messsage, type ServerToClientEvents, type ClientToServe
 import { Metaverse } from "./app";
 import { PlayerData } from "./playerData";
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 
 async function spawnPlayers(liveClients: Array<PlayerData>, metaverse : Metaverse) {
@@ -10,6 +11,7 @@ async function spawnPlayers(liveClients: Array<PlayerData>, metaverse : Metavers
 		await metaverse.gameWorld.spawnPlayer(c);
 	});
 }
+
 
 async function spawningRoutine(metaSocket : Socket, metaverse: Metaverse, livePlayers : Array<PlayerData>, retries : number) {
 	
@@ -38,7 +40,7 @@ async function spawningRoutine(metaSocket : Socket, metaverse: Metaverse, livePl
 	}, 300 + (Math.pow(retries, 2) * 100));
 }
 
-function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef : any) {		
+function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRef : any) {		
 
 	metaSocket.on('connect', () => {
 		//setTimeout( () => {
@@ -85,7 +87,8 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 
 
 	metaSocket.on('gameStart', async () => {
-		matchRef.value = true;
+      console.log("Started")
+		routerRef.push({path: '/pong_match', query:{mode: 0, id:-2}});
 	});
 	
 	metaSocket.on('apotheosis', (payload : string) => {
@@ -93,11 +96,13 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 	});
 
 	metaSocket.on('gameEnd', async () => {
-		matchRef.value = false;
+      console.log("GAME ENDED")
+		//routerRef.push({path: '/pong_match', query:{mode: 1, id:-2}});
 		metaverse.gameWorld.setLocalPlayerState(1);
 	});
 
 	metaSocket.on('stopApotheosis', (payload : string) => {
+      console.log("APOTEOSIS parada")
 		metaverse.gameWorld.stopApotheosis(payload);
 	});
 

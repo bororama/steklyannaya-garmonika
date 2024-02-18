@@ -131,6 +131,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   @SubscribeMessage('endDummyGame')
   async onEndDummyGame(@MessageBody() payload : string , @ConnectedSocket() socket : Socket) {
+    console.log("ENDING GAME:")
     socket.emit('gameEnd');
     socket.broadcast.emit('stopApotheosis', payload);
   }

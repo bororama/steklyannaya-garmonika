@@ -16,6 +16,7 @@ import RegisterPage from './components/GUI/components/RegisterPage.vue';
 import PersonalProfile from './components/GUI/components/PersonalProfile.vue';
 import ProfileDisplay from './components/GUI/components/ProfileDisplay.vue';
 import RoutablePong from './components/GUI/components/RoutablePong.vue';
+import Shop from './components/GUI/components/Shop.vue';
 import { guard_against_not_logged } from './navigation_guards/is_logged.ts';
 import { guard_against_non_admins } from './navigation_guards/is_admin.ts';
 
@@ -28,6 +29,7 @@ declare global {
   var my_data : any
   var is_admin : boolean;
   var backend : string;
+  var metaSocket : any;
 }
 
 const routes = [
@@ -79,9 +81,14 @@ const routes = [
                 path: 'profile_view',
                 name: 'ProfilePageInventory',
                 component: ProfileDisplay
-            }
-            ]
-          }],
+            },
+          ]},
+          {
+            path: '/shop',
+            name: 'CurroShop',
+            component: Shop
+          }
+          ],
 	},
     {
       path: '/register',

@@ -37,7 +37,7 @@ export default {
             }
 	   },
        async update_based_on_route (to) {
-          if (to.path !== '/inventory') {
+          if (to !== '/inventory' && to != '/inventory/pearl_close_up') {
              if (this.inventory_opened) {
                this.close_animation()
              }
