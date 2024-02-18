@@ -266,6 +266,18 @@ class GameWorld {
         this._player?.setState(state);
     }
 
+    changeLocalPlayerName(newName : string) {
+        this._player.updateName(newName);
+    }
+
+    changeRemotePlayerName(id: string, newName : string) {
+        let player = this._findLivePlayer(id);
+
+        if (player) {
+            player.updateName(newName);
+        }
+    } 
+
     apotheosis(name: string) {
         const player = this._findLivePlayer(name);
 

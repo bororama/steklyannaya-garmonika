@@ -76,7 +76,7 @@ export class GameEntity extends TransformNode {
     }
 
     private _setUpLabel(height : number = 4) {
-        this._nameLabel.billboardMode = 7; //BILLBOARD_MODE_ALL, always facing the camera
+        this._nameLabel.billboardMode = 7;
         this._nameLabel.translate(Vector3.Up(), height);
         this._nameLabel.isPickable = false;
         this._nameLabel.parent = this.mesh;
@@ -91,12 +91,32 @@ export class GameEntity extends TransformNode {
         const font = "bold 16px monospace";
         labelTexture.drawText(
             this.name, 
-            (32 * 5) / 2 - textureContext.measureText(this.name).width, 
+            ((32 * 5) / 2 )- textureContext.measureText(this.name).width, 
             16, 
             font, 
             "white", 
             "transparent", 
-            true, 
+            true,
+            true
+        );
+    }
+
+    updateName(newName: string) {
+        this.name = newName;
+
+        const font = "bold 16px monospace";
+        const labelTexture = this._nameLabel.material.diffuseTexture;
+        const textureContext = labelTexture.getContext();
+        textureContext.textAlign = "left";
+        labelTexture.clear();
+        labelTexture.drawText(
+            newName,
+            ((32 * 5) - textureContext.measureText(newName).width) / 2,
+            16,
+            font,
+            "white",
+            "transparent",
+            true,
             true
         );
     }

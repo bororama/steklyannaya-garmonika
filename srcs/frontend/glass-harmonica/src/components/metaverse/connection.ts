@@ -101,6 +101,18 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 		metaverse.gameWorld.stopApotheosis(payload);
 	});
 
+	metaSocket.on('name', (payload : any) => {
+		console.log("NAME EVENT : ", payload);
+		if (payload.id == globalThis.id) {
+			console.log("change local player name");
+			metaverse.gameWorld.changeLocalPlayerName(payload.newName);
+		}
+		else {
+			metaverse.gameWorld.changeRemotePlayerName(payload.id, payload.newName);
+		}
+		//metaverse.gameWorld.stopApotheosis(payload);
+	});
+
 	metaSocket.on('exception', (data) => {
 		console.log('event', data);
 	});

@@ -91,7 +91,7 @@ export default defineComponent({
     changeUsername (newUsername : string) {
       if (this.display_status != 'registering')
       {
-        fetch(globalThis.backend + '/changeUsername/' + this.username + '/' + newUsername, getRequestParams())
+        fetch(globalThis.backend + '/changeUsername/' + this.username + '/' + newUsername, postRequestParams())
       }
       this.username = newUsername
     },

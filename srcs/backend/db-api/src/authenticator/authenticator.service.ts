@@ -71,6 +71,7 @@ export class AuthenticatorService {
 					{
 						throw new ForbiddenException('You\'re banned');
 					}
+					this.userService.setOnlineStatus(user.id, true) //TODO QUITAR ESTO. Es un apaño para npinto-g
 					log_attempt.log_token = jwt.sign({login: personal.login, username: user.dataValues.id}, 'TODO the REAL secret')
 				}
 			} catch (e) {

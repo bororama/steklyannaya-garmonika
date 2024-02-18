@@ -11,7 +11,7 @@ import {
 import { Logger } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
 import { ServerToClientEvents, ClientToServerEvents, Message, Player, LiveClient, User } from "./shared/meta.interface"
-import { UsersService } from '../users/services/users.service';
+//import { UsersService } from '../users/services/users.service';
 
 const liveClients : Array<LiveClient> = Array();
 
@@ -29,7 +29,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   
   private logger : Logger = new Logger("MetaverseGateway");
 
-  constructor (private usersService : UsersService) {}
+  //constructor (private usersService : UsersService) {}
 
 
   @WebSocketServer()
@@ -47,7 +47,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   handleDisconnect(client: Socket) {
     const i : number = liveClients.findIndex((c) => { return c.socket === client})
     const disconnectedPlayer : Player = liveClients[i].player;
-    this.usersService.setOnlineStatus(liveClients[i].player.user.name, false)
+    //this.usersService.setOnlineStatus(liveClients[i].player.user.name, false)
     liveClients.splice(i, 1);
     this.server.emit('playerLeft', disconnectedPlayer);
   }
@@ -81,7 +81,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     socket.emit('welcomePack', {newPlayer, livePlayers});
     socket.broadcast.emit('newPlayer', {retries : 0, player : newPlayer});
 
-    this.usersService.setOnlineStatus(payload.id, true);
+    //this.usersService.setOnlineStatus(payload.id, true);
 
     return `You sent : userData ${ payload }`;
   }
@@ -142,6 +142,16 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     if (bannedClient) {
       bannedClient.socket.emit('banned');
       bannedClient.socket.disconnect();
+    }
+  }
+
+  changeName(id : string, newName : string) {
+    const client = liveClients.find( (c) => {
+      return c.player.user.id === id;
+    });
+    console.log("changing name ", client, "username? ", id);
+    if (client) {
+      client.socket.emit('name', {id : id, newName : newName});
     }
   }
 }
