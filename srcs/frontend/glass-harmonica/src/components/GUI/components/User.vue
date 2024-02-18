@@ -57,7 +57,8 @@ export default defineComponent({
 }
 
 .user_container {
-  display: flex;
+  display: inline-block;
+  text-align: center;
 }
 
 .text_user {

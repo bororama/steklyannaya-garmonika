@@ -5,7 +5,7 @@
 
   <div class="admin_page_columns_container">
       <div class="admin_page_column" id="user_ban">
-          <h3>Users</h3>
+          <h3 style="text-align: center">Users</h3>
           <User v-for="(user,index) in users" :key="index" :user="user"/>
       </div>
 
@@ -69,7 +69,7 @@ export default defineComponent({
   display: flex;
   flex-direction:column;
   align-items: center;
-  margin: 0 5%;
+  margin: 0 auto;
 }
 
 #user_ban {
@@ -77,7 +77,9 @@ export default defineComponent({
 }
 
 .admin_page_columns_container {
-  display: flex;
+  margin: 0 auto;
+  display: flex;  
+  flex-direction:row;
   font-family: 'joystix';
 }
 

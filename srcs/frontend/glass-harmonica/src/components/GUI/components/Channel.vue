@@ -2,7 +2,7 @@
 
 <div :class="{user_container:true, kicked: deleted}">
     <p @click="toggle_open" id="chan_name" class="text_user">{{channel.id}}</p>
-    <button @click="delete_chan" v-if="!deleted">DELETE</button>
+    <button class="fa_button" @click="delete_chan" v-if="!deleted">DELETE</button>
 </div>
 <div class="admin_page_column" v-if="is_open && !deleted">
     <UserChannel v-for="(user,index) in channel.users" :key="index" :user="user" :chatId="channel.id"/>
