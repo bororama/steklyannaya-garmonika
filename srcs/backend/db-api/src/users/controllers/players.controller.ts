@@ -31,8 +31,8 @@ export class PlayersController {
     }
 
     @Get()
-    async findAll(): Promise<PlayerDto[]> {
-        const players: Player[] = await this.playerService.findAll();
+    async findAll(@Req() request): Promise<PlayerDto[]> {
+        const players: Player[] = await this.playerService.findAllExcludingRequester(request.requester_info.dataValues.id);
         return Promise.all(players.map(async(player) => {
             const isAdmin = await this.adminService.isAdmin(player.id);
             const playerDto = new PlayerDto(player, isAdmin);

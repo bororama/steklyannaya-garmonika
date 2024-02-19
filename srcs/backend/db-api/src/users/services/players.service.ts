@@ -28,8 +28,20 @@ export class PlayersService {
         });
     }
 
-    async findAllWithBanStatus() {
+    async findAllExcludingRequester(requester: number): Promise<Player []> {
         return this.playerModel.findAll({
+            include: User,
+            where: {
+                id: { [Op.ne]: requester }
+            }
+        });
+    }
+
+    async findAllWithBanStatus(requester: number) {
+        return this.playerModel.findAll({
+            where: {
+                id: { [Op.ne]: requester }
+            },
             include: [
                 {
                     model: User,
@@ -76,7 +88,7 @@ export class PlayersService {
             attributes: ['id', 'wins', 'defeats'],
             include: {
                 model: User,
-                attributes: ['status']
+                attributes: ['status', 'loginFT']
             }
         });
     }

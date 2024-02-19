@@ -333,7 +333,8 @@ This only can be done by an operator'
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!this.checkIfAuthorized(request.requester_info.dataValues, user) && !this.chatService.isAdmin(request.requester_info.dataValues, chat.id)) {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)
+            && !this.chatService.isAdmin(request.requester_info.dataValues, chat.id)) {
             throw new UnauthorizedException("You can't kick user if you are not an admin");
         }
 

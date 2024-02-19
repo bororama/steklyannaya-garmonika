@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Logger } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Logger, Req } from "@nestjs/common";
 import { AdminsService } from "./admins.service";
 import { Admin } from "./admin.model";
 import { UserDto } from "../users/dto/user.dto";
@@ -14,6 +14,7 @@ import { ChatUserDto } from "../users/dto/chat-user.dto";
 import { ChatWithUsernamesDto } from "../chat/dto/chat-usernames.dto";
 import { PublicUserDto } from "../users/dto/public-user.dto";
 import { MetaverseGateway } from "../meta/metaverse.gateway";
+import { User } from "src/users/models/user.model";
 
 @ApiBearerAuth()
 @Controller('admins')
@@ -26,6 +27,12 @@ export class AdminsController {
         private readonly chatService: ChatService,
         private readonly metaverseGateway: MetaverseGateway
     ) {}
+
+    checkIfAffectsRequester(requester: User, userId: string): boolean {
+        return isNaN(+userId)
+        ? requester.userName == userId 
+        :  requester.id == +userId ;
+    }
 
     @Post()
     async create(@Body() newAdmin: NewUser): Promise<UserDto> {
@@ -62,13 +69,23 @@ export class AdminsController {
     }
 
     @Post(':adminId/ban/:idOrUsername')
-    async banUser(@Param('idOrUsername') user: string, @Param('adminId', ParseIntPipe)banner: number): Promise<void> {
+    async banUser(@Req() request, @Param('idOrUsername') user: string): Promise<void> {
+        if (this.checkIfAffectsRequester(request.requester_info.dataValues, user))
+        {
+            throw new ForbiddenException("You can't ban yourself");
+        }
+
         const player = await this.playerService.playerExists(user);
         if (!player) {
             throw new BadRequestException("Player doesn't exist");
         }
+        const isAdmin = this.adminService.isAdmin(player.id);
+        if (isAdmin)
+        {
+            await this.adminService.revokeAdminPrivilegesPlayerInfo(player);
+        }
 
-        await this.banService.banUser(player, null);
+        await this.banService.banUser(player);
         this.metaverseGateway.kickFromMetaverse(player.id + '');
     }
 
@@ -83,8 +100,10 @@ export class AdminsController {
     }
 
     @Get('players')
-    async getPlayers(): Promise<PlayerBanStatusDto[]> {
-        return this.playerService.findAllWithBanStatus().then(players => players.map(p => new PlayerBanStatusDto(p)));
+    async getPlayers(@Req() request): Promise<PlayerBanStatusDto[]> {
+        return this.playerService
+            .findAllWithBanStatus(request.requester_info.dataValues.id)
+            .then(players => players.map(p => new PlayerBanStatusDto(p)));
     }
 
     @Get()

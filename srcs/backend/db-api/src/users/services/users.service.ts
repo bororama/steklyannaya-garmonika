@@ -27,6 +27,14 @@ export class UsersService {
         });
     }
 
+    async findAllExcludingRequester(requester: number): Promise<User[]> {
+        return this.userModel.findAll({
+            where: {
+                id: { [Op.ne]: requester }
+            }
+        });
+    }
+
     async findOne(user: string): Promise<User> {
         const searchCriteria = isNaN(+user)
             ? { userName: user }
