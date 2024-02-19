@@ -7,9 +7,9 @@ export class AdminMiddleware implements NestMiddleware {
     constructor (
         private readonly adminService: AdminsService
     ) {}
-    use(@Req() req, @Res() res, next: NextFunction) {
+    async use(@Req() req, @Res() res, next: NextFunction) {
         Logger.debug("Admin middleware executed");
-        if (this.adminService.isAdmin(req.requester_info.dataValues.id)) {
+        if (await this.adminService.isAdmin(req.requester_info.dataValues.id)) {
             next();
         }
         else {
