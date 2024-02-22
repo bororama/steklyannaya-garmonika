@@ -33,7 +33,7 @@ import { MetaverseModule } from 'src/meta/metaverse.module';
   ],
   providers: [UsersService, PlayersService, { provide: APP_PIPE, useClass: ValidationPipe }],
   controllers: [UsersController, PlayersController],
-  exports: [UsersService, PlayersService]
+  exports: [UsersService, PlayersService, SequelizeModule]
 })
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

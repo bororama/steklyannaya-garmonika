@@ -11,7 +11,9 @@ import {
 import { Logger } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
 import { ServerToClientEvents, ClientToServerEvents, Message, Player, LiveClient, User } from "./shared/meta.interface"
-//import { UsersService } from '../users/services/users.service';
+import { User as UserModel } from 'src/users/models/user.model';
+import { InjectModel } from '@nestjs/sequelize';
+import { UserStatus } from 'src/users/dto/user-status.enum';
 
 const liveClients : Array<LiveClient> = Array();
 
@@ -29,7 +31,10 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   
   private logger : Logger = new Logger("MetaverseGateway");
 
-  //constructor (private usersService : UsersService) {}
+  constructor (
+    @InjectModel(UserModel)
+    private userModel: typeof UserModel,
+  ) {}
 
 
   @WebSocketServer()
@@ -47,7 +52,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   handleDisconnect(client: Socket) {
     const i : number = liveClients.findIndex((c) => { return c.socket === client})
     const disconnectedPlayer : Player = liveClients[i].player;
-    //this.usersService.setOnlineStatus(liveClients[i].player.user.name, false)
+    this.setOnlineStatus(liveClients[i].player.user.name, false)
     liveClients.splice(i, 1);
     this.server.emit('playerLeft', disconnectedPlayer);
   }
@@ -81,7 +86,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     socket.emit('welcomePack', {newPlayer, livePlayers});
     socket.broadcast.emit('newPlayer', {retries : 0, player : newPlayer});
 
-    //this.usersService.setOnlineStatus(payload.id, true);
+    this.setOnlineStatus(payload.id, true);
 
     return `You sent : userData ${ payload }`;
   }
@@ -154,5 +159,18 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
       this.server.emit('name', {id : id, newName : newName});
     }
   }
+
+  async setOnlineStatus(userId: string, status: boolean): Promise<void> {
+    const searchCondition = isNaN(+userId)
+    ? { userName: userId }
+    : { id: +userId };
+    const user = await this.userModel.findOne({
+      where: searchCondition
+    });
+    if (user) {
+      user.status = (status ? UserStatus.online : UserStatus.offline);
+      user.save();
+    }
+}
 }
 
