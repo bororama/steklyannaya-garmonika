@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, BadRequestException, UnauthorizedException, Req, Logger } from '@nestjs/common';
 import { UsersService } from '../users/services/users.service'
 import { PlayersService } from '../users/services/players.service'
 import { NewPlayer } from '../users/dto/new-player.dto'
@@ -23,6 +23,24 @@ export class AuthenticatorController {
     private readonly adminService : AdminsService,
     private readonly authService: AuthenticatorService,
   ) {}
+
+  extractJwt(request: any): string
+  {
+    const authorizationHeader = request.headers.authorization;
+
+    if (!authorizationHeader) {
+      Logger.debug("Request without authorization")
+      throw new UnauthorizedException('Unauthorized - JWT token missing');
+    }
+
+    try {
+      const token = authorizationHeader.split(' ')[1];
+      return token;
+    }
+    catch {
+      throw new UnauthorizedException('Unauthorized - Invalid JWT token');
+    }
+  }
 
   @Get('code/:code')
   tryLogWithCode(@Param('code') code :string) : Promise<any> {
@@ -102,9 +120,10 @@ export class AuthenticatorController {
     }
   }
 
-  @Get('me/:token')
-  async getMyData(@Param('token') token :string) : Promise<PlayerDto> {
+  @Get('me')
+  async getMyData(@Req() request) : Promise<PlayerDto> {
     let payload : any;
+    const token : string = this.extractJwt(request);
     try {
       payload = jwt.verify(token, this.authService.jwt_log_secret)
     }

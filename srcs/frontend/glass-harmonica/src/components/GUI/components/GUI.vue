@@ -82,7 +82,15 @@ export default defineComponent({
       this.profile_state = 'registering'
     },
     go_to_metaverse (logToken : string) {
-      fetch (globalThis.backend + '/log/me/' + logToken, getRequestParams()).then((a) => {
+      fetch (globalThis.backend + '/log/me/', {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: 'Bearer ' + logToken
+        }
+      }).then((a) => {
         a.json().then((player) => {
           globalThis.id = player.id
           globalThis.my_data = player
