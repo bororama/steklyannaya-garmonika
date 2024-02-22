@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Logger, Req } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Logger, Req, NotFoundException } from "@nestjs/common";
 import { AdminsService } from "./admins.service";
 import { Admin } from "./admin.model";
 import { UserDto } from "../users/dto/user.dto";
@@ -127,6 +127,10 @@ export class AdminsController {
 
     @Get('/getChatMembers/:chatId')
     async getChatMembers(@Param('chatId', ParseIntPipe) id: number): Promise<ChatUserDto[]> {
+        if (!await this.chatService.findOne(id))
+        {
+            throw new NotFoundException('This chat does not exist');
+        }
         const users = await this.chatService.getChatUsers(id);
         const bans = await this.chatService.getBansMembers(id, users);
         return users.map(u => new ChatUserDto(u, bans.find(b => b.userId == u.userId) !== undefined));
@@ -134,6 +138,10 @@ export class AdminsController {
 
     @Get('/getChatAdmins/:chatId')
     async getChatAdmins(@Param('chatId', ParseIntPipe) id: number): Promise<ChatUserDto[]> {
+        if (!await this.chatService.findOne(id))
+        {
+            throw new NotFoundException('This chat does not exist');
+        }
         return this.chatService.getAdmins(id)
             .then(users => users
                 .map(u => new ChatUserDto(u, false)));
@@ -141,6 +149,10 @@ export class AdminsController {
 
     @Get('/getChatBans/:chatId')
     async getChatBans(@Param('chatId', ParseIntPipe) id: number): Promise<PublicUserDto[]> {
+        if (!await this.chatService.findOne(id))
+        {
+            throw new NotFoundException('This chat does not exist');
+        }
         return this.chatService.getBans(id)
             .then(users => users
                 .map(u => new PublicUserDto(u.user)));
@@ -150,7 +162,7 @@ export class AdminsController {
     async raiseUserToChatAdmin(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
+            throw new NotFoundException("Chat doesn't exist");
         }
         return this.chatService.raiseRevokeChatAdmin(chat, user, true);
     }
@@ -159,7 +171,7 @@ export class AdminsController {
     async revokeUserFromChatAdmin(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
+            throw new NotFoundException("Chat doesn't exist");
         }
         await this.chatService.raiseRevokeChatAdmin(chat, user, false);
     }
@@ -169,7 +181,7 @@ export class AdminsController {
     async banUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string, @Body('time', ParseIntPipe) time: number): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
+            throw new NotFoundException("Chat doesn't exist");
         }
         return this.chatService.banUser(chat, user, time);
     }
@@ -178,7 +190,7 @@ export class AdminsController {
     async unBanUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId', ParseIntPipe) user: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
+            throw new NotFoundException("Chat doesn't exist");
         }
         return this.chatService.unBanUser(chat, user);
     }
@@ -187,7 +199,7 @@ export class AdminsController {
     async muteUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
+            throw new NotFoundException("Chat doesn't exist");
         }
         return this.chatService.changeMuteStatus(chat, user, true);
     }
@@ -196,7 +208,7 @@ export class AdminsController {
     async unMuteUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
+            throw new NotFoundException("Chat doesn't exist");
         }
         return this.chatService.changeMuteStatus(chat, user, false);
     }
@@ -205,7 +217,7 @@ export class AdminsController {
     async kickUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
+            throw new NotFoundException("Chat doesn't exist");
         }
 
         return this.chatService.leave(user, chat.id);
