@@ -135,9 +135,10 @@ export class AuthenticatorController {
     return playerDto
   }
 
-  @Get('generate2FAsecret/:token')
-  async generate2FAsecret (@Param('token') token : string) : Promise<Generate2FASecretAnswerDto> {
+  @Get('generate2FAsecret')
+  async generate2FAsecret (@Req() request) : Promise<Generate2FASecretAnswerDto> {
     let payload : any;
+    const token : string = this.extractJwt(request);
     try {
       payload = jwt.verify(token, this.authService.jwt_log_secret);
     }
