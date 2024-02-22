@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, ParseIntPipe, Body, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, ParseIntPipe, Body, ValidationPipe, NotFoundException } from '@nestjs/common';
 import { Match } from './models/match.model';
 import { MatchesService } from './matches.service';
 import { MatchAndUsersDto } from './dtos/matchWithUsers.dto';
@@ -80,7 +80,14 @@ export class MatchesController {
     }
 
     @Get('/room/:roomId')
-    getMatchByRoomId(@Param('roomId', new ParseIntPipe()) roomId: number): Promise<MatchAndUsersDto> {
-        return this.matchService.getByRoomId(roomId).then(match => new MatchAndUsersDto(match));
+    async getMatchByRoomId(@Param('roomId', new ParseIntPipe()) roomId: number): Promise<MatchAndUsersDto> {
+        const match = await this.matchService.getByRoomId(roomId);
+
+        if (!match)
+        {
+            throw new NotFoundException('There is no match with that RoomId');
+        }
+        
+        return new MatchAndUsersDto(match);
     }
 }
