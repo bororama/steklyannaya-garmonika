@@ -290,7 +290,8 @@ export class ChatService {
             throw new ForbiddenException('Requester doesn\'t belong to chat');
         }
 
-        return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
+        return ((userChatRelation.isAdmin || userChatRelation.isOwner)
+            && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
     }
 
     async isAdminId(userId: number, chatId:number): Promise<boolean> {
