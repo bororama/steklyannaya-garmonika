@@ -103,6 +103,7 @@ export class GameEntity extends TransformNode {
 
     updateName(newName: string) {
         this.name = newName;
+        this.mesh.metadata.name = newName;
 
         const font = "bold 16px monospace";
         const labelTexture = this._nameLabel.material.diffuseTexture;

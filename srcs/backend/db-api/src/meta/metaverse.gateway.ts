@@ -151,7 +151,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     });
     console.log("changing name ", client, "username? ", id);
     if (client) {
-      client.socket.emit('name', {id : id, newName : newName});
+      this.server.emit('name', {id : id, newName : newName});
     }
   }
 }

@@ -65,10 +65,11 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 	metaSocket.on('newPlayer', async (payload : { retries : number, player : Player }) => { 
 		console.log('newPLayer joined >', `${ (payload.player) ?  payload.player.user.name: 'undefined player' }`);
 		if (metaverse.gameWorld.isReady()) {
-			console.log("Spawning....")
+			console.log("Spawning new player....")
 			await spawnPlayers([payload.player], metaverse); // gameworld sometimes undefined??
 		}
 		else {
+			console.log("spawn failed....");
 			metaSocket.emit('spawnNewPlayerFailed', {retries : payload.retries, player : payload.player});
 		}
 	});
@@ -102,7 +103,6 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 	});
 
 	metaSocket.on('name', (payload : any) => {
-		console.log("NAME EVENT : ", payload);
 		if (payload.id == globalThis.id) {
 			console.log("change local player name");
 			metaverse.gameWorld.changeLocalPlayerName(payload.newName);
@@ -110,7 +110,6 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 		else {
 			metaverse.gameWorld.changeRemotePlayerName(payload.id, payload.newName);
 		}
-		//metaverse.gameWorld.stopApotheosis(payload);
 	});
 
 	metaSocket.on('exception', (data) => {

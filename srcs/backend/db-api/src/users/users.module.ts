@@ -29,7 +29,7 @@ import { MetaverseModule } from 'src/meta/metaverse.module';
     forwardRef(() => ChatModule),
     forwardRef(() => AdminsModule),
     forwardRef(() =>  MatchesModule),
-    MetaverseModule
+    forwardRef(() => MetaverseModule)
   ],
   providers: [UsersService, PlayersService, { provide: APP_PIPE, useClass: ValidationPipe }],
   controllers: [UsersController, PlayersController],

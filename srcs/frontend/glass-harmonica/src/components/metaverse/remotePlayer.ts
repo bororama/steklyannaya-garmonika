@@ -9,6 +9,7 @@ export class RemotePlayer extends GameEntity {
     private _glowingMesh : any;
 
     constructor(assets : any, scene: Scene, user : User) {
+        
         super(assets, scene, user.name, 'remote');
         this.user = user;
         this._soulMaterial = scene.materials.find( (m) => {
