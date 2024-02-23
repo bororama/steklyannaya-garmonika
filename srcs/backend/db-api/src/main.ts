@@ -19,13 +19,16 @@ async function bootstrap() {
 
   const configService = app.get<ConfigService>(ConfigService);
   const host = configService.get('HOST').toLowerCase();
+  const port = configService.get('FRONTEND_PORT');
 
   app.enableCors({
-    'origin': ['http://' + host + ':5173', 'http://localhost:5173'],
+    'origin': ['http://' + host + (+port != 80 ? ':' + port : '')],
     'methods': 'GET,POST,DELETE',
     'preflightContinue': false,
     'credentials': true,
   });
+
+  console.log('Serving for: http://' + host + (+port != 80 ? ':' + port : ''));
 
   app.use('/src/profile_pics', express.static('/app/src/profile_pics'))
 
