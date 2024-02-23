@@ -276,7 +276,7 @@ export class UsersService {
             include: {
                 model: Chat,
                 where: {
-                    isPrivateChat: false
+                    isFriendshipChat: false
                 },
                 required: false
             }

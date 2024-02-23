@@ -79,7 +79,7 @@ export class ChatService {
 
     async createFriendshipChat(user: User, friend: User, friendship: Friendship): Promise<Chat> {
         return this.chatModel.create({
-            isPrivateChat: true,
+            isFriendshipChat: true,
             friendshipId: friendship.id
         }).then(async chat => {
             await this.chatUserModel.bulkCreate([
@@ -172,7 +172,7 @@ export class ChatService {
             throw new ForbiddenException('User is banned from this chat');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('User can\'t join a private chat');
         }
 
@@ -215,7 +215,7 @@ export class ChatService {
             throw new BadRequestException('User doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('User can\'t join a private chat');
         }
 
@@ -251,7 +251,7 @@ export class ChatService {
             throw new BadRequestException('Chat doesn\'t exists');
         }
         
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('User can\'t leave this chat');
         }
 
@@ -343,7 +343,7 @@ export class ChatService {
     }
 
     async raiseRevokeChatAdmin(chat: Chat, user: string, admin: boolean): Promise<void> {
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('Private chat doesn\'t have administrators');
         }
 
@@ -442,7 +442,7 @@ export class ChatService {
             throw new BadRequestException('You can\'t mute the chat owner');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('You can\'t mute a user in a private chat');
         }
 
@@ -471,7 +471,7 @@ export class ChatService {
             throw new BadRequestException('You can\'t ban the chat owner');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('You can\'t mute a user in a private chat');
         }
 
@@ -515,7 +515,7 @@ export class ChatService {
             }
         });
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('You can\'t mute a user in a private chat');
         }
 
@@ -606,7 +606,7 @@ export class ChatService {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('Private chat can\'t have password');
         }
 

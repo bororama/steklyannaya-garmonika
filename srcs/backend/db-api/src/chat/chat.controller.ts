@@ -53,7 +53,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('You can\'t check this information');
         }
 
@@ -74,11 +74,11 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('You can\'t check this information');
         }
 
-        if (chat.password || chat.isPrivateChat) {
+        if (chat.password || chat.isFriendshipChat) {
             throw new ForbiddenException('Can see the members of this chat unless you belong to it');
         }
         return this.chatService.getAdmins(+id).then(users => users.map(u => new ChatUserDto(u, false)));
@@ -96,7 +96,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('You can\'t check this information');
         }
         return this.chatService.getBans(+id).then(users => users.map(u => new PublicUserDto(u.user)));
@@ -315,7 +315,7 @@ This only can be done by an operator'
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat || this.chatService.isOwnerId(chat.id, request.requester_info.dataValues)) {
+        if (chat.isFriendshipChat || this.chatService.isOwnerId(chat.id, request.requester_info.dataValues)) {
             throw new ForbiddenException('You can\'t remove this chat');
         }
 

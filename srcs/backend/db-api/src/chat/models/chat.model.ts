@@ -18,7 +18,11 @@ export class Chat extends Model {
 
     @Default(false)
     @Column
-    isPrivateChat: boolean;
+    isFriendshipChat: boolean;
+
+    @Default(false)
+    @Column
+    isPublic: boolean;
 
     @ForeignKey(() => Friendship)
     @AllowNull
