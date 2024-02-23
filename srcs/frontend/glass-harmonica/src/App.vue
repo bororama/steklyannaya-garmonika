@@ -15,6 +15,10 @@
   color: white;
 }
 
+#scene-explorer-host {
+  z-index: 1;
+}
+
 </style>
 
 <template>

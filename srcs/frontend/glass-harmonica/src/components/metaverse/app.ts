@@ -422,7 +422,7 @@ class GameWorld {
         assets["height"] = 6;
         this._NPCS.push(
             new NPC(assets, this._scene, 'Guillermo', 'angel',
-                new Vector3(-259.19837561453, 49.69347184924647, -181.9513474067934),
+                new Vector3(-259.19837561453, 47.69347184924647, -181.9513474067934),
                 new Quaternion(0, 0.8, 0),
                 [
                     "Buy 'El aquelarre de Celia'",
