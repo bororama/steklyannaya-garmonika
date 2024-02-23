@@ -158,6 +158,11 @@ export class AdminsController {
                 .map(u => new PublicUserDto(u.user)));
     }
 
+    @Delete('/chatOptions/:chatId')
+    async deleteChat(@Param('chatId', ParseIntPipe) id: number): Promise<void> {
+        return this.chatService.removeById(id);
+    }
+
     @Post('/chatOptions/:chatId/raiseToAdmin/:usernameOrId')
     async raiseUserToChatAdmin(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
