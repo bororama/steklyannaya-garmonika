@@ -63,6 +63,12 @@ export class ChatController {
         return users.map(u => new ChatUserDto(u, bans?.find(b => b.userId == u.userId) !== undefined));
     }
 
+    @Get('publicChats')
+    async getPublicChats(): Promise<Chat[]>
+    {
+        return this.chatService.getPublicChats();
+    }
+
     @Post(':id/admins')
     @ApiOperation({
         summary: 'Get the administators of this chat',
@@ -302,7 +308,25 @@ This only can be done by an operator'
         }
         return this.chatService.setMuteStatus(id, admin, user, false);
     }
-    
+
+    @Post(':id/:admin/makePublic')
+    @ApiOperation({
+        summary: 'Change access of a chat to public',
+        description: 'All users will be able to see and access to this chat'
+    })
+    makeChatPublic(@Param('id', ParseIntPipe) id: number, @Param('admin') admin: string): Promise<Chat> {
+        return this.chatService.changeAccess(admin, id, true);
+    }
+
+    @Post(':id/:admin/makePrivate')
+    @ApiOperation({
+        summary: 'Change access of a chat to private',
+        description: 'All users won\'t be able see and access to this chat'
+    })
+    makeChatPrivate( @Param('id', ParseIntPipe) id: number, @Param('admin') admin: string): Promise<Chat> {
+        return this.chatService.changeAccess(admin, id, false);
+    }
+
     @Delete(':id')
     @ApiBody({required: false, type: CreateChatDto})
     @ApiOperation({

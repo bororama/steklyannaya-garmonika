@@ -109,7 +109,7 @@ export class ChatService {
 
         const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
             where: {
-                userId: userId,
+                userId: user,
                 chatId: chat.id
             }
         });
@@ -126,6 +126,14 @@ export class ChatService {
         chat.isPublic = isPublic;
 
         return chat.save();
+    }
+
+    async getPublicChats(): Promise<Chat[]> {
+        return this.chatModel.findAll({
+            where: {
+                isPublic: true
+            }
+        });
     }
 
     deleteById(id: number): Promise<void> {
