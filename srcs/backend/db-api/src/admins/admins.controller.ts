@@ -14,7 +14,8 @@ import { ChatUserDto } from "../users/dto/chat-user.dto";
 import { ChatWithUsernamesDto } from "../chat/dto/chat-usernames.dto";
 import { PublicUserDto } from "../users/dto/public-user.dto";
 import { MetaverseGateway } from "../meta/metaverse.gateway";
-import { User } from "src/users/models/user.model";
+import { User } from "../users/models/user.model";
+import { UsersService } from "../users/services/users.service";
 
 @ApiBearerAuth()
 @Controller('admins')
@@ -25,6 +26,7 @@ export class AdminsController {
         private readonly playerService: PlayersService,
         private readonly banService: BansService,
         private readonly chatService: ChatService,
+        private readonly userService: UsersService,
         private readonly metaverseGateway: MetaverseGateway
     ) {}
 
@@ -183,37 +185,57 @@ export class AdminsController {
 
     @Post('/chatOptions/:chatId/ban/:usernameOrId')
     @ApiBody({ type: 'number', required: true })
-    async banUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string, @Body('time', ParseIntPipe) time: number): Promise<void> {
+    async banUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') userId: string, @Body('time', ParseIntPipe) time: number): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
             throw new NotFoundException("Chat doesn't exist");
+        }
+
+        const user = await this.userService.findOneLight(userId);
+        if (!user) {
+            throw new NotFoundException("User doesn't exit");
         }
         return this.chatService.banUser(chat, user, time);
     }
 
     @Post('/chatOptions/:chatId/unban/:usernameOrId')
-    async unBanUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId', ParseIntPipe) user: string): Promise<void> {
+    async unBanUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId', ParseIntPipe) userId: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
             throw new NotFoundException("Chat doesn't exist");
+        }
+
+        const user = await this.userService.findOneLight(userId);
+        if (!user) {
+            throw new NotFoundException("User doesn't exit");
         }
         return this.chatService.unBanUser(chat, user);
     }
 
     @Post('/chatOptions/:chatId/mute/:usernameOrId')
-    async muteUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
+    async muteUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') userId: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
             throw new NotFoundException("Chat doesn't exist");
+        }
+
+        const user = await this.userService.findOneLight(userId);
+        if (!user) {
+            throw new NotFoundException("User doesn't exit");
         }
         return this.chatService.changeMuteStatus(chat, user, true);
     }
 
     @Post('/chatOptions/:chatId/unmute/:usernameOrId')
-    async unMuteUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') user: string): Promise<void> {
+    async unMuteUserFromChat(@Param('chatId', ParseIntPipe) id: number, @Param('usernameOrId') userId: string): Promise<void> {
         const chat = await this.chatService.findOne(id);
         if (!chat) {
             throw new NotFoundException("Chat doesn't exist");
+        }
+
+        const user = await this.userService.findOneLight(userId);
+        if (!user) {
+            throw new NotFoundException("User doesn't exit");
         }
         return this.chatService.changeMuteStatus(chat, user, false);
     }

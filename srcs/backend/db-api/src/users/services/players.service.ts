@@ -140,6 +140,10 @@ export class PlayersService {
             throw new BadRequestException("Targeted player doesn\'t exist");
         }
 
+        if (player.id === friend.id) {
+            throw new BadRequestException("You can't gift a pearl to yourself");
+        }
+
         if (player.pearls < 1)
           return ('not_enough_pearls')
         
@@ -158,6 +162,10 @@ export class PlayersService {
         const friend = await this.usersService.userExists(newFriend);
         if (!friend) {
             throw new BadRequestException("Targeted player doesn\'t exist");
+        }
+
+        if (player == friend) {
+            throw new BadRequestException("You can't send a frienship petition to yourself");
         }
         
         const friendship = await this.friendshipModel.findOne({
@@ -273,6 +281,10 @@ export class PlayersService {
             throw new BadRequestException("Targeted player doesn\'t exist");
         }
 
+        if (player.id === friend.id) {
+            throw new BadRequestException("You are already your friend");
+        }
+
         const petition = await this.friendshipModel.findOne({
             where: {
                 userId: friend.id,
@@ -311,6 +323,11 @@ export class PlayersService {
         if (!friend) {
             throw new BadRequestException("Targeted player doesn\'t exist");
         }
+
+        if (player == friend) {
+            throw new BadRequestException("You can't become your own enemy. Love yourself.");
+        }
+
         const friendship = await this.friendshipModel.findOne({
             where: {
                 [Op.or]: [

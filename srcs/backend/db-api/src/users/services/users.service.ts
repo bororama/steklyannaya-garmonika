@@ -218,6 +218,10 @@ export class UsersService {
             throw new BadRequestException('User doesn\'t exists');
         }
 
+        if (userId == blockedUserId) {
+            throw new BadRequestException('You can\'t block yourself')
+        }
+
         try {
             await this.blockModel.create({
                 blockerId: userId,
@@ -246,6 +250,10 @@ export class UsersService {
         const blockedUserId = await this.userExists(blocked);
         if (isNaN(userId) || isNaN(blockedUserId)) {
             throw new BadRequestException('User doesn\'t exists');
+        }
+
+        if (userId == blockedUserId) {
+            throw new BadRequestException('You can\'t unblock yourself')
         }
 
         this.blockModel.destroy({
