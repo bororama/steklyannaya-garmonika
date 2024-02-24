@@ -1,11 +1,9 @@
 <template>
     <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse" @already_connected="go_to_alredy_connected_page"/>
     <div class="overlay" v-if="showing_profile_image">
-        <!-- RAYS IN METAVERSE PROFILE PAGE -->
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
     </div>
-    <!--Shop v-if="in_store" @closeShop="closeShop"/-->
     <router-view></router-view>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
@@ -61,8 +59,8 @@ export default defineComponent({
       })
     },
     metaProfileHandler (profile) {
-      this.meta_colleague_id = profile.name
-      this.showing_profile_image = true
+      console.log(profile)
+      this.$router.push({path: "/profile_view", query: {id: profile.name}})
     },
     storeHandler () {
       this.$router.push('/shop')
@@ -159,6 +157,20 @@ body {
 	top: 0;
 	left:0;
   z-index: -1;
+}
+
+.overlay-4 {
+	width: 100vw;
+	height: 100vh;
+	position:absolute;
+	top: 0;
+	left:0;
+  z-index: 9;
+  background : url('/GUI_assets/cathedral.png');
+  background-size: contain;
+  background-position: center center;
+  image-rendering: pixelated;
+  background-repeat:repeat
 }
 
 </style>

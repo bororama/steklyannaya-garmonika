@@ -42,6 +42,9 @@ export class PongService {
     const numericPlayerId: number = +playerId;
     if (numericRoomId == -2)
       return true;
+    if (Number.isNaN(numericRoomId) || Number.isNaN(numericPlayerId)) {
+      return false
+    }
     const match: MatchModel = await this.matchesService.getByRoomId(numericRoomId);
     return numericPlayerId == match.idPlayer1 || numericPlayerId == match.idPlayer2;
   }
@@ -59,7 +62,6 @@ export class PongService {
           } catch (e) {
             socket.disconnect(false);
           }
-          console.log("PARTIDAAAAAAAAAA")
           console.log(payload);
 
           if (!this.verifyPlayer(payload.username, data.pongRoomId)) {

@@ -31,7 +31,11 @@ export default defineComponent({
       this.is_open = !this.is_open
     },
     delete_chan () {
-      fetch (globalThis.backend + '/chats/' + this.channel.id, deleteRequestParams())
+      fetch (globalThis.backend + '/chats/' + this.channel.id, deleteRequestParams()).then((a) => {
+        if (a.status != 200) {
+          this.$router.push('/')
+        }
+      })
       this.deleted = true
     }
   }

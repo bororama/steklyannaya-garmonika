@@ -2,8 +2,9 @@
 
 <div class="overlay">
   <h1 style="font-family: 'joystix'">ADMIN PAGE</h1>
+  <h1 v-if="you_are_not_admin">YOU ARE NOT ADMIN</h1>
 
-  <div class="admin_page_columns_container">
+  <div v-if="!you_are_not_admin" class="admin_page_columns_container">
       <div class="admin_page_column" id="user_ban">
           <h3>Users</h3>
           <User v-for="(user,index) in users" :key="index" :user="user"/>
@@ -32,7 +33,8 @@ export default defineComponent({
   data () {
     return {
       users: [{}],
-      channels: [{}]
+      channels: [{}],
+      you_are_not_admin: true
     }
   },
   created() {
@@ -40,9 +42,10 @@ export default defineComponent({
       a.json().then((users) => {
         for (const user in users) {
           let u = users[user]
-          fetch (globalThis.backend + '/players/' + u.id + '/banned').then((a) => {
+          fetch (globalThis.backend + '/players/' + u.id + '/banned', getRequestParams()).then((a) => {
             a.text().then((isBanned) => {
-                this.users.push(u)
+              u.banned = (isBanned == 'true');
+              this.users.push(u)
             })
           })
         }
@@ -50,13 +53,19 @@ export default defineComponent({
       })
     })
     fetch(globalThis.backend + '/admins/getChatsAndMembers', getRequestParams()).then((a) => {
-      a.json().then((chats) => {
-        for (const chat in chats) {
-          let c = chats[chat]
-          this.channels.push(c)
-        }
-        this.channels.splice(0, 1)
-      })
+      if (a.status != 200) {
+      } else {
+        a.json().then((chats) => {
+          this.you_are_not_admin = false
+          for (const chat in chats) {
+            let c = chats[chat]
+            if (c.is_friend_chat != true) {
+                this.channels.push(c)
+            }
+          }
+          this.channels.splice(0, 1)
+        })
+      }
     })
   }
 })

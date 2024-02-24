@@ -44,6 +44,9 @@ export default defineComponent({
       } else if (this.username === this.new_username) {
         this.invalid_username = true
         this.invalid_user_message = 'Same username'
+      } else if (this.new_username.length > 9) {
+        this.invalid_username = true
+        this.invalid_user_message = 'Username too long'
       } else {
         this.$emit('change_username', this.new_username)
         this.invalid_username = false

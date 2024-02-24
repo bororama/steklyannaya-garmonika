@@ -17,6 +17,8 @@ import PersonalProfile from './components/GUI/components/PersonalProfile.vue';
 import ProfileDisplay from './components/GUI/components/ProfileDisplay.vue';
 import RoutablePong from './components/GUI/components/RoutablePong.vue';
 import Shop from './components/GUI/components/Shop.vue';
+import LoadingWelcome from './components/GUI/components/LoadingWelcome.vue';
+import TempleOfferings from './components/GUI/components/TempleOfferings.vue';
 import { guard_against_not_logged } from './navigation_guards/is_logged.ts';
 import { guard_against_non_admins } from './navigation_guards/is_admin.ts';
 
@@ -47,6 +49,12 @@ const routes = [
             path: 'profile_page',
             name: 'MyProfile',
             component: PersonalProfile,
+            beforeEnter: [guard_against_not_logged]
+          },
+          {
+            path: 'profile_view',
+            name: 'ProfileView',
+            component: ProfileDisplay,
             beforeEnter: [guard_against_not_logged]
           },
           {
@@ -104,7 +112,17 @@ const routes = [
 		path: '/bad_request',
 		name: 'BadRequest',
 		component: NotFound,
-	}
+	},
+    {
+      path: '/securizing',
+      name: 'Securizer',
+      component: LoadingWelcome
+    },
+    {
+      path: '/offerings',
+      name: 'Offerings',
+      component: TempleOfferings
+    }
 ];
 
 const router = createRouter(

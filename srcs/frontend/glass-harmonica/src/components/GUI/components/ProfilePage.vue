@@ -150,12 +150,13 @@ export default defineComponent({
     },
     match () {
       fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
-        this.$router.push({path: '/pong_match', query:{mode:1, id:created_match.match_id}})
+        console.log(created_match)
+        this.$router.push({path: '/pong_match', query:{mode:0, id:created_match.roomId}})
       }))
     },
     match_boundless () {
       fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
-        this.$router.push({path: '/pong_match', query:{mode:2, id:created_match.match_id}})
+        this.$router.push({path: '/pong_match', query:{mode:1, id:created_match.roomId}})
       }))
     },
     spectate () {

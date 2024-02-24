@@ -314,8 +314,9 @@ This only can be done by an operator'
         if (chat  == null) {
             throw new BadRequestException('Chat doesn\'t exists');
         }
-
-        if (chat.isPrivateChat || this.chatService.isOwnerId(chat.id, request.requester_info.dataValues)) {
+        
+        const isOwner = await this.chatService.isOwnerId(request.requester_info.dataValues.id, chat.id);
+        if (chat.isPrivateChat || !isOwner) {
             throw new ForbiddenException('You can\'t remove this chat');
         }
 

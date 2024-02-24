@@ -23,7 +23,6 @@ export default defineComponent({
   name: 'Enabler2FA',
   data () {
     return ({
-      // TODO get from the server
       enabled: globalThis.has2FA,
       enabling: false,
       qr_image: QRNotReceived,
@@ -56,6 +55,7 @@ export default defineComponent({
             this.enabling = true
             this.enabled = true
             globalThis.has2FA = true
+            this.input_code = ""
           } else if (answer === 'ko') {
             this.wrong_code = true
           }
@@ -73,6 +73,7 @@ export default defineComponent({
           if (answer === 'ok') {
             this.not_enabled = true
             this.enabled = false
+            this.input_code = ""
             globalThis.has2FA = false
           } else if (answer === 'ko') {
             this.wrong_code = true

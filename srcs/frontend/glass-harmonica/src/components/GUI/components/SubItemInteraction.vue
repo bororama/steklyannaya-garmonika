@@ -6,8 +6,8 @@
 		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_password" v-if="this.interaction == 'unlocking_password'"/>
 		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_padlock" v-if="this.interaction == 'unlocking_padlock'"/>
 		<ViewMembersPopup @close_interaction="close" @user_interact="user_interact" :members="users_in_chat" v-if="this.interaction == 'displaying_members' || this.interaction == 'making_admin' || this.interaction == 'unmaking_admin' || this.interaction == 'kicking_member'"/>
-        <AddMemberPopup v-if="this.interaction == 'adding_member'" :chat_id="item.chat_id" @close_interaction="close"/>
-        <BanTimeUserPopup v-if="this.interaction == 'time_banning'" :chat_id="item.chat_id" @close_interaction="close"/>
+        <AddMemberPopup v-if="this.interaction == 'adding_member'" :chat_id="item.chat_id" @close_interaction="close_and_reload"/>
+        <BanTimeUserPopup v-if="this.interaction == 'time_banning'" :chat_id="item.chat_id" @close_interaction="close_and_reload"/>
 	</div>
 </template>
 
@@ -40,6 +40,9 @@ export default {
 		close () {
 			this.$emit('close_interaction');
 		},
+		close_and_reload () {
+			this.$emit('close_and_reload');
+		},
 		set_password(password) {
 			this.$emit('set_password', password);
 			this.close();
@@ -56,7 +59,7 @@ export default {
 				if (!this.check_is_admin(member))
 					this.$emit('make_admin', member)
 			} else if (this.interaction == 'unmaking_admin') {
-					this.$emit('unmake_admin', member)
+				this.$emit('unmake_admin', member)
 			} else if (this.interaction == 'kicking_member') {
 				if (member != this.item.sender)
 				{

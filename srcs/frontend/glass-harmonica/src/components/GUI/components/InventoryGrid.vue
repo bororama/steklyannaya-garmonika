@@ -50,22 +50,31 @@ export default {
           this.offered_matches = []
           fetch(backend + '/' + globalThis.id + '/chats', getRequestParams()).then((r) => {
             r.json().then((answer) => {
-              console.log(answer)
               for (const chat in answer) {
                 let c = answer[chat]
                 let rosary
                 let blocked = false
                 rosary = generate_rosary(globalThis.id, answer[chat].id)
+                rosary.public_chat = c.is_public_chat
                 for (const u in c.users) {
                   if (globalThis.id == c.users[u].id) {
-                    console.log(c.users[u])
                     rosary.is_owner = c.users[u].isOwner
                     rosary.is_admin = c.users[u].isAdmin
                     blocked = c.users[u].isLocked
                   }
                 }
                 if (blocked)
+                {
                     rosary = generate_padlock(rosary)
+                } else {
+                  if (rosary.is_owner) {
+                    if (rosary.is_public) {
+                      rosary.owner_options.push( {"text": "Take from temple", "action": "unmake_public"})
+                    } else {
+                      rosary.owner_options.push( {"text": "Offer at temple", "action": "make_public"})
+                    }
+                  }
+                }
                 this.groups.push(rosary)
               }
             })

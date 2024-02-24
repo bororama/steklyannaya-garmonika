@@ -12,7 +12,7 @@
 			<li v-for="(option, index) in item.options" :key="index" class="dropdown_option" @click="act(option.action)">{{ option.text }}</li>
 		</ul>
 	</div>
-	<SubItemInteraction @close_interaction="close_sub_item_interaction" @set_password="set_password" @unlock_password="unlock_password" @make_admin="make_admin" @unmake_admin="unmake_admin" @kick_member="kick_member" @stop_user_display="stop_displaying_user" @unlock_padlock="unlock_padlock" :interaction="active_interaction" :item="item" :userId="userId"/>
+	<SubItemInteraction @close_interaction="close_sub_item_interaction" @close_and_reload="close_and_reload" @set_password="set_password" @unlock_password="unlock_password" @make_admin="make_admin" @unmake_admin="unmake_admin" @kick_member="kick_member" @stop_user_display="stop_displaying_user" @unlock_padlock="unlock_padlock" :interaction="active_interaction" :item="item" :userId="userId"/>
 </div>
 
 </template>
@@ -143,6 +143,18 @@ async function act (action) {
        } else if (action == "time_ban") {
          active_interaction.value = "time_banning";
          close_drop();
+       } else if (action == "destroy_chat") {
+         close_drop();
+         await fetch (backend + '/chats/' + item.value.chat_id, deleteRequestParams())
+         emit('reload_inventory');
+       } else if (action == "make_public") {
+         close_drop()
+         await fetch (backend + '/chats/' + item.value.chat_id + '/make_public', postRequestParams())
+         emit('reload_inventory');
+       } else if (action == "unmake_public") {
+         close_drop()
+         await fetch (backend + '/chats/' + item.value.chat_id + '/unmake_public', postRequestParams())
+         emit('reload_inventory');
  	} else {
  		console.log("ERROR: Unrecognised option");
  	}
@@ -150,6 +162,11 @@ async function act (action) {
 
 function close_sub_item_interaction() {
  	active_interaction.value = 'none';
+}
+
+function close_and_reload() {
+  close_sub_item_interaction()
+  emit('reload_inventory')
 }
 
 function set_password(password) {
@@ -217,6 +234,7 @@ function unlock_padlock(password) {
 function make_admin(member) {
        fetch(backend + "/chats/" + item.value.chat_id + "/admins/" + globalThis.id + '/riseToAdmin/' + member, postRequestParams()); 
  	active_interaction.value = 'none';
+    emit('reload_inventory')
 }
 
 function unmake_admin(member) {
@@ -227,6 +245,7 @@ function unmake_admin(member) {
  			item.value.admins.splice(i, 1);
  	}
  	active_interaction.value = 'none';
+    emit('reload_inventory')
 }
 
 function kick_member(member) {
@@ -240,6 +259,7 @@ function kick_member(member) {
  			item.value.admins.splice(j, 1);
  	}
  	active_interaction.value = 'none';
+    emit('reload_inventory')
 }
 
 function stop_displaying_user() {

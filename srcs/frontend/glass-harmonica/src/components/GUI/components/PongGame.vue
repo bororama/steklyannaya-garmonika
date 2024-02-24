@@ -72,8 +72,6 @@ export default defineComponent({
         if (this.socket) {
           this.socket.on("connect", () => {
             console.log("Connected to the server.");
-            console.log("log Token", globalThis.logToken)
-            console.log(" BEGGINGING GAME");
             this.socket?.emit("beginGame", {
               mode: this.modo,
               pongRoomId: this.pongRoomId,
@@ -81,7 +79,6 @@ export default defineComponent({
             });
           });
           this.socket.on('matchInfo', (info: any) => {
-            console.log("match info ", info.pongRoomId );
             this.matchIndex = info.matchIndex;
             this.paddleIndex = info.paddleIndex;
           });
@@ -190,13 +187,11 @@ export default defineComponent({
           if (this.colorSelector != 0){
             this.colorSelector--;  
             this.config!.BACKGROUND_COLOUR = this.colors[this.colorSelector];
-            console.log(this.colorSelector);
           }
         } else if (this.keysPressed["p"] || this.keysPressed["P"]) {
           if (this.colorSelector < this.colors.length - 1){
             this.colorSelector++;
             this.config!.BACKGROUND_COLOUR = this.colors[this.colorSelector];
-            console.log(this.colorSelector);
           }
         }
       }

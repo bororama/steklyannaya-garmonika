@@ -71,7 +71,6 @@ export default {
           this.coins = player.franciscoins;
           this.pearls = player.pearls;
           this.necklaces = player.necklaces;
-          console.log(player);
         })
       })
     },
