@@ -160,6 +160,24 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     }
   }
 
+  blockUser(userId : string, blockedUserId : string) {
+    const client = liveClients.find((c) => {
+      return c.player.user.id === userId;
+    });
+    if (client) {
+      client.socket.emit('blockUser', {blockedUserId : blockedUserId});
+    }
+  }
+
+  unblockUser(userId : string, blockedUserId : string) {
+    const client = liveClients.find((c) => {
+      return c.player.user.id === userId;
+    });
+    if (client) {
+      client.socket.emit('unblockUser', {blockedUserId : blockedUserId});
+    }
+  }
+
   async setOnlineStatus(userId: string, status: boolean): Promise<void> {
     const searchCondition = isNaN(+userId)
       ? { userName: userId }

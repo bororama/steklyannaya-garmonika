@@ -6,6 +6,7 @@ import { ref } from 'vue'
 
 
 async function spawnPlayers(liveClients: Array<PlayerData>, metaverse : Metaverse) {
+	// await for blocked user array then for each liveClient, check if their blocked, if so send this info to spawnPlayer()
 	liveClients.forEach(async (c) => {
 		await metaverse.gameWorld.spawnPlayer(c);
 	});
@@ -110,6 +111,10 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 		else {
 			metaverse.gameWorld.changeRemotePlayerName(payload.id, payload.newName);
 		}
+	});
+
+	metaSocket.on('blockUser', (payload : any) => {
+		metaverse.gameWorld.blockUser(payload.blockedUserId);
 	});
 
 	metaSocket.on('exception', (data) => {

@@ -1,5 +1,15 @@
+<style>
+  .outer-darkness {
+    height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; z-index: -1; background-size:
+  contain;
+  background-image: url("/GUI_assets/outer_darkness.gif");
+  }
+</style>
+
 <template>
 	<PongGame :meta-socket="metaSocket" :modo="0" :pong-room-id="-2"  v-if="match" @closeGame="closeGame"/>
+  <div class="outer-darkness">
+  </div>
 </template>
 
 <script setup lang="ts">

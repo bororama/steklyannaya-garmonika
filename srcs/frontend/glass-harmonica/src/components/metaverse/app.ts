@@ -258,7 +258,7 @@ class GameWorld {
         let player = this._findLivePlayer(m.user.id);
         if (player) {
             console.log(" player that's sayin' all this ", player);
-            player.say(m.text);
+            player.say((player.isBlocked) ? 'censored message' : m.text);
         }
     }
 
@@ -285,16 +285,24 @@ class GameWorld {
         }
     }
 
-    apotheosis(name: string) {
-        const player = this._findLivePlayer(name);
+    apotheosis(id: string) {
+        const player = this._findLivePlayer(id);
 
         if (player) {
             player.showFlamingSoul();
         }
     }
 
-    stopApotheosis(name: string) {
-        const player = this._findLivePlayer(name);
+    blockUser(id : string) {
+        const player = this._findLivePlayer(id);
+
+        if (player) {
+            player.getBlocked();
+        }
+    }
+
+    stopApotheosis(id: string) {
+        const player = this._findLivePlayer(id);
 
         if (player) {
             player.hideFlamingSoul();

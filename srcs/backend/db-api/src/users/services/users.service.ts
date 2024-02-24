@@ -216,6 +216,7 @@ export class UsersService {
                 blockerId: userId,
                 blockedId: blockedUserId
             });
+            this.metaverseGateway.blockUser(userId.toString(), blockedUserId.toString());
         }
         catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
@@ -247,6 +248,7 @@ export class UsersService {
                 blockedId: blockedUserId
             }
         });
+        this.metaverseGateway.unblockUser(userId.toString(), blockedUserId.toString());
     }
 
     async getOnlineUsers(): Promise<User[]> {
