@@ -31,7 +31,6 @@ export default {
 }
 
 .information_wrapper {
-	width: 99vw;
 	margin:0;
 }
 
