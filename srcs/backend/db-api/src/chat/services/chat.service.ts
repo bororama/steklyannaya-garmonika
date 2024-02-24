@@ -148,11 +148,22 @@ export class ChatService {
         return this.chatModel.findAll();
     }
 
+    findAllExceptFriendshipChats(): Promise<Chat[]> {
+        return this.chatModel.findAll({
+            where: {
+                isFriendshipChat: false
+            }
+        });
+    }
+
     findAllWithUsernames(): Promise<Chat[]> {
         return this.chatModel.findAll({
+            where: {
+                isFriendshipChat: false
+            },
             include: {
                 model: User,
-                attributes: ['id', 'userName']
+                attributes: ['id', 'userName'],
             }
         })
     }
@@ -170,7 +181,7 @@ export class ChatService {
     async getChatUsers(id: number): Promise<ChatUsers[]> {
         return this.chatUserModel.findAll({
             where: {
-                chatId: id
+                chatId: id,
             },
             include: {
                 model: User

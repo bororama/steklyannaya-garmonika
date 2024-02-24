@@ -115,7 +115,7 @@ export class AdminsController {
 
     @Get('/getChatsAndMembers')
     async getChatsAndMembers(): Promise<ChatDto[]> {
-        const chatsPromise: Promise<Chat[]> = this.chatService.findAll();
+        const chatsPromise: Promise<Chat[]> = this.chatService.findAllExceptFriendshipChats();
         return chatsPromise
             .then(async chats => await Promise.all(chats
                 .map(chat => this.chatService.getChatUsers(chat.id)
