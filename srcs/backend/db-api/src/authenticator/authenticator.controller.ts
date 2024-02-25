@@ -179,7 +179,7 @@ export class AuthenticatorController {
                                           token:enable2FAInfo.code,
                                           window: 6})
     if (isValid) {
-      this.userService.set2FA(payload.username, true)
+      await this.userService.set2FA(payload.username, true)
       return 'ok'
     }
     else
@@ -200,7 +200,7 @@ export class AuthenticatorController {
                                             token:enable2FAInfo.code,
                                             window: 6})
       if (isValid) {
-        this.userService.set2FA(payload.username, false)
+        await this.userService.set2FA(payload.username, false)
         return 'ok'
       }
       else

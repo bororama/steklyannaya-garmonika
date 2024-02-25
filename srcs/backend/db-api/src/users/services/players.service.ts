@@ -29,6 +29,9 @@ export class PlayersService {
     }
 
     async findAllExcludingRequester(requester: number): Promise<Player []> {
+        if (!requester || isNaN(requester)) {
+            return this.findAll();
+        }
         return this.playerModel.findAll({
             include: User,
             where: {
@@ -38,6 +41,20 @@ export class PlayersService {
     }
 
     async findAllWithBanStatus(requester: number) {
+        if (!requester || isNaN(requester)) {
+            return this.playerModel.findAll({
+                include: [
+                    {
+                        model: User,
+                        required: true
+                    },
+                    {
+                        model: Ban,
+                        required: false
+                    }
+                ]
+            });
+        }
         return this.playerModel.findAll({
             where: {
                 id: { [Op.ne]: requester }
@@ -56,6 +73,10 @@ export class PlayersService {
     }
 
     async findOne(userId: string): Promise<Player> {
+        if (!userId) {
+            return undefined;
+        }
+
         if (!isNaN(+userId)) {
             return this.playerModel.findOne({
                 where: { id: +userId },
@@ -94,6 +115,10 @@ export class PlayersService {
     }
 
     async getPlayerStatus(playerId: number): Promise<UserStatus> {
+        if (!playerId || isNaN(playerId)) {
+            return undefined;
+        }
+
         return this.playerModel.findByPk(playerId, {
             attributes: [],
             include: {
@@ -209,6 +234,11 @@ export class PlayersService {
     }
 
     async sendFriendshipPetitionById(playerId: number, newFriend: number) : Promise<void> {
+        if (!playerId || !newFriend || isNaN(playerId) || isNaN(newFriend))
+        {
+            return ;
+        }
+
         const friendship = await this.friendshipModel.findOne({
             where: {
                 [Op.or]: [
@@ -419,6 +449,9 @@ export class PlayersService {
         }
 
         const modifiedUser = await this.usersService.update(user.user, newPlayer);
+        if (!modifiedUser) {
+            return null;
+        }
 
         let modifiedPlayer = await user.save();
         modifiedPlayer.user = modifiedUser;

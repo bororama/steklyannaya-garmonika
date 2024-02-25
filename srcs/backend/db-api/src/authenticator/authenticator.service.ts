@@ -67,6 +67,9 @@ export class AuthenticatorService {
 			let user : any;
 			try {
 				user = await this.userService.signIn(personal.login);
+				if (!user) {
+					throw new ForbiddenException('Needs to register');
+				}
 				if (user.has2FA) {
 					log_attempt.status = 'needs_2fa'
 					log_attempt.fa_token = jwt.sign({login: personal.login, username: user.dataValues.id}, this.jwt_2fa_secret)
