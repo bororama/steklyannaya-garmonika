@@ -126,13 +126,13 @@ export class AuthenticatorController {
     let payload : any;
     const token : string = this.extractJwt(request);
     try {
-      console.log("THIS IS THE TOKEN")
-      console.log (token)
-      console.log (this.authService.jwt_log_secret)
       payload = jwt.verify(token, this.authService.jwt_log_secret)
     }
     catch {
-      console.log("ME CATCH")
+      throw new UnauthorizedException('Unauthorized - Invalid JWT token');
+    }
+
+    if (!payload.username) {
       throw new UnauthorizedException('Unauthorized - Invalid JWT token');
     }
     const player: Player = await this.playerService.findOne(payload.username)
