@@ -58,6 +58,7 @@ class GameWorld {
     private _yellowDevilName: string;
     private _yellowDevil: NPC | any;
     private _NPCS: Array<NPC> | any;
+    private _ready : boolean;
 
     constructor(metaSocket: Socket, playerData: PlayerData) {
         this._canvas = this._createCanvas();
@@ -71,6 +72,7 @@ class GameWorld {
         this._input = null;
         this._livePlayers = new Array();
         this._NPCS = new Array();
+        this._ready = false;
         this._environment = null;
         this._yellowDevilName = 'فرانسيسكو خيسوس دي جاتا وفالديس';
         //Events for debugging
@@ -112,7 +114,7 @@ class GameWorld {
     */
 
     isReady() {
-        return this._scene.isReady();
+        return this._ready;
     }
 
     async ready() {
@@ -208,19 +210,22 @@ class GameWorld {
             console.log("Instancing mesh for ", player.user.name);
 
             try {
-                const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
-                if (!assets) {
-                    console.error('Failed to load player assets.');
-                    return;
-                }
+                this._scene.executeWhenReady( async () => {
+                    const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
+                    if (!assets) {
+                        console.error('Failed to load player assets.');
+                        return;
+                    }
+                    let newPlayer: any = new RemotePlayer(assets, this._scene, player.user);
+                    if (!newPlayer) {
+                        console.error('Failed to instantiate RemotePlayer.');
+                        return;
+                    }
+                    this._livePlayers.push(newPlayer);
+                    console.log("instanced")
 
-                let newPlayer: any = new RemotePlayer(assets, this._scene, player.user);
-                if (!newPlayer) {
-                    console.error('Failed to instantiate RemotePlayer.');
-                    return;
-                }
+                });
 
-                this._livePlayers.push(newPlayer);
             } catch (error) {
                 console.error('Error during player spawning:', error);
             }
@@ -252,7 +257,8 @@ class GameWorld {
 
         let player = this._findLivePlayer(m.user.id);
         if (player) {
-            player.say(m.text);
+            console.log(" player that's sayin' all this ", player);
+            player.say((player.isBlocked) ? 'censored message' : m.text);
         }
     }
 
@@ -266,16 +272,37 @@ class GameWorld {
         this._player?.setState(state);
     }
 
-    apotheosis(name: string) {
-        const player = this._findLivePlayer(name);
+    changeLocalPlayerName(newName: string) {
+        this._player.updateName(newName);
+    }
+
+    changeRemotePlayerName(id: string, newName: string) {
+        let player = this._findLivePlayer(id);
+
+        if (player) {
+            console.log("changingName of remote player ", player);
+            player.updateName(newName);
+        }
+    }
+
+    apotheosis(id: string) {
+        const player = this._findLivePlayer(id);
 
         if (player) {
             player.showFlamingSoul();
         }
     }
 
-    stopApotheosis(name: string) {
-        const player = this._findLivePlayer(name);
+    blockUser(id : string) {
+        const player = this._findLivePlayer(id);
+
+        if (player) {
+            player.getBlocked();
+        }
+    }
+
+    stopApotheosis(id: string) {
+        const player = this._findLivePlayer(id);
 
         if (player) {
             player.hideFlamingSoul();
@@ -378,6 +405,7 @@ class GameWorld {
         this._scene.attachControl();
         this._setUpMaterials();
         await this._instanceAllNpcs();
+        this._ready = true;
     }
 
     private async _initializeGameAsync(scene: Scene): Promise<void> {
@@ -398,29 +426,29 @@ class GameWorld {
         );
 
         /*guille*/
-         assets = await this._loadPlayerAssets(this._scene, false, 'escultura1.glb');
-         assets["height"] = 6;
-         this._NPCS.push(
-             new NPC(assets, this._scene, 'Guillermo', 'angel',
-                 new Vector3(-259.19837561453, 49.69347184924647, -181.9513474067934),
-                 new Quaternion(0, 0.8, 0),
-                 [
-                     "Buy 'El aquelarre de Celia'",
-                     "Read 'El aquelarre de Celia'",
-                     "The Falcon has spread its wings.",
-                     "Climb down this hill, find your destiny",
-                     "Be careful in this God-forsaken land",
-                     "Do it for Him",
-                     "The wings of liberty glide across the sky",
-                     "Offer your heart",
-                     "MARCH ON",
-                     "I like you. I want you",
-                     "*frowns*",
-                 ]
-             )
-         );
- 
-         /*Nico*/
+        assets = await this._loadPlayerAssets(this._scene, false, 'escultura1.glb');
+        assets["height"] = 6;
+        this._NPCS.push(
+            new NPC(assets, this._scene, 'Guillermo', 'angel',
+                new Vector3(-259.19837561453, 47.69347184924647, -181.9513474067934),
+                new Quaternion(0, 0.8, 0),
+                [
+                    "Buy 'El aquelarre de Celia'",
+                    "Read 'El aquelarre de Celia'",
+                    "The Falcon has spread its wings.",
+                    "Climb down this hill, find your destiny",
+                    "Be careful in this God-forsaken land",
+                    "Do it for Him",
+                    "The wings of liberty glide across the sky",
+                    "Offer your heart",
+                    "MARCH ON",
+                    "I like you. I want you",
+                    "*frowns*",
+                ]
+            )
+        );
+
+        /*Nico*/
         assets = await this._loadPlayerAssets(this._scene, false, 'nico1.glb');
         assets["height"] = 5;
         this._NPCS.push(
@@ -541,7 +569,7 @@ class GameWorld {
 
     private async _loadPlayerAssets(scene: Scene, checkCollisions: boolean, modelPath: string) {
         //collision mesh
-        const outer = MeshBuilder.CreateBox("outer", { width: 1, depth: 1, height: 1 }, scene);
+        const outer = await MeshBuilder.CreateBox("outer", { width: 1, depth: 1, height: 1 }, scene);
         outer.isVisible = false;
         outer.isPickable = false;
         outer.checkCollisions = checkCollisions;

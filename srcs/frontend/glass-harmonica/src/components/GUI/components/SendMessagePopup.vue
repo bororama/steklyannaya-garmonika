@@ -14,7 +14,7 @@
 
 import { postRequestParams } from './connect_params'
 export default {
-	props: ['chat_id', 'sender'],
+	props: ['chat_id', 'sender', 'target'],
 	data: () => ({
 		message_text_component: ""
 	}),

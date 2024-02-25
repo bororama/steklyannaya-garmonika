@@ -18,6 +18,7 @@ export default {
 	}),
 	methods:{
 		lock() {
+          if (this.password_component != "")
 			this.$emit('set_password', this.password_component);
 		}
 	}

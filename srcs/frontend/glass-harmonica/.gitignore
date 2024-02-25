@@ -13,6 +13,7 @@ dist
 dist-ssr
 coverage
 *.local
+srcs/backend/db-api/src/profile_pics/
 
 /cypress/videos/
 /cypress/screenshots/

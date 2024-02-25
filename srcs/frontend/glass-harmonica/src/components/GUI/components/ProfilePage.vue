@@ -11,7 +11,7 @@
                 <Username :username="this.username" :editable="display_status == 'registering' || display_status == 'my_profile'" @change_username="changeUsername"/>
                 <div class="float_left">
                     <Enabler2FA v-if="display_status != 'registering' && display_status != 'profile_display'"/>
-                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && !is_friend && !is_potential_friend" @click="befriend">Befriend</button>
+                    <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && !is_friend && !is_potential_friend" @click="befriend">Sneak Pearl</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked" @click="block">Block</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online' && !unmatchable" @click="match">Match</button>
                     <button class="compressed_button" v-if="display_status == 'profile_display' && !is_blocked && is_friend && online_status == 'online' && !unmatchable" @click="match_boundless">Boundless</button>
@@ -21,6 +21,7 @@
             <h3 v-if="not_enough_pearls">Not enough pearls</h3>
         </div>
     </div>
+    <h3 class="edit_error_field" v-if="already_registered">Username already in use</h3>
     <button class='fa_button' v-if="display_status == 'registering' && can_register" @click="registerUser">Descend to جَيَّان</button>
 
 </template>
@@ -58,57 +59,76 @@ export default defineComponent({
       online_status: 'disconnected',
       matchUserId: '0',
       can_register: false,
-      not_enough_pearls: false
+      not_enough_pearls: false,
+      already_registered: false
     })
   },
   methods: {
+    async upload_and_emit(registerAnswer) {
+      console.log({tut: "Hola", yup: "Adios"})
+       const param = postRequestParams()
+       const formData = new FormData()
+       await formData.append('image', this.image)
+       globalThis.logToken = registerAnswer.meta_token
+       param.body = formData
+       param.headers = {
+           Authorization: 'Bearer ' + globalThis.logToken
+       }
+       console.log(param)
+       await fetch(backend + '/users/' + this.username  + '/uploadProfilePic', param)
+       this.$emit('successful_register', registerAnswer.meta_token)
+    },
     registerUser () {
       const myData : any = postRequestParams()
       myData.body = JSON.stringify({
         username: this.username,
-        register_token: this.register_token
+        register_token: this.register_token,
       })
-      fetch(globalThis.backend + '/log/register', myData).then((r) => {
-        r.json().then((registerAnswer) => {
-          if (registerAnswer.status === 'ok') {
-            if (this.image != 'no_image')
-            {
-                const formData = new FormData()
-                formData.append('image', this.image)
-                fetch(globalThis.backend + '/users/' + this.username + '/uploadProfilePic', {
-                  method: 'POST',
-                  headers: {
-                    Authorization: "Bearer " + registerAnswer.meta_token
-                  },
-                  body: formData
-                })
+      fetch(backend + '/log/register', myData).then((r) => {
+        if (r.status == 400) {
+           this.already_registered = true
+        } else {
+          r.json().then((registerAnswer) => {
+            if (registerAnswer.status === 'ok') {
+              globalThis.logToken = registerAnswer.meta_token
+              if (this.image != 'no_image')
+              {
+                 this.upload_and_emit(registerAnswer);
+              } else {
+                  this.$emit('successful_register', registerAnswer.meta_token)
+              }
             }
-            this.$emit('successful_register', registerAnswer.meta_token)
-          }
-        })
+          })
+        }
       })
     },
     changeUsername (newUsername : string) {
       if (this.display_status != 'registering')
       {
-        fetch(globalThis.backend + '/changeUsername/' + this.username + '/' + newUsername, getRequestParams())
+        fetch(backend + '/changeUsername/' + this.username + '/' + newUsername, postRequestParams()).then((a) => {
+          if (a.status == 400) {
+            this.already_registered = true
+          }
+        })
       }
       this.username = newUsername
+      globalThis.username = newUsername
+      let param = postRequestParams()
     },
     changeImage(new_image:string) {
       if (this.display_status != 'registering')
       {
         const formData = new FormData()
-        formData.append('image', new_image)
-        fetch(globalThis.backend + '/users/' + globalThis.id + '/uploadProfilePic', {
-          method: 'POST',
-          headers: {
-            Authorization: "Bearer " + globalThis.logToken
-          },
-          body: formData,
-        })
-      } else {
         console.log(new_image)
+        formData.append('image', new_image)
+        let param = postRequestParams()
+        param.body = formData
+        param.headers = {
+          Authorization: 'Bearer ' + globalThis.logToken
+        }
+        console.log(param)
+        fetch(backend + '/users/' + globalThis.id + '/uploadProfilePic', param)
+      } else {
         this.image = new_image
       }
     },
@@ -129,19 +149,14 @@ export default defineComponent({
       })
     },
     match () {
-      fetch (globalThis.backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
-        console.log("NORMAL")
-        created_match.match_id = created_match.roomId;
-        created_match.boundless = false
-        this.$emit('start_match', created_match)
+      fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
+        console.log(created_match)
+        this.$router.push({path: '/pong_match', query:{mode:0, id:created_match.roomId}})
       }))
     },
     match_boundless () {
-      fetch (globalThis.backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
-        console.log("BOUNDLESS")
-        created_match.match_id = created_match.roomId;
-        created_match.boundless = true
-        this.$emit('start_match', created_match)
+      fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
+        this.$router.push({path: '/pong_match', query:{mode:1, id:created_match.roomId}})
       }))
     },
     spectate () {
@@ -188,6 +203,15 @@ export default defineComponent({
           this.player_data = player
           this.username = player.name
           this.is_friend = false
+          fetch (globalThis.backend + '/' + globalThis.id + '/blocks', getRequestParams()).then((a) => {
+            a.json().then((blocks) => {
+              for (const b in blocks)
+              {
+                if (blocks[b].username ==  player.username)
+                  this.is_blocked = true;
+              }
+            })
+          })
           fetch (globalThis.backend + '/players/' + globalThis.id + '/isFriend/' + this.userId, getRequestParams()).then((a) => {a.text().then((isFriend) => {
                 if (isFriend == 'yes')
                   this.is_friend = true
@@ -201,9 +225,9 @@ export default defineComponent({
                   this.is_potential_friend = true
                 }
               }
+              setTimeout(() => {this.loaded = true}, 10)
             })
           })
-          this.loaded = true
         })
       })
     } else {

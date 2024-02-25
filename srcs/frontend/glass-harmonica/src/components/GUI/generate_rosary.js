@@ -26,6 +26,7 @@ export default function generate_rosary(sender, id) {
         "is_admin": false,
         "is_owner": false,
 		"glow": false,
+        "is_public": false,
 		"description": "Is it better to conect with the indvidual, or with the group? What makes for better phylosophical debate? You seem to have found your own answer..."
 	}
 	);

@@ -1,6 +1,6 @@
 <template>
   <div class="global-shop overlay">
-    <button  @click="() => {this.$emit('closeShop')}" class="fa_button">EXIT</button>
+    <button  @click="$router.push('/')" class="fa_button">EXIT</button>
     <h1>متجر فرانسيسكو خيسوس دي جاتا إي فالديس</h1>
     <div class="shop-wrapper">
       <div>
@@ -66,13 +66,11 @@ export default {
       this.text = this.texts[Math.floor(Math.random() * this.texts.length)];
     },
     updateInfo() {
-      console.log("IDDDDDDD" + globalThis.id)
       fetch(globalThis.backend + '/players/' + globalThis.id, getRequestParams()).then((answer) => {
         answer.json().then((player) => {
           this.coins = player.franciscoins;
           this.pearls = player.pearls;
           this.necklaces = player.necklaces;
-          console.log(player);
         })
       })
     },

@@ -2,7 +2,7 @@
     <p class="edit_error_field" v-if="this.invalid_username">{{this.invalid_user_message}}</p>
     <div class="username_container">
         <h3 class="username_text" v-if='!this.editing'>{{username}}</h3>
-        <textarea class="username_input" v-if='this.editing' v-model="new_username"></textarea>
+        <textarea id="username_editable_field" class="username_input" v-if='this.editing' v-model="new_username"></textarea>
         <EditField v-if="this.editable" @start_edit="start_edit" @cancel_edit="cancel_edit" @accept_edit="accept_edit"/>
     </div>
 </template>
@@ -30,6 +30,10 @@ export default defineComponent({
     start_edit () {
       this.editing = true
       this.new_username = this.username
+      this.$nextTick(() => {
+        document.getElementById("username_editable_field").focus()
+        this.new_username = ''
+      })
     },
     accept_edit () {
       this.editing = false
@@ -40,6 +44,9 @@ export default defineComponent({
       } else if (this.username === this.new_username) {
         this.invalid_username = true
         this.invalid_user_message = 'Same username'
+      } else if (this.new_username.length > 9) {
+        this.invalid_username = true
+        this.invalid_user_message = 'Username too long'
       } else {
         this.$emit('change_username', this.new_username)
         this.invalid_username = false
@@ -77,6 +84,7 @@ export default defineComponent({
 .edit_error_field {
   color: red;
   margin: 0.2em;
+  font-family: joystix;
 }
 
 </style>

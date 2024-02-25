@@ -171,7 +171,11 @@ export class MatchesService {
     }
 
     async delete(matchId: number): Promise<void> {
-        const match = await  this.matchModel.findOne({
+      console.log("HEREEEEEE")
+      console.log(matchId)
+      if (!matchId)
+        return 
+      const match = await  this.matchModel.findOne({
             where: {
                 [Op.or]: [
                     { id: matchId },

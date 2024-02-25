@@ -26,25 +26,34 @@ export default defineComponent({
   },
   methods: {
     ban () {
-      fetch (globalThis.backend + '/admins/' + globalThis.id + '/ban/' + this.user.id, postRequestParams())
+      fetch (globalThis.backend + '/admins/' + globalThis.id + '/ban/' + this.user.id, postRequestParams()).then((a) => {
+        if (a.status != 201)
+          this.$router.push('/')
+      })
       this.is_banned = true
     },
     unban () {
-      fetch (globalThis.backend + '/admins/unban/' + this.user.id, postRequestParams())
+      fetch (globalThis.backend + '/admins/unban/' + this.user.id, postRequestParams()).then((a) => {
+        if (a.status != 201)
+          this.$router.push('/')
+      })
       this.is_banned = false
     }, 
     make_admin () {
-      fetch (globalThis.backend + '/admins/' + this.user.id, postRequestParams())
+      fetch (globalThis.backend + '/admins/' + this.user.id, postRequestParams()).then((a) => {
+        if (a.status != 201) {
+          this.$router.push('/')
+        }
+      })
       this.is_admin = true
     },
     unmake_admin() {
-      fetch (globalThis.backend + '/admins/' + this.user.id, deleteRequestParams())
+      fetch (globalThis.backend + '/admins/' + this.user.id, deleteRequestParams()).then((a) => {
+        if (a.status != 200)
+          this.$router.push('/')
+      })
       this.is_admin = false
     }
-  },
-  created () {
-    console.log("AHHH")
-    console.log(this.user)
   }
 })
 

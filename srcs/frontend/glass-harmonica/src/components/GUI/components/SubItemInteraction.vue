@@ -1,21 +1,13 @@
 <template>
 	<div class="sub_interaction_wrapper" v-if="this.interaction != 'none'">
 		<ViewMessagesPopup @close_interaction="close" :chatId="item.chat_id" :user="item.sender" v-if="this.interaction == 'viewing_messages'"/>
-		<SendMessagePopup @close_interaction="close" :chat_id="item.chat_id" :sender="item.sender" v-if="this.interaction == 'sending_message'"/>
+		<SendMessagePopup @close_interaction="close" :chat_id="item.chat_id" :sender="item.sender" :target="item.target" v-if="this.interaction == 'sending_message'"/>
 		<SetPasswordPopup @close_interaction="close" @set_password="set_password" v-if="this.interaction == 'setting_password'"/>
 		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_password" v-if="this.interaction == 'unlocking_password'"/>
 		<InputPasswordPopup @close_interaction="close" @unlock_password="unlock_padlock" v-if="this.interaction == 'unlocking_padlock'"/>
 		<ViewMembersPopup @close_interaction="close" @user_interact="user_interact" :members="users_in_chat" v-if="this.interaction == 'displaying_members' || this.interaction == 'making_admin' || this.interaction == 'unmaking_admin' || this.interaction == 'kicking_member'"/>
-        <AddMemberPopup v-if="this.interaction == 'adding_member'" :chat_id="item.chat_id" @close_interaction="close"/>
-        <BanTimeUserPopup v-if="this.interaction == 'time_banning'" :chat_id="item.chat_id" @close_interaction="close"/>
-        <div  v-if="displaying_profile" class="overlay">
-            <button @click="closeProfile">Close Profile</button>
-            <ProfilePage display_status="profile_display" :userId="display_userId" @start_match="(param) => $emit('go_to_pong_match', param)"/>
-        </div>
-        <div  v-if="this.interaction == 'user_display'" class="overlay">
-            <button @click="stop_user_display">Close Profile</button>
-            <ProfilePage  display_status="profile_display" :userId="userId" @start_match="(param) => $emit('go_to_pong_match', param)"/>
-        </div>
+        <AddMemberPopup v-if="this.interaction == 'adding_member'" :chat_id="item.chat_id" @close_interaction="close_and_reload"/>
+        <BanTimeUserPopup v-if="this.interaction == 'time_banning'" :chat_id="item.chat_id" @close_interaction="close_and_reload"/>
 	</div>
 </template>
 
@@ -48,6 +40,9 @@ export default {
 		close () {
 			this.$emit('close_interaction');
 		},
+		close_and_reload () {
+			this.$emit('close_and_reload');
+		},
 		set_password(password) {
 			this.$emit('set_password', password);
 			this.close();
@@ -64,7 +59,7 @@ export default {
 				if (!this.check_is_admin(member))
 					this.$emit('make_admin', member)
 			} else if (this.interaction == 'unmaking_admin') {
-					this.$emit('unmake_admin', member)
+				this.$emit('unmake_admin', member)
 			} else if (this.interaction == 'kicking_member') {
 				if (member != this.item.sender)
 				{

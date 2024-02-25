@@ -1,8 +1,9 @@
 <template>
     <div>
+        <h1 v-if="needs2fa">Input 2FA code to access</h1>
         <textarea v-model='code2fa' v-if="needs2fa"></textarea>
         <button @click="send_with_code" v-if="needs2fa">Send</button>
-        <h1 v-if="wrong_code">WRONG CODE</h1>
+        <h1 v-if="wrong_code && needs2fa">WRONG CODE</h1>
     </div>
 </template>
 
@@ -37,6 +38,7 @@ export default defineComponent({
       window.location.href = this.api_42
     } else if (urlParams.get('code') !== null) {
       const code : any = urlParams.get('code')
+      window.history.replaceState({}, document.title, "/")
       this.try_log(code)
     }
   },

@@ -27,15 +27,24 @@ export default defineComponent({
   },
   methods: {
     make_admin () {
-      fetch (globalThis.backend + '/admins/chatOptions/' + this.chatId + '/raiseToAdmin/' + this.user.id, postRequestParams())
+      fetch (globalThis.backend + '/admins/chatOptions/' + this.chatId + '/raiseToAdmin/' + this.user.id, postRequestParams()).then((a) => {
+        if (a.status != 200)
+          this.$router.push('/')
+      })
       this.admin = true
     },
     demote_admin () {
-      fetch (globalThis.backend + '/admins/chatOptions/' + this.chatId + '/revokeAdmin/' + this.user.id, postRequestParams())
+      fetch (globalThis.backend + '/admins/chatOptions/' + this.chatId + '/revokeAdmin/' + this.user.id, postRequestParams()).then((a) => {
+        if (a.status != 200)
+          this.$router.push('/')
+      })
       this.admin = false
     },
     kick_user () {
-      fetch (globalThis.backend + '/chats/' + this.user.id + '/' + this.chatId, deleteRequestParams())
+      fetch (globalThis.backend + '/chats/' + this.user.id + '/' + this.chatId, deleteRequestParams()).then((a) => {
+        if (a.status != 200)
+          this.$router.push('/')
+      })
       this.kicked = true
     }
   }

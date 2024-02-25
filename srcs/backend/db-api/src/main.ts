@@ -10,13 +10,14 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('ft_transcendence DB API Doc')
     .setDescription('API Specification for the Database API for the ft_transcendence project')
-    .setVersion('0.1.1')
+    .setVersion('0.0.123')
     .addBearerAuth()
     .build();
     
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  app.use(express.json({limit: '50mb'}))
   const configService = app.get<ConfigService>(ConfigService);
   const host = configService.get('HOST').toLowerCase();
   const port = configService.get('FRONTEND_PORT');

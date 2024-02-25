@@ -20,6 +20,7 @@ export default defineComponent({
   },
   created() {
     this.letGodSpeak()
+    console.log("ILLUSION IS ETERNITY")
   },
   methods: {
     async letGodSpeak() {
@@ -54,8 +55,10 @@ export default defineComponent({
 
 @keyframes god_speaks {
   0% {opacity: 0}
+  10% {opacity: 0}
   25% {opacity: 100%}
   50% {opacity: 100%}
+  90% {opacity: 0}
   100% {opacity: 0}
 }
 

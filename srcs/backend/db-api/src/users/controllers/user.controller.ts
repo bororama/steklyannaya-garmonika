@@ -12,7 +12,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @Controller()
 @ApiTags("User General Data")
 export class UsersController {
-    constructor (private readonly usersService: UsersService) {}
+    constructor (
+        private readonly usersService: UsersService,
+        ) {}
 
     checkIfAuthorized(requester: User, userId: string) {
         return isNaN(+userId)
@@ -171,6 +173,7 @@ export class UsersController {
         @Param('idOrUsername') userId : string) {
 		Logger.debug("Upload Profile Pic endpoint called");
         if (!this.checkIfAuthorized(request.requester_info.dataValues, userId)) {
+            console.log("Unauthorized");
             throw new UnauthorizedException("Private information");
         }
         this.usersService.setUserProfilePic(userId, file.path)

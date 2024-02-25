@@ -4,6 +4,7 @@ export default function generate_pearl(sender, target) {
 		"item_type": "pearl",
 		"image": "perla.png",
 		"options": [
+            {"text": "Close look", "action": "look_at_pearl"},
 			{"text": "Remember friend", "action": "display_target"},
 			{"text": "Send message", "action": "send_message"},
 			{"text": "View messages", "action": "view_messages"},

@@ -25,27 +25,45 @@ export default {
 			this.inventory_opened = false;
 		},
 		toggle_inventory () {
-            const animation_delay = 60;
 			if (!this.inventory_opened)
             {
-              this.$emit('inventory_open')
-              this.current_image = this.bolsa[1]
-              setTimeout(() => {this.current_image = this.bolsa[2]}, animation_delay);
-              setTimeout(() => {this.current_image = this.bolsa[3]}, animation_delay * 2);
-              setTimeout(() => {this.inventory_opened = !this.inventory_opened;}, animation_delay * 3);
+              this.open_animation()
+              this.$router.push('/inventory');
             }
 			else
             {
-              this.$emit('inventory_close')
-              this.inventory_opened = !this.inventory_opened;
-              setTimeout(() => {this.current_image = this.bolsa[2]}, animation_delay);
-              setTimeout(() => {this.current_image = this.bolsa[1]}, animation_delay * 2);
-              setTimeout(() => {this.current_image = this.bolsa[0]}, animation_delay * 3);
+              this.close_animation()
+              this.$router.push('/')
             }
-		}
+	   },
+       async update_based_on_route (to) {
+          if (to !== '/inventory' && to != '/inventory/pearl_close_up') {
+             if (this.inventory_opened) {
+               this.close_animation()
+             }
+          }
+       },
+       async close_animation() {
+          const animation_delay = 60;
+          this.inventory_opened = !this.inventory_opened;
+          setTimeout(() => {this.current_image = this.bolsa[2]}, animation_delay);
+          setTimeout(() => {this.current_image = this.bolsa[1]}, animation_delay * 2);
+          setTimeout(() => {this.current_image = this.bolsa[0]}, animation_delay * 3);
+       },
+       async open_animation() {
+          const animation_delay = 60;
+          this.current_image = this.bolsa[1]
+          setTimeout(() => {this.current_image = this.bolsa[2]}, animation_delay);
+          setTimeout(() => {this.current_image = this.bolsa[3]}, animation_delay * 2);
+          setTimeout(() => {this.inventory_opened = !this.inventory_opened;}, animation_delay * 3);
+       }
 	},
 	created () {
 		this.current_image = this.bolsa[0]
+        this.$router.beforeEach((to, from, next) => {
+          this.update_based_on_route(to.path)
+          next()
+        })
 	}
 }
 </script>

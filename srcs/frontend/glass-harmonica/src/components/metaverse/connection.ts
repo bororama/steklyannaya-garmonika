@@ -3,13 +3,16 @@ import { type User, type Messsage, type ServerToClientEvents, type ClientToServe
 import { Metaverse } from "./app";
 import { PlayerData } from "./playerData";
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 
 async function spawnPlayers(liveClients: Array<PlayerData>, metaverse : Metaverse) {
+	// await for blocked user array then for each liveClient, check if their blocked, if so send this info to spawnPlayer()
 	liveClients.forEach(async (c) => {
 		await metaverse.gameWorld.spawnPlayer(c);
 	});
 }
+
 
 async function spawningRoutine(metaSocket : Socket, metaverse: Metaverse, livePlayers : Array<PlayerData>, retries : number) {
 	
@@ -38,7 +41,7 @@ async function spawningRoutine(metaSocket : Socket, metaverse: Metaverse, livePl
 	}, 300 + (Math.pow(retries, 2) * 100));
 }
 
-function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef : any) {		
+function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRef : any) {		
 
 	metaSocket.on('connect', () => {
 		//setTimeout( () => {
@@ -65,10 +68,11 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 	metaSocket.on('newPlayer', async (payload : { retries : number, player : Player }) => { 
 		console.log('newPLayer joined >', `${ (payload.player) ?  payload.player.user.name: 'undefined player' }`);
 		if (metaverse.gameWorld.isReady()) {
-			console.log("Spawning....")
+			console.log("Spawning new player....")
 			await spawnPlayers([payload.player], metaverse); // gameworld sometimes undefined??
 		}
 		else {
+			console.log("spawn failed....");
 			metaSocket.emit('spawnNewPlayerFailed', {retries : payload.retries, player : payload.player});
 		}
 	});
@@ -85,7 +89,8 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 
 
 	metaSocket.on('gameStart', async () => {
-		matchRef.value = true;
+      console.log("Started")
+		routerRef.push({path: '/pong_match', query:{mode: 0, id:-2}});
 	});
 	
 	metaSocket.on('apotheosis', (payload : string) => {
@@ -93,13 +98,28 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 	});
 
 	metaSocket.on('gameEnd', async () => {
+		//routerRef.push({path: '/pong_match', query:{mode: 1, id:-2}});
 		matchRef.value = false;
-		console.log("HOLAAA")
 		metaverse.gameWorld.setLocalPlayerState(1);
 	});
 
 	metaSocket.on('stopApotheosis', (payload : string) => {
+      console.log("APOTEOSIS parada")
 		metaverse.gameWorld.stopApotheosis(payload);
+	});
+
+	metaSocket.on('name', (payload : any) => {
+		if (payload.id == globalThis.id) {
+			console.log("change local player name");
+			metaverse.gameWorld.changeLocalPlayerName(payload.newName);
+		}
+		else {
+			metaverse.gameWorld.changeRemotePlayerName(payload.id, payload.newName);
+		}
+	});
+
+	metaSocket.on('blockUser', (payload : any) => {
+		metaverse.gameWorld.blockUser(payload.blockedUserId);
 	});
 
 	metaSocket.on('exception', (data) => {

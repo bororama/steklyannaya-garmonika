@@ -76,7 +76,7 @@ export class GameEntity extends TransformNode {
     }
 
     private _setUpLabel(height : number = 4) {
-        this._nameLabel.billboardMode = 7; //BILLBOARD_MODE_ALL, always facing the camera
+        this._nameLabel.billboardMode = 7;
         this._nameLabel.translate(Vector3.Up(), height);
         this._nameLabel.isPickable = false;
         this._nameLabel.parent = this.mesh;
@@ -91,12 +91,33 @@ export class GameEntity extends TransformNode {
         const font = "bold 16px monospace";
         labelTexture.drawText(
             this.name, 
-            (32 * 5) / 2 - textureContext.measureText(this.name).width, 
+            ((32 * 5) / 2 )- textureContext.measureText(this.name).width, 
             16, 
             font, 
             "white", 
             "transparent", 
-            true, 
+            true,
+            true
+        );
+    }
+
+    updateName(newName: string) {
+        this.name = newName;
+        this.mesh.metadata.name = newName;
+
+        const font = "bold 16px monospace";
+        const labelTexture = this._nameLabel.material.diffuseTexture;
+        const textureContext = labelTexture.getContext();
+        textureContext.textAlign = "left";
+        labelTexture.clear();
+        labelTexture.drawText(
+            newName,
+            ((32 * 5) - textureContext.measureText(newName).width) / 2,
+            16,
+            font,
+            "white",
+            "transparent",
+            true,
             true
         );
     }
@@ -151,7 +172,6 @@ export class GameEntity extends TransformNode {
         this._bubble.removeControl(this._messageText);
         this._bubble.alpha = 1.0;
         const r : BoundingRect = this._getClientRectFromMesh();
-        this._determineBubblePosition(r);
         this._determineBubbleFontSize(r);
         this._messageText.textWrapping = 1;
         this._messageText.text = message;
@@ -160,7 +180,9 @@ export class GameEntity extends TransformNode {
         this._bubble.adaptHeightToChildren = true;
         this._bubble.addControl(this._messageText);
         let context = bubbleTexture.getContext();
-        this._bubble.width = (clamp((context.measureText(message).width + 24), 64, 1024).toString() + "px");
+        let bubbleWidth = clamp((context.measureText(message).width + 24), 64, 1024);
+        this._bubble.width = (bubbleWidth.toString() + "px");
+        this._determineBubblePosition(r, bubbleWidth);
         //this._bubble.height = (this._messageText.fontSizeInPixels * 2).toString() + "px";
         bubbleTexture.addControl(this._bubble);
        // let fadeOut = new AnimationGroup("fadeOut");
@@ -175,11 +197,11 @@ export class GameEntity extends TransformNode {
         }, 400 + (message.length * 50));
     }
 
-    private _determineBubblePosition(r : BoundingRect) {
+    private _determineBubblePosition(r : BoundingRect, bubbleWidth : number) {
         const canvas = super.getScene().getEngine().getRenderingCanvas();
 
         this._bubble.top = ((Math.random() * (6) + ((r.top / canvas!.clientHeight) * 100) - 16).toString() + "%");
-        this._bubble.left = ((Math.random() * (5) + ((r.left / canvas!.clientWidth) * 100)).toString() + "%");
+        this._bubble.left = ((Math.random() * (2) + ((clamp(r.left, 0, canvas!.clientWidth - (bubbleWidth  * 6)) / canvas!.clientWidth ) * 100)).toString() + "%");
     }
 
     private _determineBubbleFontSize(r : BoundingRect) {
