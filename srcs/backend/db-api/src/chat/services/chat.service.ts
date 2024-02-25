@@ -96,33 +96,7 @@ export class ChatService {
         });
     }
 
-    async changeAccess(userId: string, chatId: number, isPublic: boolean): Promise<Chat> {
-        const user = await this.userService.userExists(userId);
-        if (!user) {
-            throw new BadRequestException("User doesn't exist");
-        }
-
-        const chat = await this.findOne(chatId);
-        if (!chat) {
-            throw new BadRequestException("Chat doesn't exist");
-        }
-
-        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
-            where: {
-                userId: user,
-                chatId: chat.id
-            }
-        });
-
-        if (!userChatRelation) {
-            throw new ForbiddenException('User don\'t belong to chat');
-        }
-
-        if (!userChatRelation.isAdmin && !userChatRelation.isOwner)
-        {
-            throw new ForbiddenException("Only chat administrators can change chat access");
-        }
-        
+    async changeAccess(chat: Chat, isPublic: boolean): Promise<Chat> {
         chat.isPublic = isPublic;
 
         return chat.save();
