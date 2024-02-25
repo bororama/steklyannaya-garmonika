@@ -1,6 +1,8 @@
-import { Scene, Mesh, TransformNode, DynamicTexture, ShadowGenerator,
-        StandardMaterial, Vector3, ArcRotateCamera, UniversalCamera, Quaternion,
-        Ray, Scalar, Plane, MeshBuilder, Color3, Animation, AnimationGroup} from "@babylonjs/core";
+import {
+    Scene, Mesh, TransformNode, DynamicTexture, ShadowGenerator,
+    StandardMaterial, Vector3, ArcRotateCamera, UniversalCamera, Quaternion,
+    Ray, Scalar, Plane, MeshBuilder, Color3, Animation, AnimationGroup
+} from "@babylonjs/core";
 import { AdvancedDynamicTexture, InputText, Control, Rectangle, TextBlock } from "@babylonjs/gui"
 import { clamp, getFadeOutAnimation } from "./utils";
 import { PlayerInput } from "./inputController";
@@ -12,7 +14,7 @@ import { type Message } from './shared/meta.interface';
 
 enum Animations { IDLE = 1, JUMP = 2, LAND = 3, RUN = 4 };
 enum playerStates { SPEAKING = 0, IDLING = 1, JUMPING = 2, RUNNING = 3, PLAYING = 4 };
-enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
+enum bubbleStates { INVISIBLE = 0, VISIBLE = 1 }
 
 
 
@@ -20,13 +22,13 @@ enum bubbleStates {INVISIBLE = 0, VISIBLE = 1}
 export class LocalPlayer extends TransformNode {
 
     public camera;
-    
+
     private _camRoot;
-    private _metaSocket : Socket;
+    private _metaSocket: Socket;
     public scene: Scene;
 
 
-    private _input : PlayerInput;
+    private _input: PlayerInput;
     private _inputMagnitude;
 
     private _moveDirection: Vector3;
@@ -47,25 +49,25 @@ export class LocalPlayer extends TransformNode {
     private static readonly GRAVITY: number = -2.8;
 
     //Player
-    public  mesh: Mesh;
+    public mesh: Mesh;
     private _nameLabel: Mesh;
     private _playerData: PlayerData;
 
     //Notifications
-    private _popUpCallback : any;
+    private _popUpCallback: any;
 
 
     //Chat-related
-    private _bubbleTexture : AdvancedDynamicTexture;
-    private _bubble : Rectangle;
-    private _messageText : TextBlock;
-    private _bubbleState : number;
+    private _bubbleTexture: AdvancedDynamicTexture;
+    private _bubble: Rectangle;
+    private _messageText: TextBlock;
+    private _bubbleState: number;
 
-    private _inputBoxTexture : AdvancedDynamicTexture;
-    private _inputBox : InputText;
+    private _inputBoxTexture: AdvancedDynamicTexture;
+    private _inputBox: InputText;
 
 
-    constructor(assets: any, scene: Scene, input : PlayerInput, metaSocket : Socket, playerData : PlayerData) {
+    constructor(assets: any, scene: Scene, input: PlayerInput, metaSocket: Socket, playerData: PlayerData) {
         super("LocalPlayer", scene);
         this.scene = scene;
         this._popUpCallback = assets.popUpCallback;
@@ -82,14 +84,14 @@ export class LocalPlayer extends TransformNode {
         this._setUpChatBox();
     }
 
-    setState(state : number) {
+    setState(state: number) {
         this._state = state;
     }
 
     private _setUpMesh() {
-        const metadata = {tag : 'LocalPlayer', name : this.name};
+        const metadata = { tag: 'LocalPlayer', name: this.name };
         this.mesh.metadata = metadata;
-        this.mesh.getChildMeshes().forEach( (m) => {
+        this.mesh.getChildMeshes().forEach((m) => {
             m.metadata = metadata;
         });
         this.mesh.position = new Vector3(-256, 120, -167);
@@ -115,31 +117,31 @@ export class LocalPlayer extends TransformNode {
                 this._inputBox.isVisible = false;
             }
             if (eventData.key === "Escape") {
-                    this._inputBox.text = "";
-                    this._inputBox.isVisible = false;
-                    this._inputBox.blur();
+                this._inputBox.text = "";
+                this._inputBox.isVisible = false;
+                this._inputBox.blur();
             }
         });
     }
 
-    private _say(message : string) {
+    private _say(message: string) {
         this._bubbleTexture.removeControl(this._bubble);
         this._bubble.removeControl(this._messageText);
         this._bubble.alpha = 1.0;
         this._bubble.top = ((Math.random() * (45 - 30)) + 30).toString() + "%";
-        this._bubble.left = ((Math.random() * (5 -(-5))) - 5).toString() + "%";
+        this._bubble.left = ((Math.random() * (5 - (-5))) - 5).toString() + "%";
         this._messageText.color = "black";
-        this._messageText.textWrapping  = 1;
+        this._messageText.textWrapping = 1;
         this._messageText.fontSize = "12px";
-        this._messageText.resizeToFit = true;        
+        this._messageText.resizeToFit = true;
         this._bubble.adaptHeightToChildren = true;
-        
+
         if (message.length > 64) {
             this._messageText.text = "Message too long...";
         }
         else {
             this._messageText.text = message;
-            this._metaSocket.emit('chat',  {user : this._playerData.user, text : message}, response  => console.log('Server:', response));
+            this._metaSocket.emit('chat', { user: this._playerData.user, text: message }, response => console.log('Server:', response));
         }
         let context = this._bubbleTexture.getContext();
         let textWidth = clamp((context.measureText(this._messageText.text).width), 64, 128);
@@ -150,7 +152,7 @@ export class LocalPlayer extends TransformNode {
         let fadeOut = new AnimationGroup("fadeOut");
         this._bubbleState = bubbleStates.VISIBLE;
         fadeOut.addTargetedAnimation(getFadeOutAnimation(2000, 1.0, 0), this._bubble);
-        fadeOut.onAnimationGroupEndObservable.add( () => {
+        fadeOut.onAnimationGroupEndObservable.add(() => {
             this._bubbleState = bubbleStates.INVISIBLE;
         });
         setTimeout(async () => {
@@ -165,29 +167,49 @@ export class LocalPlayer extends TransformNode {
     }
 
     private _setUpPlayerLabel() {
-        this._nameLabel = MeshBuilder.CreatePlane("label", {width: 5, height : 1}, this.scene);
+        this._nameLabel = MeshBuilder.CreatePlane("label", { width: 5, height: 1 }, this.scene);
         this._nameLabel.billboardMode = 7; //BILLBOARD_MODE_ALL, always facing the camera
         this._nameLabel.translate(Vector3.Up(), 4);
         this._nameLabel.isPickable = false;
         this._nameLabel.parent = this.mesh;
 
-        const labelTexture = new DynamicTexture("label-texture", { width: 32 * (5), height : 32}, this.scene);
+        const labelTexture = new DynamicTexture("label-texture", { width: 32 * (5), height: 32 }, this.scene);
         const textureContext = labelTexture.getContext();
         const material = new StandardMaterial("mat", this._scene);
         material.diffuseTexture = labelTexture;
         material.diffuseTexture.hasAlpha = true;
         material.emissiveColor = Color3.White();
         this._nameLabel.material = material;
-
         const font = "bold 16px monospace";
+        textureContext.font = font;
         labelTexture.drawText(
             this._playerData.user.name,
-            (32 * 5) / 2 - textureContext.measureText(this._playerData.user.name).width,
+            ((32 * 5) - textureContext.measureText(this._playerData.user.name).width) / 2,
             16,
             font,
             "white",
             "transparent",
-            true, 
+            true,
+            true
+        );
+    }
+
+    updateName(newName: string) {
+        this._playerData.user.name = newName;
+        this.mesh.metadata.name = newName;
+
+        const font = "bold 16px monospace";
+        const labelTexture = this._nameLabel.material.diffuseTexture;
+        const textureContext = labelTexture.getContext();
+        labelTexture.clear();
+        labelTexture.drawText(
+            newName,
+            ((32 * 5) - textureContext.measureText(newName).width) / 2,
+            16,
+            font,
+            "white",
+            "transparent",
+            true,
             true
         );
     }
@@ -202,7 +224,7 @@ export class LocalPlayer extends TransformNode {
     }
 
     private _switchAnimations(): void {
-        let currentAnimationState : number;
+        let currentAnimationState: number;
 
         switch (this._state) {
             case (playerStates.RUNNING): {
@@ -243,7 +265,7 @@ export class LocalPlayer extends TransformNode {
     }
 
     private _updateCamera(): void {
-        this._camRoot.position =  new Vector3(this.mesh.position.x, this.mesh.position.y + 2, this.mesh.position.z);
+        this._camRoot.position = new Vector3(this.mesh.position.x, this.mesh.position.y + 2, this.mesh.position.z);
         if (this._input.camera !== 0) {
             this._camRoot.rotation = new Vector3(this._camRoot.rotation.x, this._camRoot.rotation.y + ((0.6 * this._input.camera) * this._deltaTime));
         }
@@ -276,7 +298,7 @@ export class LocalPlayer extends TransformNode {
         if (!this._inputBox.isVisible && this._state !== playerStates.PLAYING) {
             let correctedVertical = this._camRoot.forward.scaleInPlace(this._input.vertical);
             let correctedHorizontal = this._camRoot.right.scaleInPlace(this._input.horizontal);
-    
+
             this._moveDirection = (correctedHorizontal.addInPlace(correctedVertical).normalize());
             this._inputMagnitude = clamp(Math.abs(this._input.horizontal) + Math.abs(this._input.vertical), 0, 1);
         }
@@ -322,14 +344,14 @@ export class LocalPlayer extends TransformNode {
         this._moveDirection = this._moveDirection.scaleInPlace(this._inputMagnitude * LocalPlayer.PLAYER_SPEED);
 
         if (this._state === playerStates.PLAYING) {
-            return ;
+            return;
         }
         if (this._inputMagnitude > 0) {
             let angle = Math.atan2(this._input.horizontal, this._input.vertical);
             angle += this._camRoot.rotation.y;
             let targ = Quaternion.FromEulerAngles(0, angle, 0);
             this.mesh.rotationQuaternion = Quaternion.Slerp(this.mesh.rotationQuaternion, targ, 10 * this._deltaTime);
-            if ( this._state !== playerStates.JUMPING) {
+            if (this._state !== playerStates.JUMPING) {
                 this._state = playerStates.RUNNING;
             }
         }
@@ -375,12 +397,12 @@ export class LocalPlayer extends TransformNode {
         if (!isGrounded) {
             this._addGravity();
         }
-        else if (this._input.jumping && this._jumpCount > 0){
+        else if (this._input.jumping && this._jumpCount > 0) {
             this._jump();
         }
         else {
             this._groundCharacter();
-        }        
+        }
         this.mesh.moveWithCollisions(this._moveDirection.addInPlace(this._gravity));
         if (this._state !== playerStates.IDLING) {
             this._playerData.setPosition(this.mesh.position);
@@ -390,11 +412,11 @@ export class LocalPlayer extends TransformNode {
         }
     }
 }
-      
+
 
 //temporary helpers, should be refactored into the generic Player class
-function createLocalPlayerInputBox() : InputText {
-    let inputBox : InputText = new InputText();
+function createLocalPlayerInputBox(): InputText {
+    let inputBox: InputText = new InputText();
     inputBox.width = 0.4;
     inputBox.maxWidth = 0.4;
     inputBox.height = "24px";
@@ -408,7 +430,7 @@ function createLocalPlayerInputBox() : InputText {
 }
 
 
-function createLocalPlayerBubble() : Rectangle {
+function createLocalPlayerBubble(): Rectangle {
     let bubble = new Rectangle();
 
     bubble.cornerRadius = 25;

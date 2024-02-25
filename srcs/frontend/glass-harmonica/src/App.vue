@@ -19,6 +19,10 @@ body {
   margin: 0;
 }
 
+#scene-explorer-host {
+  z-index: 1;
+}
+
 </style>
 
 <template>

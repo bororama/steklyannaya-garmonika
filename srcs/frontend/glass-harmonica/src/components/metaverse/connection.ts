@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 
 
 async function spawnPlayers(liveClients: Array<PlayerData>, metaverse : Metaverse) {
+	// await for blocked user array then for each liveClient, check if their blocked, if so send this info to spawnPlayer()
 	liveClients.forEach(async (c) => {
 		await metaverse.gameWorld.spawnPlayer(c);
 	});
@@ -67,10 +68,11 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	metaSocket.on('newPlayer', async (payload : { retries : number, player : Player }) => { 
 		console.log('newPLayer joined >', `${ (payload.player) ?  payload.player.user.name: 'undefined player' }`);
 		if (metaverse.gameWorld.isReady()) {
-			console.log("Spawning....")
+			console.log("Spawning new player....")
 			await spawnPlayers([payload.player], metaverse); // gameworld sometimes undefined??
 		}
 		else {
+			console.log("spawn failed....");
 			metaSocket.emit('spawnNewPlayerFailed', {retries : payload.retries, player : payload.player});
 		}
 	});
@@ -104,6 +106,20 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	metaSocket.on('stopApotheosis', (payload : string) => {
       console.log("APOTEOSIS parada")
 		metaverse.gameWorld.stopApotheosis(payload);
+	});
+
+	metaSocket.on('name', (payload : any) => {
+		if (payload.id == globalThis.id) {
+			console.log("change local player name");
+			metaverse.gameWorld.changeLocalPlayerName(payload.newName);
+		}
+		else {
+			metaverse.gameWorld.changeRemotePlayerName(payload.id, payload.newName);
+		}
+	});
+
+	metaSocket.on('blockUser', (payload : any) => {
+		metaverse.gameWorld.blockUser(payload.blockedUserId);
 	});
 
 	metaSocket.on('exception', (data) => {

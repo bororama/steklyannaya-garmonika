@@ -9,6 +9,7 @@ import { ChatDto } from '../../chat/dto/chat.dto';
 import { UpdatePlayerDto } from '../dto/player-update.dto';
 import { UserStatus } from '../dto/user-status.enum';
 import { Op } from 'sequelize';
+import { MetaverseGateway } from 'src/meta/metaverse.gateway';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,7 @@ export class UsersService {
         private blockModel: typeof Block,
         @InjectModel(ChatUsers)
         private chatUsersModel: typeof ChatUsers,
+        private metaverseGateway: MetaverseGateway,
     ) {}
 
     async findAll(): Promise<User[]> {
@@ -148,6 +150,7 @@ export class UsersService {
         user.userName = newUsername;
         try {
             await user.save();
+            this.metaverseGateway.changeName(user.id + '', newUsername);
         }
         catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
@@ -231,6 +234,7 @@ export class UsersService {
                 blockerId: userId,
                 blockedId: blockedUserId
             });
+            this.metaverseGateway.blockUser(userId.toString(), blockedUserId.toString());
         }
         catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
@@ -266,6 +270,7 @@ export class UsersService {
                 blockedId: blockedUserId
             }
         });
+        this.metaverseGateway.unblockUser(userId.toString(), blockedUserId.toString());
     }
 
     async getOnlineUsers(): Promise<User[]> {

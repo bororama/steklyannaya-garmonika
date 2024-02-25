@@ -12,7 +12,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @Controller()
 @ApiTags("User General Data")
 export class UsersController {
-    constructor (private readonly usersService: UsersService) {}
+    constructor (
+        private readonly usersService: UsersService,
+        ) {}
 
     checkIfAuthorized(requester: User, userId: string) {
         return isNaN(+userId)
