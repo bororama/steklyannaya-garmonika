@@ -264,6 +264,24 @@ export class UsersService {
             );
     }
 
+    async getBlockedUsersById(user: number): Promise<User[]> {
+        return this.blockModel
+            .findAll ({
+                where: {
+                    blockerId: user
+                },
+                include: {
+                    model: User,
+                    as: 'blocked'
+                }
+            })
+            .then (
+                blockedUsers => blockedUsers
+                    .map(block => block.blocked)
+            );
+    }
+
+
     async blockUser(blocker: string, blocked: string): Promise<void> {
         const userId = await this.userExists(blocker);
         const blockedUserId = await this.userExists(blocked);

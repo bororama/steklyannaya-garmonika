@@ -39,7 +39,8 @@ export class MessageService {
 		});
 	}
 
-	async getMessages(chat: ChatUsers): Promise<Message[]> {
+	async getMessages(chat: ChatUsers): Promise<Message[]> { //TODO: Test
+		const blockedUsers = await this.userService.getBlockedUsersById(chat.userId).then(users => users.map(u => u.id));
 		return this.messageModel.findAll({
 			where: {
 				chatId: chat.chatId,
@@ -48,6 +49,9 @@ export class MessageService {
 				},
 				[Op.not]: {
 					senderId: chat.userId
+				},
+				senderId: {
+					[Op.notIn]: blockedUsers
 				}
 			},
             order: [
