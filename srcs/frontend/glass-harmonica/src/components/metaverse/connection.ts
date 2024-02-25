@@ -98,8 +98,6 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	});
 
 	metaSocket.on('gameEnd', async () => {
-		//routerRef.push({path: '/pong_match', query:{mode: 1, id:-2}});
-		matchRef.value = false;
 		metaverse.gameWorld.setLocalPlayerState(1);
 	});
 

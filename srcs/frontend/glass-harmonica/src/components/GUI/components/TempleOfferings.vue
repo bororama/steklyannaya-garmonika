@@ -1,6 +1,7 @@
 <template>
 <div class="overlay-4">
     <h3 class="temple_title" >Offerings left</h3>
+    <Offering v-for="(offering, index) in public_offerings" :key="index" :chat="offering"/>
 </div>
 <div class="temple_background"> </div>
 </template>
@@ -22,9 +23,10 @@ onMounted(() => {
 })
 
 async function watch_offerings() {
-  fetch (backend + '/getPublicChats', getRequestParams()).then((a) => {
+  fetch (backend + '/chats/publicChats', getRequestParams()).then((a) => {
+    console.log(a.status)
     if (a.status != 200) {
-//      router.push('/')
+      router.push('/')
     } else {
       a.json().then((answer) => {
         for (a in answer) {

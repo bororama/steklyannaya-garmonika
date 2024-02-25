@@ -55,7 +55,7 @@ export default {
                 let rosary
                 let blocked = false
                 rosary = generate_rosary(globalThis.id, answer[chat].id)
-                rosary.public_chat = c.is_public_chat
+                rosary.public_chat = c.isPublic
                 for (const u in c.users) {
                   if (globalThis.id == c.users[u].id) {
                     rosary.is_owner = c.users[u].isOwner
@@ -68,7 +68,7 @@ export default {
                     rosary = generate_padlock(rosary)
                 } else {
                   if (rosary.is_owner) {
-                    if (rosary.is_public) {
+                    if (rosary.public_chat) {
                       rosary.owner_options.push( {"text": "Take from temple", "action": "unmake_public"})
                     } else {
                       rosary.owner_options.push( {"text": "Offer at temple", "action": "make_public"})

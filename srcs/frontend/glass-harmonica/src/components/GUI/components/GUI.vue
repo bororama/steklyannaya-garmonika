@@ -57,8 +57,6 @@ export default defineComponent({
         }
       }).then((a) => {
         a.json().then((player) => {
-          console.log("USER LOGGED IN ")
-          console.log(player)
           globalThis.id = player.id
           globalThis.my_data = player
           globalThis.username = player.name

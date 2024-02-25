@@ -186,9 +186,10 @@ export default defineComponent({
         }
       }).then((a) => {
         a.json().then((player) => {
+          console.log(player)
           globalThis.id = player.id
           globalThis.my_data = player
-          globalThis.is_admin = player.is_admin
+          globalThis.is_admin = player.isAdmin
           this.player_data = player
           this.username = player.name
           this.matchUserId = globalThis.id

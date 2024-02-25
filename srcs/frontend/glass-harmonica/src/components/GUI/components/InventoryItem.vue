@@ -149,11 +149,11 @@ async function act (action) {
          emit('reload_inventory');
        } else if (action == "make_public") {
          close_drop()
-         await fetch (backend + '/chats/' + item.value.chat_id + '/make_public', postRequestParams())
+         await fetch (backend + '/chats/' + item.value.chat_id + '/makePublic', postRequestParams())
          emit('reload_inventory');
        } else if (action == "unmake_public") {
          close_drop()
-         await fetch (backend + '/chats/' + item.value.chat_id + '/unmake_public', postRequestParams())
+         await fetch (backend + '/chats/' + item.value.chat_id + '/makePrivate', postRequestParams())
          emit('reload_inventory');
  	} else {
  		console.log("ERROR: Unrecognised option");

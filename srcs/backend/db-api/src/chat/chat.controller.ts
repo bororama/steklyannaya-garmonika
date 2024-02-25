@@ -149,7 +149,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id))
+        if (!(await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id)))
         {
             throw new ForbiddenException('Only chat admins can do this');
         }
@@ -169,7 +169,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id))
+        if (!(await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id)))
         {
             throw new ForbiddenException('Only chat admins can do this');
         }
@@ -309,22 +309,40 @@ This only can be done by an operator'
         return this.chatService.setMuteStatus(id, admin, user, false);
     }
 
-    @Post(':id/:admin/makePublic')
+    @Post(':id/makePublic')
     @ApiOperation({
         summary: 'Change access of a chat to public',
         description: 'All users will be able to see and access to this chat'
     })
-    makeChatPublic(@Param('id', ParseIntPipe) id: number, @Param('admin') admin: string): Promise<Chat> {
-        return this.chatService.changeAccess(admin, id, true);
+    async makeChatPublic(@Req() request, @Param('id', ParseIntPipe) id: number): Promise<Chat> {
+        const chat: Chat = await this.chatService.findOne(id);
+        if (!chat) {
+            throw new BadRequestException('Chat doesn\'t exists');
+        }
+
+        if (!(await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id)))
+        {
+            throw new ForbiddenException('Only chat admins can do this');
+        }
+        return this.chatService.changeAccess(chat, true);
     }
 
-    @Post(':id/:admin/makePrivate')
+    @Post(':id/makePrivate')
     @ApiOperation({
         summary: 'Change access of a chat to private',
         description: 'All users won\'t be able see and access to this chat'
     })
-    makeChatPrivate( @Param('id', ParseIntPipe) id: number, @Param('admin') admin: string): Promise<Chat> {
-        return this.chatService.changeAccess(admin, id, false);
+    async makeChatPrivate(@Req() request, @Param('id', ParseIntPipe) id: number): Promise<Chat> {
+        const chat: Chat = await this.chatService.findOne(id);
+        if (!chat) {
+            throw new BadRequestException('Chat doesn\'t exists');
+        }
+
+        if (!(await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id)))
+        {
+            throw new ForbiddenException('Only chat admins can do this');
+        }
+        return this.chatService.changeAccess(chat, false);
     }
 
     @Delete(':id')
