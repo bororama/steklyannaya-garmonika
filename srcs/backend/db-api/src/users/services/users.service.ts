@@ -23,7 +23,15 @@ export class UsersService {
 
     async findAll(): Promise<User[]> {
         return this.userModel.findAll({
-            attributes: { exclude: ['secret2FA', 'has2FA'] }
+            attributes: { exclude: ['secret2FA', 'has2FA', 'inventory'] }
+        });
+    }
+
+    async findAllExcludingRequester(requester: number): Promise<User[]> {
+        return this.userModel.findAll({
+            where: {
+                id: { [Op.ne]: requester }
+            }
         });
     }
 
@@ -214,6 +222,10 @@ export class UsersService {
             throw new BadRequestException('User doesn\'t exists');
         }
 
+        if (userId == blockedUserId) {
+            throw new BadRequestException('You can\'t block yourself')
+        }
+
         try {
             await this.blockModel.create({
                 blockerId: userId,
@@ -244,6 +256,10 @@ export class UsersService {
             throw new BadRequestException('User doesn\'t exists');
         }
 
+        if (userId == blockedUserId) {
+            throw new BadRequestException('You can\'t unblock yourself')
+        }
+
         this.blockModel.destroy({
             where: {
                 blockerId: userId,
@@ -272,7 +288,7 @@ export class UsersService {
             include: {
                 model: Chat,
                 where: {
-                    isPrivateChat: false
+                    isFriendshipChat: false
                 },
                 required: false
             }

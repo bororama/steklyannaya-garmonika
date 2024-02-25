@@ -79,7 +79,7 @@ export class ChatService {
 
     async createFriendshipChat(user: User, friend: User, friendship: Friendship): Promise<Chat> {
         return this.chatModel.create({
-            isPrivateChat: true,
+            isFriendshipChat: true,
             friendshipId: friendship.id
         }).then(async chat => {
             await this.chatUserModel.bulkCreate([
@@ -96,6 +96,46 @@ export class ChatService {
         });
     }
 
+    async changeAccess(userId: string, chatId: number, isPublic: boolean): Promise<Chat> {
+        const user = await this.userService.userExists(userId);
+        if (!user) {
+            throw new BadRequestException("User doesn't exist");
+        }
+
+        const chat = await this.findOne(chatId);
+        if (!chat) {
+            throw new BadRequestException("Chat doesn't exist");
+        }
+
+        const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
+            where: {
+                userId: user,
+                chatId: chat.id
+            }
+        });
+
+        if (!userChatRelation) {
+            throw new ForbiddenException('User don\'t belong to chat');
+        }
+
+        if (!userChatRelation.isAdmin && !userChatRelation.isOwner)
+        {
+            throw new ForbiddenException("Only chat administrators can change chat access");
+        }
+        
+        chat.isPublic = isPublic;
+
+        return chat.save();
+    }
+
+    async getPublicChats(): Promise<Chat[]> {
+        return this.chatModel.findAll({
+            where: {
+                isPublic: true
+            }
+        });
+    }
+
     deleteById(id: number): Promise<void> {
         return this.chatModel.destroy({
             where: {
@@ -108,11 +148,22 @@ export class ChatService {
         return this.chatModel.findAll();
     }
 
+    findAllExceptFriendshipChats(): Promise<Chat[]> {
+        return this.chatModel.findAll({
+            where: {
+                isFriendshipChat: false
+            }
+        });
+    }
+
     findAllWithUsernames(): Promise<Chat[]> {
         return this.chatModel.findAll({
+            where: {
+                isFriendshipChat: false
+            },
             include: {
                 model: User,
-                attributes: ['id', 'userName']
+                attributes: ['id', 'userName'],
             }
         })
     }
@@ -130,7 +181,7 @@ export class ChatService {
     async getChatUsers(id: number): Promise<ChatUsers[]> {
         return this.chatUserModel.findAll({
             where: {
-                chatId: id
+                chatId: id,
             },
             include: {
                 model: User
@@ -172,7 +223,7 @@ export class ChatService {
             throw new ForbiddenException('User is banned from this chat');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('User can\'t join a private chat');
         }
 
@@ -215,7 +266,7 @@ export class ChatService {
             throw new BadRequestException('User doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('User can\'t join a private chat');
         }
 
@@ -251,7 +302,7 @@ export class ChatService {
             throw new BadRequestException('Chat doesn\'t exists');
         }
         
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('User can\'t leave this chat');
         }
 
@@ -262,7 +313,7 @@ export class ChatService {
             }
         })
         if (!relation) {
-            throw new BadRequestException('User doesn\'t belong to this chat');
+            throw new ForbiddenException('User doesn\'t belong to this chat');
         }
 
         if (chat.users.length == 1 || relation.isOwner) {
@@ -287,10 +338,11 @@ export class ChatService {
         });
         if (!userChatRelation)
         {
-            throw new BadRequestException('Requester doesn\'t belong to chat');
+            throw new ForbiddenException('Requester doesn\'t belong to chat');
         }
 
-        return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
+        return ((userChatRelation.isAdmin || userChatRelation.isOwner)
+            && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
     }
 
     async isAdminId(userId: number, chatId:number): Promise<boolean> {
@@ -302,10 +354,11 @@ export class ChatService {
         });
         if (!userChatRelation)
         {
-            throw new BadRequestException('Requester doesn\'t belong to chat');
+            throw new ForbiddenException('Requester doesn\'t belong to chat');
         }
 
-        return (userChatRelation.isAdmin && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
+        return ((userChatRelation.isAdmin || userChatRelation.isOwner)
+            && !(await this.isBannedId(userChatRelation.chatId, userChatRelation.userId)));
     }
 
     async isOwnerId(userId: number, chatId:number): Promise<boolean> {
@@ -317,7 +370,7 @@ export class ChatService {
         });
         if (!userChatRelation)
         {
-            throw new BadRequestException('Requester doesn\'t belong to chat');
+            throw new ForbiddenException('Requester doesn\'t belong to chat');
         }
 
         return (userChatRelation.isOwner);
@@ -342,7 +395,7 @@ export class ChatService {
     }
 
     async raiseRevokeChatAdmin(chat: Chat, user: string, admin: boolean): Promise<void> {
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('Private chat doesn\'t have administrators');
         }
 
@@ -369,7 +422,7 @@ export class ChatService {
         userChatRelation.save();
     }
 
-    async setMuteStatus(id: number, chatAdmin: string, user: string, status: boolean): Promise<void> {
+    async setMuteStatus(id: number, chatAdminId: string, userId: string, status: boolean): Promise<void> {
         const chat: Chat = await this.chatModel.findOne({
             attributes: ['id'],
             where: {
@@ -380,14 +433,29 @@ export class ChatService {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!await this.isAdmin(chatAdmin, id)) {
+        const user: User = await this.userService.findOneLight(userId);
+        if (!user) {
+            throw new BadRequestException("User doesn't exist");
+        }
+
+        const chatAdmin: User = await this.userService.findOneLight(chatAdminId);
+        if (!userId) {
+            throw new BadRequestException('Requester doesn\'t exists');
+        }
+
+        if (user.id == chatAdmin.id) {
+            throw new BadRequestException('You can\'t mute yourself in the chat');
+        }
+
+        if (!await this.isAdminId(chatAdmin.id, id)) {
             throw new BadRequestException('Requester is not a chat administrator');
         }
+
 
         await this.changeMuteStatus(chat, user, status);
     }
 
-    async chatAdminBanUser(id: number, chatAdmin: string, user: string, minutes: number): Promise<void> {
+    async chatAdminBanUser(id: number, chatAdminId: string, userId: string, minutes: number): Promise<void> {
         const chat: Chat = await this.chatModel.findOne({
             attributes: ['id'],
             where: {
@@ -398,13 +466,28 @@ export class ChatService {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!await this.isAdmin(chatAdmin, id)) {
+        const user: User = await this.userService.findOneLight(userId);
+        if (!user) {
+            throw new BadRequestException("User doesn't exist");
+        }
+
+        const chatAdmin: User = await this.userService.findOneLight(chatAdminId);
+        if (!userId) {
+            throw new BadRequestException('Requester doesn\'t exists');
+        }
+
+        if (user.id == chatAdmin.id) {
+            throw new BadRequestException('You can\'t ban yourself from the chat');
+        }
+
+        if (!await this.isAdminId(chatAdmin.id, id)) {
             throw new BadRequestException('Requester is not a chat administrator');
         }
+
         return this.banUser(chat, user, minutes);
     }
 
-    async chatAdminUnbanUser(id: number, chatAdmin: string, user: string): Promise<void> {
+    async chatAdminUnbanUser(id: number, chatAdminId: string, userId: string): Promise<void> {
         const chat: Chat = await this.chatModel.findOne({
             attributes: ['id'],
             where: {
@@ -415,22 +498,32 @@ export class ChatService {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!await this.isAdmin(chatAdmin, id)) {
+        const user: User = await this.userService.findOneLight(userId);
+        if (!user) {
+            throw new BadRequestException("User doesn't exist");
+        }
+
+        const chatAdmin: User = await this.userService.findOneLight(chatAdminId);
+        if (!userId) {
+            throw new BadRequestException('Requester doesn\'t exists');
+        }
+
+        if (user.id == chatAdmin.id) {
+            throw new BadRequestException('You can\'t ban yourself from the chat');
+        }
+
+        if (!await this.isAdminId(chatAdmin.id, id)) {
             throw new BadRequestException('Requester is not a chat administrator');
         }
+
         this.unBanUser(chat, user);
     }
 
-    async changeMuteStatus(chat: Chat, user: string, status: boolean)
+    async changeMuteStatus(chat: Chat, user: User, status: boolean)
     {
-        const userId: number = await this.userService.userExists(user);
-        if (!userId) {
-            throw new BadRequestException('User doesn\'t exists');
-        }
-
         const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
             where: {
-                userId: userId,
+                userId: user.id,
                 chatId: chat.id,
             }
         });
@@ -441,7 +534,7 @@ export class ChatService {
             throw new BadRequestException('You can\'t mute the chat owner');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('You can\'t mute a user in a private chat');
         }
 
@@ -452,16 +545,11 @@ export class ChatService {
         userChatRelation.save();
     }
 
-    async banUser(chat: Chat, user: string, minutes: number)
+    async banUser(chat: Chat, user: User, minutes: number)
     {
-        const userId: number = await this.userService.userExists(user);
-        if (!userId) {
-            throw new BadRequestException('User doesn\'t exists');
-        }
-
         const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
             where: {
-                userId: userId,
+                userId: user.id,
                 chatId: chat.id,
             }
         });
@@ -470,7 +558,7 @@ export class ChatService {
             throw new BadRequestException('You can\'t ban the chat owner');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('You can\'t mute a user in a private chat');
         }
 
@@ -481,7 +569,7 @@ export class ChatService {
         const ban = await this.chatBansModel.findOne({
             where: {
                 chatId: chat.id,
-                userId: userId
+                userId: user.id
             }
         })
 
@@ -494,34 +582,29 @@ export class ChatService {
         else {
             this.chatBansModel.create({
                 chatId: chat.id,
-                userId: userId,
+                userId: user.id,
                 endDate: banEnd
             });
         }
     }
 
-    async unBanUser(chat: Chat, user: string)
+    async unBanUser(chat: Chat, user: User)
     {
-        const userId: number = await this.userService.userExists(user);
-        if (!userId) {
-            throw new BadRequestException('User doesn\'t exists');
-        }
-
         const userChatRelation: ChatUsers = await this.chatUserModel.findOne({
             where: {
-                userId: userId,
+                userId: user.id,
                 chatId: chat.id,
             }
         });
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('You can\'t mute a user in a private chat');
         }
 
         this.chatBansModel.destroy({
             where: {
                 chatId: chat.id,
-                userId: userId,
+                userId: user.id,
             }
         });
     }
@@ -605,7 +688,7 @@ export class ChatService {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new BadRequestException('Private chat can\'t have password');
         }
 
@@ -647,7 +730,7 @@ export class ChatService {
 
         if (!chatRelation)
         {
-            throw new BadRequestException('User doesn\'t belong to that chat');
+            throw new ForbiddenException('User doesn\'t belong to that chat');
         }
 
         if (chatRelation.chatLocked) {
@@ -667,10 +750,6 @@ export class ChatService {
             throw new BadRequestException('User doesn\'t exist');
         }
 
-        if (await this.isBannedId(chat.id, user.id)) {
-            throw new ForbiddenException('User is banned from this chat');
-        }
-
         const chatRelation = await this.chatUserModel.findOne({
             where: {
                 userId: user.id,
@@ -680,11 +759,21 @@ export class ChatService {
 
         if (!chatRelation)
         {
-            throw new BadRequestException('User doesn\'t belong to that chat');
+            throw new ForbiddenException('User doesn\'t belong to that chat');
+        }
+
+        if (await this.isBannedId(chat.id, user.id))
+        {
+            throw new ForbiddenException('User is banned from this chat');
+        }
+
+        if (chatRelation.isMuted)
+        {
+            throw new ForbiddenException('User is muted in this chat');
         }
 
         if (chatRelation.chatLocked) {
-            throw new BadRequestException('Chat is locked for this user. Unlock it to be able to send messages.');
+            throw new ForbiddenException('Chat is locked for this user. Unlock it to be able to send messages.');
         }
 
         return this.messageService.sendMessage(user, chat, message);
@@ -708,7 +797,7 @@ export class ChatService {
         });
 
         if (!chatUserRelation) {
-            throw new BadRequestException('User doesn\'t belong to this chat');
+            throw new ForbiddenException('User doesn\'t belong to this chat');
         }
 
         if (chatUserRelation.isOwner || chatUserRelation.isAdmin) {
@@ -737,7 +826,7 @@ export class ChatService {
         });
 
         if (!chatUserRelation) {
-            throw new BadRequestException('User doesn\'t belong to this chat');
+            throw new ForbiddenException('User doesn\'t belong to this chat');
         }
 
         if (chatUserRelation.isOwner || chatUserRelation.isAdmin) {
@@ -759,5 +848,4 @@ export class ChatService {
         });
         return !userChatRelation || userChatRelation?.chatLocked;
     }
-
 }

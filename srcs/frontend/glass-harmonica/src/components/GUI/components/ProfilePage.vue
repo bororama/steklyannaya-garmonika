@@ -176,8 +176,15 @@ export default defineComponent({
   created () {
     if (globalThis.logToken != undefined && this.userId === undefined)
     {
-      const myData : any = getRequestParams()
-      fetch(globalThis.backend + '/log/me/' + globalThis.logToken, myData).then((a) => {
+      fetch(globalThis.backend + '/log/me/', {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: 'Bearer ' + logToken
+        }
+      }).then((a) => {
         a.json().then((player) => {
           globalThis.id = player.id
           globalThis.my_data = player

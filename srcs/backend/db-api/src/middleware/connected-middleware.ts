@@ -1,6 +1,6 @@
 import { Injectable, Logger, NestMiddleware, Req, Res } from "@nestjs/common";
 import { NextFunction } from "express";
-import { UserStatus } from "src/users/dto/user-status.enum";
+import { UserStatus } from "../users/dto/user-status.enum";
 
 @Injectable()
 export class ConnectedMiddleware implements NestMiddleware {

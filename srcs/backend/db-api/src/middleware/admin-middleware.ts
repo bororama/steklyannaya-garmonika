@@ -10,7 +10,6 @@ export class AdminMiddleware implements NestMiddleware {
     async use(@Req() req, @Res() res, next: NextFunction) {
         Logger.debug("Admin middleware executed");
         if (await this.adminService.isAdmin(req.requester_info.dataValues.id)) {
-          console.log("YES YOU ARE ADMIN")
             next();
         }
         else {

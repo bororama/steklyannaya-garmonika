@@ -5,6 +5,7 @@ import { UsersService } from "../users/services/users.service";
 import { NewUser } from "../users/dto/new-user.dto";
 import { User } from "../users/models/user.model";
 import { ConfigService } from "@nestjs/config";
+import { Player } from "src/users/models/player.model";
 
 @Injectable()
 export class AdminsService {
@@ -83,6 +84,18 @@ export class AdminsService {
         await this.adminModel.destroy({
             where: {
                 id: userId.id
+            }
+        });
+    }
+
+    async revokeAdminPrivilegesPlayerInfo(admin: Player): Promise<void> {
+        if (admin.user.loginFT == this.caliphLogin) {
+            throw new BadRequestException("This user is the Caliph, cannot revoke this priviledge");
+        }
+
+        await this.adminModel.destroy({
+            where: {
+                id: admin.id
             }
         });
     }

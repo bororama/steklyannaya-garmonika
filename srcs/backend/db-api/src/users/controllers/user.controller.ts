@@ -21,8 +21,8 @@ export class UsersController {
     }
 
     @Get("/users")
-    findAll(): Promise<User[]> {
-        return this.usersService.findAll();
+    findAll(@Req() request): Promise<User[]> {
+        return this.usersService.findAllExcludingRequester(request.requester_info.dataValues.id);
     }
 
     @Get("/connected")

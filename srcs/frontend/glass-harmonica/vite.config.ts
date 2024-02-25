@@ -12,6 +12,9 @@ export default ({ mode }) => {
       "process.env": env,
     },
     plugins: [vue()],
+    server: {
+      port: process.env.PORT
+    },
     resolve: {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),

@@ -8,8 +8,8 @@ import { UpdatePlayerDto } from "../dto/player-update.dto";
 import { LeaderboardPlayerDto } from "../dto/leaderboard-player.dto";
 import { FriendshipDto } from "../dto/friendship.dto";
 import { PublicPlayerDto } from "../dto/public-player.dto";
-import { AdminsService } from "src/admins/admins.service";
-import { MatchesService } from "src/matches/matches.service";
+import { AdminsService } from "../../admins/admins.service";
+import { MatchesService } from "../../matches/matches.service";
 import { User } from "../models/user.model";
 
 @ApiBearerAuth()
@@ -31,8 +31,8 @@ export class PlayersController {
     }
 
     @Get()
-    async findAll(): Promise<PlayerDto[]> {
-        const players: Player[] = await this.playerService.findAll();
+    async findAll(@Req() request): Promise<PlayerDto[]> {
+        const players: Player[] = await this.playerService.findAllExcludingRequester(request.requester_info.dataValues.id);
         return Promise.all(players.map(async(player) => {
             const isAdmin = await this.adminService.isAdmin(player.id);
             const playerDto = new PlayerDto(player, isAdmin);

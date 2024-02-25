@@ -5,8 +5,8 @@ import { MatchesController } from './matches.controller';
 import { MatchesService } from './matches.service';
 import { APP_PIPE } from '@nestjs/core';
 import { UsersModule } from '../users/users.module';
-import { AuthMiddleware } from 'src/middleware/auth-middleware';
-import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
+import { AuthMiddleware } from '../middleware/auth-middleware';
+import { AuthenticMiddleware } from '../middleware/authenticity-middleware';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({

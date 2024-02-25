@@ -10,6 +10,7 @@ export class FtOauthService {
 	private readonly getTokenEndpoint: string = this.ftApiHost + '/oauth/token';
 	private readonly getInfoEndpoint: string =  this.ftApiHost + '/v2/me';
 	private readonly host: string;
+	private readonly port: string
 	
 	constructor(
 		private readonly configService: ConfigService,
@@ -17,6 +18,7 @@ export class FtOauthService {
 		this.id = this.configService.get('UID');
 		this.secret = this.configService.get('SECRET');
 		this.host = this.configService.get('HOST');
+		this.port = this.configService.get('FRONTEND_PORT');
 	}
 
 	async getOAuthKey(code: string): Promise<any>
@@ -34,7 +36,8 @@ export class FtOauthService {
 							+ '&client_id=' + this.id
 							+ '&client_secret=' + this.secret
 							+ '&code=' + code
-							+ '&redirect_uri=http://' + this.host + ':5173';
+							+ '&redirect_uri=http://' + this.host
+							+ (+this.port != 80 ? ':' + this.port : '');
 		const accessToken = await axios.post(this.getTokenEndpoint, urlInfo)
 		.then((res) => {
 			rvalue.status = 'ok'

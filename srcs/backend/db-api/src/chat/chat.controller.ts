@@ -8,7 +8,7 @@ import { ChatUserDto } from '../users/dto/chat-user.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { Message } from './models/message.model';
 import { PublicUserDto } from '../users/dto/public-user.dto';
-import { User } from 'src/users/models/user.model';
+import { User } from '../users/models/user.model';
 
 @ApiBearerAuth()
 @Controller('chats')
@@ -53,7 +53,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('You can\'t check this information');
         }
 
@@ -61,6 +61,12 @@ export class ChatController {
         const bans = await this.chatService.getBansMembers(id, users);
         console.log("Got banned users");
         return users.map(u => new ChatUserDto(u, bans?.find(b => b.userId == u.userId) !== undefined));
+    }
+
+    @Get('publicChats')
+    async getPublicChats(): Promise<Chat[]>
+    {
+        return this.chatService.getPublicChats();
     }
 
     @Post(':id/admins')
@@ -74,11 +80,11 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('You can\'t check this information');
         }
 
-        if (chat.password || chat.isPrivateChat) {
+        if (chat.password || chat.isFriendshipChat) {
             throw new ForbiddenException('Can see the members of this chat unless you belong to it');
         }
         return this.chatService.getAdmins(+id).then(users => users.map(u => new ChatUserDto(u, false)));
@@ -96,7 +102,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (chat.isPrivateChat) {
+        if (chat.isFriendshipChat) {
             throw new ForbiddenException('You can\'t check this information');
         }
         return this.chatService.getBans(+id).then(users => users.map(u => new PublicUserDto(u.user)));
@@ -302,7 +308,25 @@ This only can be done by an operator'
         }
         return this.chatService.setMuteStatus(id, admin, user, false);
     }
-    
+
+    @Post(':id/:admin/makePublic')
+    @ApiOperation({
+        summary: 'Change access of a chat to public',
+        description: 'All users will be able to see and access to this chat'
+    })
+    makeChatPublic(@Param('id', ParseIntPipe) id: number, @Param('admin') admin: string): Promise<Chat> {
+        return this.chatService.changeAccess(admin, id, true);
+    }
+
+    @Post(':id/:admin/makePrivate')
+    @ApiOperation({
+        summary: 'Change access of a chat to private',
+        description: 'All users won\'t be able see and access to this chat'
+    })
+    makeChatPrivate( @Param('id', ParseIntPipe) id: number, @Param('admin') admin: string): Promise<Chat> {
+        return this.chatService.changeAccess(admin, id, false);
+    }
+
     @Delete(':id')
     @ApiBody({required: false, type: CreateChatDto})
     @ApiOperation({
@@ -314,9 +338,9 @@ This only can be done by an operator'
         if (chat  == null) {
             throw new BadRequestException('Chat doesn\'t exists');
         }
-        
+
         const isOwner = await this.chatService.isOwnerId(request.requester_info.dataValues.id, chat.id);
-        if (chat.isPrivateChat || !isOwner) {
+        if (chat.isFriendshipChat || !isOwner) {
             throw new ForbiddenException('You can\'t remove this chat');
         }
 
@@ -334,7 +358,8 @@ This only can be done by an operator'
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!this.checkIfAuthorized(request.requester_info.dataValues, user) && !this.chatService.isAdmin(request.requester_info.dataValues, chat.id)) {
+        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)
+            && !this.chatService.isAdmin(request.requester_info.dataValues, chat.id)) {
             throw new UnauthorizedException("You can't kick user if you are not an admin");
         }
 

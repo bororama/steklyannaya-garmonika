@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { Match } from './components/Match';
-import { Match as MatchModel } from 'src/matches/models/match.model';
+import { Match as MatchModel } from '../matches/models/match.model';
 import { MatchesService } from '../matches/matches.service'
 import { Constants } from './components/Match';
 import * as jwt from 'jsonwebtoken';

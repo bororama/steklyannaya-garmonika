@@ -7,9 +7,9 @@ import { ChatUserModule } from '../chat-user/chat-user.module';
 import { UsersModule } from '../users/users.module';
 import { MessageService } from './services/message.service';
 import { Message } from './models/message.model';
-import { AuthMiddleware } from 'src/middleware/auth-middleware';
-import { AuthenticMiddleware } from 'src/middleware/authenticity-middleware';
-import { ConnectedMiddleware } from 'src/middleware/connected-middleware';
+import { AuthMiddleware } from '../middleware/auth-middleware';
+import { AuthenticMiddleware } from '../middleware/authenticity-middleware';
+import { ConnectedMiddleware } from '../middleware/connected-middleware';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({

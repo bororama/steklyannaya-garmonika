@@ -15,11 +15,13 @@ import { UsersService } from '../users/services/users.service';
 import { ConfigService } from '@nestjs/config';
 
 const liveClients : Array<LiveClient> = Array();
-const host: string = new ConfigService().get('HOST').toLowerCase();
+const configService = new ConfigService;
+const host: string = configService.get('HOST').toLowerCase();
+const port: string = configService.get('FRONTEND_PORT');
 
 @WebSocketGateway(777, {
   cors: {
-    'origin': ['http://' + host + ':5173', 'http://localhost:5173'],
+    'origin': ['http://' + host + (+port != 80 ? ':' + port : '')],
     'methods': 'GET,POST,DELETE',
     'preflightContinue': false,
     'credentials': false,

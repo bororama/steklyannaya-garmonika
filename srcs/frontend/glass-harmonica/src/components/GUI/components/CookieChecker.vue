@@ -14,16 +14,22 @@ import { getRequestParams, postRequestParams } from './connect_params'
 export default defineComponent({
   name: 'CookieChecker',
   data () {
+    let url = 'https://api.intra.42.fr/oauth/authorize?client_id='
+                + process.env.UID
+                + '&redirect_uri=http%3A%2F%2F'
+                + process.env.HOST
+    const port = process.env.PORT
+    if (+port != 80) {
+      url += '%3A' + port
+    }
+    url += '&response_type=code'
+
     return ({
       needs2fa: false,
       code2fa: '',
       fa_token: '1234',
       wrong_code: false,
-      api_42: 'https://api.intra.42.fr/oauth/authorize?client_id='
-                + process.env.UID
-                + '&redirect_uri=http%3A%2F%2F'
-                + process.env.HOST
-                + '%3A5173&response_type=code',
+      api_42: url,
     })
   },
   created () {
