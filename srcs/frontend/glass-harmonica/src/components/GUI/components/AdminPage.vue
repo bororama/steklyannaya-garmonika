@@ -2,17 +2,23 @@
 
 <div class="overlay">
   <h1 style="font-family: 'joystix'">ADMIN PAGE</h1>
-  <h1 v-if="you_are_not_admin">YOU ARE NOT ADMIN</h1>
+  <h1 v-if="!you_are_not_admin">YOU ARE NOT ADMIN</h1>
 
-  <div v-if="!you_are_not_admin" class="admin_page_columns_container">
+  <div v-if="you_are_not_admin" class="admin_page_columns_container">
       <div class="admin_page_column" id="user_ban">
           <h3 style="text-align: center">Users</h3>
-          <User v-for="(user,index) in users" :key="index" :user="user"/>
+          <div style="max-height: 800px;overflow-y: scroll;;max-width: 750px;">
+           <User v-for="(user,index) in users" :key="index" :user="user"/> 
+          </div>
+          
       </div>
 
       <div class="admin_page_column" id="user_ban">
           <h3>Channels</h3>
-          <Channel v-for="(channel,index) in channels" :key="index" :channel="channel"/>
+          <div style="max-height: 800px;overflow-y: scroll;;max-width: 750px;">
+            <Channel v-for="(channel,index) in channels" :key="index" :channel="channel"/>
+  
+          </div>
       </div>
   </div>
 </div>

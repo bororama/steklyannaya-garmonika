@@ -6,8 +6,9 @@
 				<div v-for="(message, index) in this.messages" :key="index" class="one_message_container" :style="'animation-delay: ' + index * 0.15 + 's'">
 					<li class="message">{{message}}</li>
 				</div>
-				<button class="close_popup" @click="this.$emit('close_interaction')">Close</button>
 			</div>
+			<button class="close_popup" @click="this.$emit('close_interaction')">Close</button>
+
 		</div>
 	</div>
 </template>
@@ -81,6 +82,9 @@ export default {
 .message_wrapper {
 	padding: 0;
 	font-family: monospace;
+	max-height: 600px;
+	overflow-y: scroll;
+	max-width: 750px;
 }
 
 .message {

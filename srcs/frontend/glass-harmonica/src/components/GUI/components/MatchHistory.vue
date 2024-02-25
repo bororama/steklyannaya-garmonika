@@ -49,6 +49,8 @@ export default defineComponent({
 
 .history_container {
   width: 100%;
+  max-height: 400px;
   margin: 0 1em;
+  overflow-y:scroll;
 }
 </style>

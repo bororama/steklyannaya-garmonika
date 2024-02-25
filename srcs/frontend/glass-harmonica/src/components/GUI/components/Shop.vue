@@ -1,6 +1,6 @@
 <template>
   <div class="global-shop overlay">
-    <button  @click="$router.push('/')" class="fa_button">EXIT</button>
+    <button id="exit_button" @click="$router.push('/')" class="fa_button">EXIT</button>
     <h1>متجر فرانسيسكو خيسوس دي جاتا إي فالديس</h1>
     <div class="shop-wrapper">
       <div>
@@ -109,6 +109,12 @@ export default {
 </script>
 
 <style>
+
+#exit_button {
+  position: absolute;
+  top: 10%;
+}
+
 .global-shop {
   display: flex;
   align-items: center;
@@ -180,6 +186,11 @@ export default {
 
 
 @media screen and (max-width : 600px) {
+
+  .shop-wrapper img {
+    width: 142px;
+  }
+
   .items img {
     width: 42px;
   }
@@ -188,4 +199,20 @@ export default {
     width: 50px;
   }
 }
+
+@media screen and (max-height : 600px) {
+  .shop-wrapper img {
+    width: 100px;
+  }
+
+  .items img {
+    width: 42px;
+  }
+
+  .coins-container img {
+    width: 50px;
+  }
+}
+
+
 </style>
