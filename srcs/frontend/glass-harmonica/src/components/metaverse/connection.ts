@@ -42,12 +42,13 @@ async function spawningRoutine(metaSocket : Socket, metaverse: Metaverse, livePl
 		else {
 			const payload = "NULL PLAYER FOUND";
 			metaSocket.emit('spawnExistingPlayersFailed', payload, (newLivePlayers : any) => {
-				console.table(newLivePlayers);
+				//console.table(newLivePlayers);
 				spawningRoutine(metaSocket, metaverse, newLivePlayers, retries + 1);
 			});
 		}
 	}, 300 + (Math.pow(retries, 2) * 100));
 }
+//throw an error on spawning routine after 12 retries : connexion error
 
 function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRef : any) {		
 
@@ -59,13 +60,13 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	});
 	
 	metaSocket.on('welcomePack', async (payload : { newPlayer : Player, livePlayers : Array<PlayerData>}) => {
-		console.log('WelcomePack >>');
+		//console.log('WelcomePack >>');
 		await metaverse.initPlayerData(
 			payload.newPlayer.user.id,
 			payload.newPlayer.user.name
 		);
 		await metaverse.initGameWorld(metaSocket);
-		console.table(payload.livePlayers);
+		//console.table(payload.livePlayers);
 		spawningRoutine(metaSocket, metaverse, payload.livePlayers, 0);
 	});
 	
@@ -80,17 +81,17 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	metaSocket.on('newPlayer', async (payload : { retries : number, player : Player }) => { 
 		console.log('newPLayer joined >', `${ (payload.player) ?  payload.player.user.name: 'undefined player' }`);
 		if (metaverse.gameWorld.isReady()) {
-			console.log("Spawning new player....")
+			//console.log("Spawning new player....")
 			await spawnPlayers([payload.player], metaverse); // gameworld sometimes undefined??
 		}
 		else {
-			console.log("spawn failed....");
+			//console.log("spawn failed....");
 			metaSocket.emit('spawnNewPlayerFailed', {retries : payload.retries, player : payload.player});
 		}
 	});
 
 	metaSocket.on('playerLeft', (payload : Player) => { 
-		console.log('Player left ....>>', `${payload.user.name}`);
+		//console.log('Player left ....>>', `${payload.user.name}`);
 		metaverse.gameWorld.removePlayer(payload);
 	});
 
@@ -114,7 +115,7 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	});
 
 	metaSocket.on('stopApotheosis', (payload : string) => {
-      console.log("APOTEOSIS parada")
+      //console.log("APOTEOSIS parada")
 		metaverse.gameWorld.stopApotheosis(payload);
 	});
 
@@ -137,12 +138,12 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	});
 
 	metaSocket.on('exception', (data) => {
-		console.log('event', data);
+		//console.log('event', data);
 	});
 
 
 	metaSocket.on('banned', () => {
-		console.log("B A N N E D");
+		//console.log("B A N N E D");
 		metaverse.gameWorld.showPopUp("Away with you, cursed one, into the eternal fire.", false);
 		metaverse.gameWorld.resetLivePlayers();
 	})

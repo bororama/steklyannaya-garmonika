@@ -86,16 +86,16 @@ class GameWorld {
                 }
             }
 
-            else if (ev.key === "l") {
+            /*else if (ev.key === "l") {
                 console.log("Player position : ",
                     `${this._player!.mesh.position.x}, ${this._player!.mesh.position.y}, ${this._player!.mesh.position.z}`)
             }
 
             else if (ev.key === "r") {
                 console.log("Player rotation : ", `${this._player!.mesh.rotationQuaternion}`);
-            }
+            }*/
 
-            else if (ev.key === "R") {
+            else if (ev.key === "R" && ev.ctrlKey) {
                 this._player!.mesh.position = Vector3.Zero();
             }
 

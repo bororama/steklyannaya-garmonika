@@ -76,7 +76,7 @@ export class PlayerInput {
         }
 
         if (this.inputMap["t"] || this.inputMap["T"]) {
-            console.log("this.inputMap[t] = ", this.inputMap["t"]);
+            //console.log("this.inputMap[t] = ", this.inputMap["t"]);
             this.inputMap["t"] = false;
             if (this._switch)
                 this.toggleChatBox = false;
