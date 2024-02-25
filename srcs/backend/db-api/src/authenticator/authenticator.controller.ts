@@ -126,13 +126,13 @@ export class AuthenticatorController {
     let payload : any;
     const token : string = this.extractJwt(request);
     try {
-      console.log("THIS IS THE TOKEN")
-      console.log (token)
-      console.log (this.authService.jwt_log_secret)
       payload = jwt.verify(token, this.authService.jwt_log_secret)
     }
     catch {
-      console.log("ME CATCH")
+      throw new UnauthorizedException('Unauthorized - Invalid JWT token');
+    }
+
+    if (!payload.username) {
       throw new UnauthorizedException('Unauthorized - Invalid JWT token');
     }
     const player: Player = await this.playerService.findOne(payload.username)
@@ -179,7 +179,7 @@ export class AuthenticatorController {
                                           token:enable2FAInfo.code,
                                           window: 6})
     if (isValid) {
-      this.userService.set2FA(payload.username, true)
+      await this.userService.set2FA(payload.username, true)
       return 'ok'
     }
     else
@@ -200,7 +200,7 @@ export class AuthenticatorController {
                                             token:enable2FAInfo.code,
                                             window: 6})
       if (isValid) {
-        this.userService.set2FA(payload.username, false)
+        await this.userService.set2FA(payload.username, false)
         return 'ok'
       }
       else

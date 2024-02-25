@@ -183,27 +183,33 @@ export class ChatService {
             }
         });
     }
-
-    async join(userId: string, chat: Chat): Promise<ChatUsers> {
-        const user: User = await this.userService.findOne(userId);
+    
+    async join(requester: User, user: User, chat: Chat): Promise<ChatUsers> {
         let locked = false;
         let chatUserRelation;
-
-        if (!user) {
-            throw new BadRequestException('User doesn\'t exists');
-        }
         
+        if (chat.isFriendshipChat) {
+            throw new ForbiddenException('Anyone can\'t join this chat');
+        }
+
         if (await this.isBannedId(chat.id, user.id)) {
             throw new ForbiddenException('User is banned from this chat');
-        }
-
-        if (chat.isFriendshipChat) {
-            throw new ForbiddenException('User can\'t join a private chat');
         }
 
         if (chat.password) {
             locked = true;
         }
+
+        if (requester.id !== user.id) {
+            const requesterIsAdmin = await this.isAdminId(requester.id, chat.id);
+            if (!requesterIsAdmin) {
+                throw new ForbiddenException('Only chat admins can do this');
+            }
+        }
+        else if (!chat.isPublic) {
+            throw new ForbiddenException('User can\'t join private chat themselves');
+        }
+
 
         try {
             chatUserRelation = await this.chatUserModel.create({

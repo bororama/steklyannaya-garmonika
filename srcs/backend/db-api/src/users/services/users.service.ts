@@ -30,6 +30,10 @@ export class UsersService {
     }
 
     async findAllExcludingRequester(requester: number): Promise<User[]> {
+        if (!requester || isNaN(requester)) {
+            return this.findAll();
+        }
+
         return this.userModel.findAll({
             where: {
                 id: { [Op.ne]: requester }
@@ -38,6 +42,10 @@ export class UsersService {
     }
 
     async findOne(user: string): Promise<User> {
+        if (!user) {
+            return undefined;
+        }
+
         const searchCriteria = isNaN(+user)
             ? { userName: user }
             : { id: +user };
@@ -47,6 +55,10 @@ export class UsersService {
     }
 
     async findOneLight(user: string): Promise<User> {
+        if (!user) {
+            return undefined;
+        }
+
         const searchCriteria = isNaN(+user)
             ? { userName: user }
             : { id: +user };
@@ -58,10 +70,17 @@ export class UsersService {
 
 
     async findOneById(user: number): Promise<User> {
+        if (!user || isNaN(user)) {
+            return undefined;
+        }
         return this.userModel.findByPk(user);
     }
     
     async findOneByFtLogin(user: string): Promise<User> {
+        if (!user) {
+            return undefined;
+        }
+
         return this.userModel.findOne({
             where: {
                 loginFT: user
@@ -70,6 +89,10 @@ export class UsersService {
     }
 
     async userExists(user: string): Promise<number> {
+        if (!user) {
+            return undefined;
+        }
+
         const searchCriteria = isNaN(+user)
             ? { userName: user }
             : { id: +user };
@@ -80,6 +103,10 @@ export class UsersService {
     }
 
     async getFtLogin(user: string): Promise<User> {
+        if (!user) {
+            return undefined;
+        }
+
         const searchCriteria = isNaN(+user)
             ? { userName: user }
             : { id: +user };
@@ -90,6 +117,10 @@ export class UsersService {
     }
 
     async create(newUser: NewUser): Promise<User> {
+        if (!newUser) {
+            throw new BadRequestException('Undefined user data');
+        }
+
         return this.userModel.create({
             loginFT: newUser.loginFt,
             userName: newUser.userName,
@@ -107,6 +138,10 @@ export class UsersService {
     }
 
     async setOnlineStatus(userId: string, status: boolean): Promise<void> {
+        if (!userId) {
+            throw new BadRequestException('Undefined user Id');
+        }
+
         const user = await this.findOne(userId);
         if (!user) {
             throw new BadRequestException('User doesn\'t exists');
@@ -116,6 +151,9 @@ export class UsersService {
     }
 
     async setUserProfilePic(userId: string, profilePic: string) : Promise<void> {
+        if (!profilePic) {
+            throw new BadRequestException("Invalid photography");
+        }
         const user = await this.findOne(userId);
         if (!user) {
             throw new BadRequestException('User doesn\'t exists');
@@ -125,6 +163,10 @@ export class UsersService {
     }
 
     async signIn(loginFt: string): Promise<User> {
+        if (!loginFt) {
+            return undefined;
+        }
+
         const user = await this.userModel.findOne({ where: { loginFT: loginFt } });
         if (!user) {
             throw new BadRequestException('Is not registered yet');
@@ -133,6 +175,10 @@ export class UsersService {
     }
     
     async changeUsername(userId: string, newUsername: string) : Promise<void> {
+        if (!userId || !newUsername) {
+            throw new BadRequestException('Name is undefined');
+        }
+        
         const user = await this.findOne(userId);
         if (!user) {
             throw new BadRequestException('User doesn\'t exists');
@@ -198,7 +244,7 @@ export class UsersService {
 
     async getBlockedUsers(user: string): Promise<User[]> {
         const userId = await this.userExists(user);
-        if (isNaN(userId)) {
+        if (!userId || isNaN(userId)) {
             throw new BadRequestException('User doesn\'t exists');
         }
 
@@ -221,7 +267,7 @@ export class UsersService {
     async blockUser(blocker: string, blocked: string): Promise<void> {
         const userId = await this.userExists(blocker);
         const blockedUserId = await this.userExists(blocked);
-        if (isNaN(userId) || isNaN(blockedUserId)) {
+        if (!userId || !blockedUserId || isNaN(userId) || isNaN(blockedUserId)) {
             throw new BadRequestException('User doesn\'t exists');
         }
 
@@ -256,7 +302,7 @@ export class UsersService {
     async unblockUser(blocker:string, blocked: string): Promise<void> {
         const userId = await this.userExists(blocker);
         const blockedUserId = await this.userExists(blocked);
-        if (isNaN(userId) || isNaN(blockedUserId)) {
+        if (!userId || !blockedUserId || isNaN(userId) || isNaN(blockedUserId)) {
             throw new BadRequestException('User doesn\'t exists');
         }
 
@@ -284,6 +330,10 @@ export class UsersService {
     }
 
     async getUserChats(idOrUsername: string): Promise<ChatDto[]> {
+        if (!idOrUsername) {
+            throw new BadRequestException("Undefined user id");
+        }
+
         const searchCriteria = isNaN(+idOrUsername)
             ? { userName: idOrUsername }
             : { id: +idOrUsername };
@@ -338,7 +388,10 @@ export class UsersService {
     }
 
     async deleteUser(user: number): Promise<void> {
-        await this.userModel.destroy({ where: { id: user } });
+        if (user && !isNaN(user))
+        {
+            await this.userModel.destroy({ where: { id: user } });
+        }
     }
 
     async addCoins(userId: string, quantity: number) : Promise<string> {
@@ -346,12 +399,19 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException('User doesn\'t exist')
         }
+        if (!quantity || isNaN(quantity)) {
+            throw new BadRequestException('Invalid coins quantity');
+        }
         user.franciscoins += quantity;
         user.save();
         return ('ok');
     }
 
     async subtractCoins(user: User, quantity: number) : Promise<string> {
+        if (!quantity || isNaN(quantity)) {
+            throw new BadRequestException('Invalid coins quantity');
+        }
+
         if (user.franciscoins < quantity)
             return ('not_enough_coins')
         else {
@@ -362,6 +422,10 @@ export class UsersService {
     }
 
     async addPearls(user: User, quantity: number) : Promise<string> {
+        if (!quantity || isNaN(quantity)) {
+            throw new BadRequestException('Invalid pearls quantity');
+        }
+
         user.pearls += quantity;
         await user.save();
         return ('ok');
@@ -372,6 +436,11 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException('User doesn\'t exist')
         }
+
+        if (!quantity || isNaN(quantity)) {
+            throw new BadRequestException('Invalid pearls quantity');
+        }
+
         if (user.pearls< quantity)
             return ('not_enough_pearls')
         else {
@@ -382,6 +451,10 @@ export class UsersService {
     }
 
     async addNecklace(user: User, quantity: number) : Promise<string> {
+        if (!quantity || isNaN(quantity)) {
+            throw new BadRequestException('Invalid necklaces quantity');
+        }
+
         user.necklaces += quantity;
         await user.save();
         return ('ok');
@@ -392,6 +465,11 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException('User doesn\'t exist')
         }
+
+        if (!quantity || isNaN(quantity)) {
+            throw new BadRequestException('Invalid necklaces quantity');
+        }
+
         if (user.necklaces < quantity)
             return ('not_enough_necklaces')
         else {
@@ -402,6 +480,10 @@ export class UsersService {
     }
 
     async subtractNecklaceFromUser(user: User, quantity: number) : Promise<boolean> {
+        if (!quantity || isNaN(quantity)) {
+            throw new BadRequestException('Invalid necklaces quantity');
+        }
+
         if (user.necklaces < quantity)
             return false;
         else {

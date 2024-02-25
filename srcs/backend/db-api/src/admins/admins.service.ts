@@ -101,7 +101,10 @@ export class AdminsService {
     }
 
     async isAdmin(userId: number): Promise<boolean> {
-        const user = this.usersService.findOneById(userId);
+        const user = await this.usersService.findOneById(userId);
+        if (!user) {
+            return false;
+        }
         const admin = this.findOne(userId);
         return Promise.all([user, admin]).then(data =>{
           return (data[0] != null && data[0].loginFT == this.caliphLogin) || data[1] != null;

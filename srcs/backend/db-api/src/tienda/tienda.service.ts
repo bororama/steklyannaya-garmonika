@@ -23,7 +23,7 @@ export class TiendaService {
     const result :string = await this.userService.subtractCoins(user, this.pearlPrice);
 
     if (result == 'ok') {
-        this.userService.addPearls(user, 1)
+        await this.userService.addPearls(user, 1)
     }
 
     return (result);
