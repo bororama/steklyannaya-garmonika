@@ -76,6 +76,10 @@ export class AuthenticatorService {
 					{
 						throw new ForbiddenException('You\'re banned');
                     }
+                    if (user.dataValues.status == "online")
+                    {
+                      log_attempt.status = 'already_connected'
+                    }
 					log_attempt.log_token = jwt.sign({login: personal.login, username: user.dataValues.id}, this.jwt_log_secret)
 				}
 			} catch (e) {
