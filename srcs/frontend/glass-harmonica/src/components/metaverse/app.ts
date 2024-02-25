@@ -200,7 +200,7 @@ class GameWorld {
         this._livePlayers = Array<RemotePlayer>();
     }
 
-    async spawnPlayer(player: PlayerData) {
+    async spawnPlayer(player: PlayerData, isBlocked : boolean) {
         if (this._findLivePlayer(player.user.id) !== undefined) {
             console.log(`Player: ${player.user.name} already joined`);
             return;
@@ -221,9 +221,11 @@ class GameWorld {
                         console.error('Failed to instantiate RemotePlayer.');
                         return;
                     }
+                    if (isBlocked) {
+                        console.log(newPlayer.name, " BLOCKED");
+                        newPlayer.getBlocked();
+                    }
                     this._livePlayers.push(newPlayer);
-                    console.log("instanced")
-
                 });
 
             } catch (error) {
@@ -293,11 +295,19 @@ class GameWorld {
         }
     }
 
-    blockUser(id : string) {
+    blockRemotePlayer(id : string) {
         const player = this._findLivePlayer(id);
 
         if (player) {
             player.getBlocked();
+        }
+    }
+
+    unblockRemotePlayer(id : string) {
+        const player = this._findLivePlayer(id);
+
+        if (player) {
+            player.getUnblocked();
         }
     }
 
@@ -340,16 +350,18 @@ class GameWorld {
                 return (m.metadata !== null && m.metadata.tag === 'GameEntity');
             });
             if (pickInfo!.hit) {
+                //console.log("metadata : ", pickInfo?.pickedMesh?.metadata );
                 if (pickInfo?.pickedMesh?.metadata.type === 'Devil') {
-                    console.log("Emitter ", vueEmitter);
                     vueEmitter('storeRequest', { userId: this._playerData!.user.id });
                 }
                 else if (pickInfo?.pickedMesh?.metadata.type === 'remote') {
                     vueEmitter('profileRequest', { name: pickInfo!.pickedMesh!.metadata.name });
                 }
+                else if (pickInfo?.pickedMesh?.metadata.type === 'Cathedral') {
+                    vueEmitter('offeringsRequest', { userId: this._playerData!.user.id });
+                }
                 else {
                     let NPC = this._NPCS.find((npc: any) => { return npc.name === pickInfo!.pickedMesh!.metadata.name })
-                    console.log(NPC.name, ": About to saySomething()");
                     NPC.saySomething();
                 }
             }
@@ -429,21 +441,17 @@ class GameWorld {
         assets = await this._loadPlayerAssets(this._scene, false, 'escultura1.glb');
         assets["height"] = 6;
         this._NPCS.push(
-            new NPC(assets, this._scene, 'Guillermo', 'angel',
+            new NPC(assets, this._scene, 'Michael', 'angel',
                 new Vector3(-259.19837561453, 47.69347184924647, -181.9513474067934),
                 new Quaternion(0, 0.8, 0),
                 [
-                    "Buy 'El aquelarre de Celia'",
-                    "Read 'El aquelarre de Celia'",
-                    "The Falcon has spread its wings.",
                     "Climb down this hill, find your destiny",
                     "Be careful in this God-forsaken land",
-                    "Do it for Him",
-                    "The wings of liberty glide across the sky",
                     "Offer your heart",
                     "MARCH ON",
-                    "I like you. I want you",
-                    "*frowns*",
+                    " *frowns* ",
+                    "Be not afraid",
+                    "Join the worshippers",
                 ]
             )
         );

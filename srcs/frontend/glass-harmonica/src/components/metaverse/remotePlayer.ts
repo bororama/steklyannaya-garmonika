@@ -42,6 +42,12 @@ export class RemotePlayer extends GameEntity {
         this.isBlocked = true;
     }
 
+    getUnblocked() {
+        setMeshTransparency(this._glowingMesh, 1);
+        setMeshTransparency(this.mesh, 1);
+        this.isBlocked = false;
+    }
+
     die() {
         this._glowingMesh.dispose();
         this.mesh.dispose();

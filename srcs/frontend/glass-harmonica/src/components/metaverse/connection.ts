@@ -4,12 +4,20 @@ import { Metaverse } from "./app";
 import { PlayerData } from "./playerData";
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { getRequestParams, backend } from "../GUI/components/connect_params";
 
 
 async function spawnPlayers(liveClients: Array<PlayerData>, metaverse : Metaverse) {
 	// await for blocked user array then for each liveClient, check if their blocked, if so send this info to spawnPlayer()
+	const response  = await fetch( globalThis.backend + '/' + globalThis.id.toString() + '/blocks', getRequestParams());
+	const blockedUsers = await response.json();
+
+
 	liveClients.forEach(async (c) => {
-		await metaverse.gameWorld.spawnPlayer(c);
+		const isBlocked = blockedUsers.some((u) => {
+			return (u.id.toString() === c.user.id)
+		});
+		await metaverse.gameWorld.spawnPlayer(c, isBlocked);
 	});
 }
 
@@ -119,7 +127,11 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	});
 
 	metaSocket.on('blockUser', (payload : any) => {
-		metaverse.gameWorld.blockUser(payload.blockedUserId);
+		metaverse.gameWorld.blockRemotePlayer(payload.blockedUserId);
+	});
+
+	metaSocket.on('unblockUser', (payload : any) => {
+		metaverse.gameWorld.unblockRemotePlayer(payload.blockedUserId);
 	});
 
 	metaSocket.on('exception', (data) => {

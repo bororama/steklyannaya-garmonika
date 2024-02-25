@@ -8,25 +8,28 @@ export class Environment {
     }
 
     public async load() {
-        const assets = await this._loadAsset();
+        const jaen = await this._loadAsset("jaen.glb");
         //Loop through all environment meshes that were imported
-        assets.allMeshes.forEach((m) => {
+        jaen.allMeshes.forEach((m) => {
             m.receiveShadows = true;
             m.checkCollisions = true;
             m.metadata = {tag : 'terrain', name: 'Jaén'};
         });
-        
+        jaen.env.locallyTranslate(new Vector3(600, -70, 0));
+        const cathedral = await this._loadAsset("catedral.glb");
+        cathedral.env.locallyTranslate(new Vector3(600, -70, 0));
+        cathedral.allMeshes.forEach((m) => {
+            m.receiveShadows = true;
+            m.checkCollisions = true;
+            m.metadata = {tag : 'GameEntity', type: 'Cathedral', name: 'Asunción de la virgen de Jaén'};
+        });
     }
 
-    private async _loadAsset() {
-        //const result = await SceneLoader.ImportMeshAsync(null, "/3d/", "plane.glb", this._scene);
-        //const result = await SceneLoader.ImportMeshAsync(null, "/3d/", "macan.glb", this._scene);
-        //const result = await SceneLoader.ImportMeshAsync(null, "/3d/", "low_poly_forest.glb", this._scene);
-        const result = await SceneLoader.ImportMeshAsync(null, "/3d/", "jaen.glb", this._scene);
+    private async _loadAsset(path : string) {
+        const result = await SceneLoader.ImportMeshAsync(null, "/3d/", path, this._scene);
 
         let env = result.meshes[0];
         let allMeshes = env.getChildMeshes();
-        env.locallyTranslate(new Vector3(600, -70, 0));
         allMeshes.forEach((mesh) => {
             if (mesh.material) {
               const activeTexture = mesh.material.getActiveTextures();
