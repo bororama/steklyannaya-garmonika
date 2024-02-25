@@ -8,7 +8,7 @@ import {
   OnGatewayDisconnect,
   ConnectedSocket
 } from '@nestjs/websockets';
-import { Logger } from "@nestjs/common";
+import { Logger, BadRequestException } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
 import { ServerToClientEvents, ClientToServerEvents, Message, Player, LiveClient, User } from "./shared/meta.interface"
 import { User as UserModel } from 'src/users/models/user.model';
@@ -53,12 +53,18 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     liveClients.push(newLiveClient);
   }
 
-  handleDisconnect(client: Socket) {
-    const i: number = liveClients.findIndex((c) => { return c.socket === client })
-    const disconnectedPlayer: Player = liveClients[i].player;
-    this.setOnlineStatus(liveClients[i].player.user.name, false)
-    liveClients.splice(i, 1);
-    this.server.emit('playerLeft', disconnectedPlayer);
+  async handleDisconnect(client: Socket) {
+    try {
+      const i: number = liveClients.findIndex((c) => { return c.socket === client })
+      const disconnectedPlayer: Player = liveClients[i].player;
+      await this.setOnlineStatus(liveClients[i].player.user.name, false)
+      liveClients.splice(i, 1);
+      this.server.emit('playerLeft', disconnectedPlayer);
+    }
+
+    catch (error) {
+      console.error(error);
+    }
   }
 
   @SubscribeMessage('reconnect')
@@ -69,28 +75,27 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('userData')
   async onUserDataMessage(@MessageBody() payload: User, @ConnectedSocket() socket: Socket): Promise<String> {
 
-    const clientIndex = liveClients.findIndex((p) => {
-      return p.socket === socket;
-    });
+    try {
 
-    const newUser: User = { id: payload.id, name: payload.name };
-    const newPlayer: Player = { user: newUser, position: [0, 0, 0], rotation: [0, 0, 0, 1.0], state: 0 };
-    liveClients[clientIndex].player = newPlayer;
-    let i = 0;
+      await this.setOnlineStatus(payload.id, true);
+      const clientIndex = liveClients.findIndex((p) => {
+        return p.socket === socket;
+      });
+  
+      const newUser: User = { id: payload.id, name: payload.name };
+      const newPlayer: Player = { user: newUser, position: [0, 0, 0], rotation: [0, 0, 0, 1.0], state: 0 };
+      liveClients[clientIndex].player = newPlayer;
+      const livePlayers = liveClients.map((c: LiveClient) => {
+        return c.player;
+      });
+      socket.emit('welcomePack', { newPlayer, livePlayers });
+      socket.broadcast.emit('newPlayer', { retries: 0, player: newPlayer });
+    }
 
-    //console.log("--------");
-    //for (let p of liveClients) {
-    // console.log(i, "] p of livePlayers : ", p.player, " id : ", p.socket.id);
-    // i++;
-    //}
-    //console.log("--------");
-    const livePlayers = liveClients.map((c: LiveClient) => {
-      return c.player;
-    });
-    socket.emit('welcomePack', { newPlayer, livePlayers });
-    socket.broadcast.emit('newPlayer', { retries: 0, player: newPlayer });
-
-    this.setOnlineStatus(payload.id, true);
+    catch  (error) {
+      this.logger.warn(error);
+      socket.emit('alreadyJoined');
+    }
 
     return `You sent : userData ${payload}`;
   }
@@ -190,6 +195,8 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
       where: searchCondition
     });
     if (user) {
+      if (user.status === UserStatus.online && status === true)
+        throw new BadRequestException("User is already online");
       user.status = (status ? UserStatus.online : UserStatus.offline);
       user.save();
     }

@@ -69,6 +69,10 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 		spawningRoutine(metaSocket, metaverse, payload.livePlayers, 0);
 	});
 	
+	metaSocket.on('alreadyJoined', () => {
+		alert("This account is already instanced on the curroverse...");
+	});
+
 	metaSocket.on('chat', (payload : Messsage) => {
 		metaverse.gameWorld.makeRemotePlayerSay(payload);
 	});
