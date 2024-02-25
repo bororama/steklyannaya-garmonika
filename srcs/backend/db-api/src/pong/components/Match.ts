@@ -6,6 +6,7 @@ import { BackendConfig } from './BackendConfig';
 import { CollisionController } from './CollisionController';
 import { Server } from 'socket.io';
 import { MatchesService } from '../../matches/matches.service'
+import { MatchDto } from './MatchDto';
 
 export enum Constants {
   MATCH_FAILED = -1,
@@ -92,13 +93,14 @@ export class Match {
       this.scores[0].score++;
       this.ball.goalRedraw();
     }
-
-    io.to(this.matchIndex.toString()).emit('updateGameState', this);
+    let matchdto = new MatchDto(this);
+    io.to(this.matchIndex.toString()).emit('updateGameState', matchdto);
 
     if (this.maxScoreAchieved()) {
       console.log('Match ended.', this.config.pointsToWin);
       this.isGameInProgress = Constants.MATCH_ENDED;
-      io.to(this.matchIndex.toString()).emit('updateGameState', this);
+      let matchdto = new MatchDto(this);
+      io.to(this.matchIndex.toString()).emit('updateGameState', matchdto);
       this.recordOnDB();
       return;
     }

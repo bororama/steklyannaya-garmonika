@@ -53,6 +53,6 @@ export default defineComponent({
   flex-direction: row;
   z-index: 10;
   left: 6vw;
-  top: 87vh;
+  top: 84%;
 }
 </style>
