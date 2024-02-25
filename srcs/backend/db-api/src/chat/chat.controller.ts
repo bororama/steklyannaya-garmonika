@@ -138,19 +138,7 @@ export class ChatController {
             throw new BadRequestException('User doesn\'t exists');
         }
 
-        const isChatAdmin: boolean = await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id);
-
-        if (!isChatAdmin && request.requester_info.dataValues.id != user.id)
-        {
-            throw new ForbiddenException('Only chat admins can do this');
-        }
-
-        if (chat.isFriendshipChat || 
-            (!chat.isPublic && !isChatAdmin)) {
-            throw new ForbiddenException('User can\'t join a private chat');
-        }
-
-        return this.chatService.join(user, chat).then(chatUser => new ChatUserDto(chatUser, false));
+        return this.chatService.join(request.requester_info.dataValues, user, chat).then(chatUser => new ChatUserDto(chatUser, false));
     }
 
     @Post(':id/setPassword')

@@ -209,10 +209,14 @@ export class ChatService {
             }
         });
     }
-
-    async join(user: User, chat: Chat): Promise<ChatUsers> {
+    
+    async join(requester: User, user: User, chat: Chat): Promise<ChatUsers> {
         let locked = false;
         let chatUserRelation;
+        
+        if (chat.isFriendshipChat) {
+            throw new ForbiddenException('Anyone can\'t join this chat');
+        }
 
         if (await this.isBannedId(chat.id, user.id)) {
             throw new ForbiddenException('User is banned from this chat');
@@ -221,6 +225,17 @@ export class ChatService {
         if (chat.password) {
             locked = true;
         }
+
+        if (requester.id !== user.id) {
+            const requesterIsAdmin = await this.isAdminId(requester.id, chat.id);
+            if (!requesterIsAdmin) {
+                throw new ForbiddenException('Only chat admins can do this');
+            }
+        }
+        else if (!chat.isPublic) {
+            throw new ForbiddenException('User can\'t join private chat themselves');
+        }
+
 
         try {
             chatUserRelation = await this.chatUserModel.create({
