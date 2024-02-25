@@ -210,21 +210,12 @@ export class ChatService {
         });
     }
 
-    async join(userId: string, chat: Chat): Promise<ChatUsers> {
-        const user: User = await this.userService.findOne(userId);
+    async join(user: User, chat: Chat): Promise<ChatUsers> {
         let locked = false;
         let chatUserRelation;
 
-        if (!user) {
-            throw new BadRequestException('User doesn\'t exists');
-        }
-        
         if (await this.isBannedId(chat.id, user.id)) {
             throw new ForbiddenException('User is banned from this chat');
-        }
-
-        if (chat.isFriendshipChat) {
-            throw new ForbiddenException('User can\'t join a private chat');
         }
 
         if (chat.password) {

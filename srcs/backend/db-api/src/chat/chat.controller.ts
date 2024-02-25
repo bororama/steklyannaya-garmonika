@@ -9,6 +9,7 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { Message } from './models/message.model';
 import { PublicUserDto } from '../users/dto/public-user.dto';
 import { User } from '../users/models/user.model';
+import { UsersService } from 'src/users/services/users.service';
 
 @ApiBearerAuth()
 @Controller('chats')
@@ -16,6 +17,7 @@ import { User } from '../users/models/user.model';
 export class ChatController {
     constructor(
         private readonly chatService: ChatService,
+        private readonly userService: UsersService
         ) {}
 
     checkIfAuthorized(requester: User, userId: string) {
@@ -123,15 +125,29 @@ export class ChatController {
         summary: 'Add a user to a chat room',
         description: 'This endpoint will add a user to the indicated chat room by its id.'
     })
-    async joinChat(@Req() request, @Param('user') user: string, @Param('id') id: number): Promise<ChatUserDto> {
+    async joinChat(@Req() request, @Param('user') userId: string, @Param('id') id: number): Promise<ChatUserDto> {
         const chat: Chat = await this.chatService.findOne(id);
         if (!chat)
         {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!this.checkIfAuthorized(request.requester_info.dataValues, user)) {
-            throw new UnauthorizedException("Private action");
+        const user: User = await this.userService.findOne(userId);
+
+        if (!user) {
+            throw new BadRequestException('User doesn\'t exists');
+        }
+
+        const isChatAdmin: boolean = await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id);
+
+        if (!isChatAdmin && request.requester_info.dataValues.id != user.id)
+        {
+            throw new ForbiddenException('Only chat admins can do this');
+        }
+
+        if (chat.isFriendshipChat || 
+            (!chat.isPublic && !isChatAdmin)) {
+            throw new ForbiddenException('User can\'t join a private chat');
         }
 
         return this.chatService.join(user, chat).then(chatUser => new ChatUserDto(chatUser, false));
@@ -149,7 +165,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id))
+        if (!(await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id)))
         {
             throw new ForbiddenException('Only chat admins can do this');
         }
@@ -169,7 +185,7 @@ export class ChatController {
             throw new BadRequestException('Chat doesn\'t exists');
         }
 
-        if (!this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id))
+        if (!(await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id)))
         {
             throw new ForbiddenException('Only chat admins can do this');
         }
