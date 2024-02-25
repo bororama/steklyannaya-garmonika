@@ -47,10 +47,12 @@ export default defineComponent({
 }
 
 .interface_buttons {
-  position: absolute;
+  position: fixed;
   display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
   z-index: 10;
-  left: 13vw;
+  left: 6vw;
   top: 87vh;
 }
 </style>

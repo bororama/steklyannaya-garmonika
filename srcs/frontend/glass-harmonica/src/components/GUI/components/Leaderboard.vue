@@ -1,7 +1,7 @@
 <template>
   <div class="global overlay-3">
     <h1 style="font-family: joystix; font-size: 48px; text-shadow: #FC0 1px 0 10px;">Leaderboard</h1>
-    <div style="max-height: 500px;overflow-y: scroll;width:100%;max-width: 750px;"> 
+    <div style="max-height: 500px;overflow-y: scroll;width:100%;max-width: 750px;">
       <table style="margin: 0 auto;width: 100%;max-width: 750px;">
         <tr>
           <td class="t-column" style="font-size:32px">
