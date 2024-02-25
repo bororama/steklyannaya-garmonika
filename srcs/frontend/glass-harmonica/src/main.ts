@@ -70,6 +70,12 @@ const routes = [
             beforeEnter: [guard_against_not_logged]
           },
           {
+            path: '/offerings',
+            name: 'Offerings',
+            component: TempleOfferings,
+            beforeEnter: [guard_against_not_logged]
+          },
+          {
             path: 'pong_match',
             name: 'RoutablePong',
             component: RoutablePong,
@@ -117,11 +123,6 @@ const routes = [
       path: '/securizing',
       name: 'Securizer',
       component: LoadingWelcome
-    },
-    {
-      path: '/offerings',
-      name: 'Offerings',
-      component: TempleOfferings
     }
 ];
 

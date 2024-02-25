@@ -1,9 +1,9 @@
 <template>
     <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse" @already_connected="go_to_alredy_connected_page"/>
-    <div class="overlay" v-if="showing_profile_image">
+    <!--div class="overlay" v-if="showing_profile_image">
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
-    </div>
+    </div-->
     <router-view></router-view>
     <MetaOverlay v-if="in_metaverse"/>
     <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
@@ -57,6 +57,8 @@ export default defineComponent({
         }
       }).then((a) => {
         a.json().then((player) => {
+          console.log("USER LOGGED IN ")
+          console.log(player)
           globalThis.id = player.id
           globalThis.my_data = player
           globalThis.username = player.name
@@ -174,7 +176,7 @@ body {
 	top: 0;
 	left:0;
   z-index: 9;
-  background : url('/GUI_assets/cathedral.png');
+  background : url('/GUI_assets/dithered-cathedral.png');
   background-size: contain;
   background-position: center center;
   image-rendering: pixelated;

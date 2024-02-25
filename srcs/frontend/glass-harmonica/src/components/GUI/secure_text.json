@@ -1,0 +1,18 @@
+{
+  "secure":[
+    "Hiding API keys",
+    "Softcoding token secrets",
+    "Establishing CORS",
+    "Encrypting passwords",
+    "Securizing the mainframe",
+    "Reading .env",
+    "Semantic analysis",
+    "Refixing errors",
+    "Redoing broken code",
+    "Protecting against crashes",
+    "Securizing backend tunnel",
+    "Scanning network",
+    "Enabling firewall",
+    ""
+  ]
+}

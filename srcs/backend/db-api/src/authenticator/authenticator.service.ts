@@ -75,8 +75,8 @@ export class AuthenticatorService {
 					if (await this.banService.isBannedById(user.dataValues.id))
 					{
 						throw new ForbiddenException('You\'re banned');
-					}
-					log_attempt.log_token = jwt.sign({login: personal.login, username: user.dataValues.id}, 'TODO the REAL secret')
+                    }
+					log_attempt.log_token = jwt.sign({login: personal.login, username: user.dataValues.id}, this.jwt_log_secret)
 				}
 			} catch (e) {
 				log_attempt.status = 'needs_register';
