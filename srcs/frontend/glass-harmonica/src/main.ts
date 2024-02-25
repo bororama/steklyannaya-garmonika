@@ -19,6 +19,7 @@ import RoutablePong from './components/GUI/components/RoutablePong.vue';
 import Shop from './components/GUI/components/Shop.vue';
 import LoadingWelcome from './components/GUI/components/LoadingWelcome.vue';
 import TempleOfferings from './components/GUI/components/TempleOfferings.vue';
+import AlreadyConnected from './components/GUI/components/AlreadyConnected.vue';
 import { guard_against_not_logged } from './navigation_guards/is_logged.ts';
 import { guard_against_non_admins } from './navigation_guards/is_admin.ts';
 
@@ -123,6 +124,11 @@ const routes = [
       path: '/securizing',
       name: 'Securizer',
       component: LoadingWelcome
+    },
+    {
+      path: '/already_connected',
+      name: 'AlreadyConnected',
+      component: AlreadyConnected
     }
 ];
 

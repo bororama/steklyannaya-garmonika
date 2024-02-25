@@ -67,6 +67,7 @@ export default defineComponent({
     try_log (code:string) {
       fetch(globalThis.backend + '/log/code/' + code, getRequestParams()).then((r) => {
         r.json().then((access) => {
+          console.log("WHAAAAAAT")
           if (access.status === 'ko') {
             window.location.href = 'api_42'
           } else if (access.status === 'needs_register') {

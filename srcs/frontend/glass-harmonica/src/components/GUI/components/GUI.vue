@@ -77,7 +77,7 @@ export default defineComponent({
       this.showing_profile_image = false
     },
     go_to_alredy_connected_page () {
-      this.already_connected = true
+      this.$router.push('/already_connected')
     },
     closeShop() {
       this.$router.push('/')
