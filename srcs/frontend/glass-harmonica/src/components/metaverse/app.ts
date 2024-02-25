@@ -207,8 +207,6 @@ class GameWorld {
         }
 
         if (player && player.user.name !== this._playerData?.user.name) {
-            console.log("Instancing mesh for ", player.user.name);
-
             try {
                 this._scene.executeWhenReady( async () => {
                     const assets = await this._loadPlayerAssets(this._scene, false, 'player.glb');
@@ -259,7 +257,7 @@ class GameWorld {
 
         let player = this._findLivePlayer(m.user.id);
         if (player) {
-            console.log(" player that's sayin' all this ", player);
+            //console.log(" player that's sayin' all this ", player);
             player.say((player.isBlocked) ? 'censored message' : m.text);
         }
     }
@@ -282,7 +280,7 @@ class GameWorld {
         let player = this._findLivePlayer(id);
 
         if (player) {
-            console.log("changingName of remote player ", player);
+            //console.log("changingName of remote player ", player);
             player.updateName(newName);
         }
     }
@@ -551,7 +549,7 @@ class GameWorld {
 
         evilTheme.attachToMesh(this._yellowDevil.mesh);
 
-        console.log("theme : ", evilTheme, "mesh position", this._yellowDevil.mesh.position);
+        //console.log("theme : ", evilTheme, "mesh position", this._yellowDevil.mesh.position);
     }
 
 

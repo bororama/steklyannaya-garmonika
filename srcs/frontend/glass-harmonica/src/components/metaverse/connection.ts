@@ -97,7 +97,10 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 
 	metaSocket.on('playerUpdate', async ( payload : Player) => {
 		//console.log('playerUpdate>>', `${payload.user.name} position: `, payload.position[0], payload.position[1], payload.position[2], " state : ", payload.state);
-		metaverse.gameWorld.applyRemotePlayerUpdate(payload); // <--promise is failing
+		if (metaverse.gameWorld.isReady()) {
+			console.log("GameWorld is loading...");
+			metaverse.gameWorld.applyRemotePlayerUpdate(payload); // <--promise is failing
+		}
 	});
 
 

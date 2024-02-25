@@ -39,7 +39,7 @@ export class GameEntity extends TransformNode {
         if (this._animations.length) {
             this._previousAnimation  = this._animations[Animations.LAND];
             this._currentAnimation = this._animations[Animations.IDLE];
-            console.log("animatiions ", this._animations);
+            //console.log("animatiions ", this._animations);
             this._animations[Animations.RUN].loopAnimation = true;
             this._animations[Animations.IDLE].loopAnimation = true;
             this._currentAnimation.play(true);
@@ -241,7 +241,7 @@ export class GameEntity extends TransformNode {
           right: maxX,
           bottom: maxY,
         }
-        console.table(rect);
+        //console.table(rect);
         return rect;
       }
     
