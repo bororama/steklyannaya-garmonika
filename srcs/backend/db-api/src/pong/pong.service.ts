@@ -6,7 +6,7 @@ import { MatchesService } from '../matches/matches.service'
 import { Constants } from './components/Match';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-
+import { MatchDto } from './components/MatchDto';
 @Injectable()
 export class PongService {
   private readonly jwt_log_secret : string = this.configService.get('JWT_LOG_SECRET');
@@ -104,8 +104,11 @@ export class PongService {
             pongRoomId: match.pongRoomId,
             paddleIndex,
           });       
-          match.assignPaddleToPlayer(playerId);        
-          io.to(match.matchIndex.toString()).emit('updateGameState', match);        
+          match.assignPaddleToPlayer(playerId); 
+
+          console.log("a ver que pasa aqui: ", match);
+          let matchdto = new MatchDto(match);
+          io.to(match.matchIndex.toString()).emit('updateGameState', matchdto);        
           if (match.paddles.length >= 2 && match.isGameInProgress === Constants.MATCH_NOT_IN_PROGRESS) {
             console.log('Starting a new match between ', match.paddles[0].playerId, ' and ', match.paddles[1].playerId);
             match.isGameInProgress = Constants.MATCH_IN_PROGRESS;
@@ -122,7 +125,8 @@ export class PongService {
           if (paddle) {
             paddle.direction = data.direction === 'stop' ? 999 : data.direction === 'up' ? -user.match.config.paddleSpeed: user.match.config.paddleSpeed;
           }
-          io.to(user.match.matchIndex.toString()).emit('updateGameState', user.match);
+          let matchdto = new MatchDto(user.match);
+          io.to(user.match.matchIndex.toString()).emit('updateGameState', matchdto);
         }
       });
 
@@ -158,7 +162,8 @@ export class PongService {
             console.log('Less than two players connected. Stopping the game ', match.matchIndex);
             this.matchesService.delete(match.pongRoomId);
             match.isGameInProgress = Constants.MATCH_FAILED;
-            io.to(match.matchIndex.toString()).emit('updateGameState', match);
+            let matchdto = new MatchDto(match);
+            io.to(match.matchIndex.toString()).emit('updateGameState', matchdto);
           }
         }
       });
