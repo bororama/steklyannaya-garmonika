@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Delete, ValidationPipe, UnauthorizedException, Req } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, Post, Delete, NotFoundException, UnauthorizedException, Req } from "@nestjs/common";
 import { PlayersService } from "../services/players.service";
 import { Player } from "../models/player.model";
 import { PlayerDto } from "../dto/player.dto";
@@ -49,6 +49,9 @@ export class PlayersController {
     @Get(':idOrUsername')
     async findOne(@Param('idOrUsername') id: string): Promise<PlayerDto> {
         const player: Player = await this.playerService.findOne(id);
+        if (!player) {
+            throw new NotFoundException("This player doesn't exist");
+        }
         const matchRoomId: number = await this.matchService.getPlayerCurrentMatchByPlayerId(player.id).then(match => match?.roomId);
         const playerDto = new PlayerDto(player, await this.adminService.isAdmin(player.id), matchRoomId);
 
