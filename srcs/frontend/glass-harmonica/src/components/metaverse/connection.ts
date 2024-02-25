@@ -94,6 +94,7 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, matchRef
 
 	metaSocket.on('gameEnd', async () => {
 		matchRef.value = false;
+		console.log("HOLAAA")
 		metaverse.gameWorld.setLocalPlayerState(1);
 	});
 

@@ -39,21 +39,21 @@ export class PlayerInput {
             this.jumping = false;
         }
         
-        if (this.inputMap["q"]) {
+        if (this.inputMap["q"] || this.inputMap["Q"]) {
             this.camera = -1;
         }
-        else if (this.inputMap["e"]) {
+        else if (this.inputMap["e"] || this.inputMap["E"]) {
             this.camera = 1;
         }
         else {
             this.camera = 0;
         }
 
-        if (this.inputMap["ArrowUp"] || this.inputMap["w"]) {
+        if (this.inputMap["ArrowUp"] || this.inputMap["w"] || this.inputMap["W"]) {
             this.vertical = Scalar.Lerp(this.vertical, 1, 0.15);
         }
 
-        else if (this.inputMap["ArrowDown"] || this.inputMap["s"]) {
+        else if (this.inputMap["ArrowDown"] || this.inputMap["s"]|| this.inputMap["S"]) {
             this.vertical = Scalar.Lerp(this.vertical, -1, 0.15);
         }
 
@@ -62,12 +62,12 @@ export class PlayerInput {
             this.vertical = 0;
         }
         
-        if (this.inputMap["ArrowLeft"] || this.inputMap["a"]) {
+        if (this.inputMap["ArrowLeft"] || this.inputMap["a"]|| this.inputMap["A"]) {
             this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.15);
 
         }
 
-        else if (this.inputMap["ArrowRight"] || this.inputMap["d"]) {
+        else if (this.inputMap["ArrowRight"] || this.inputMap["d"]|| this.inputMap["D"]) {
             this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.15);
         }
 
@@ -75,7 +75,7 @@ export class PlayerInput {
             this.horizontal = 0;
         }
 
-        if (this.inputMap["t"]) {
+        if (this.inputMap["t"] || this.inputMap["T"]) {
             console.log("this.inputMap[t] = ", this.inputMap["t"]);
             this.inputMap["t"] = false;
             if (this._switch)
