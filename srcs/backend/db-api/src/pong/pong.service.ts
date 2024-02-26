@@ -46,7 +46,7 @@ export class PongService {
       return false
     }
     const match: MatchModel = await this.matchesService.getByRoomId(numericRoomId);
-    return numericPlayerId == match.idPlayer1 || numericPlayerId == match.idPlayer2;
+    return match && (numericPlayerId == match.idPlayer1 || numericPlayerId == match.idPlayer2);
   }
 
   public initSocket(io: Server): void {

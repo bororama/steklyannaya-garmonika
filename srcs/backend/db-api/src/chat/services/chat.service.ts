@@ -305,7 +305,9 @@ export class ChatService {
     }
 
     async isAdmin(user: string, chatId:number): Promise<boolean> {
+        console.log("Buscando user");
         const userId: number = await this.userService.userExists(user);
+        console.log("User buscado");
         if (!userId) {
             throw new BadRequestException('Requester doesn\'t exists');
         }
@@ -316,6 +318,9 @@ export class ChatService {
                 chatId: chatId,
             },
         });
+
+        console.log("Después de la request");
+
         if (!userChatRelation)
         {
             throw new ForbiddenException('Requester doesn\'t belong to chat');

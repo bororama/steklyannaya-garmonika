@@ -231,6 +231,10 @@ export class ChatController {
             throw new UnauthorizedException("Private action");
         }
 
+        if (message.message.length > 255) {
+            throw new BadRequestException("Message too long!");
+        }
+
         return this.chatService.sendMessageToChat(user, chat, message.message);
     }
     
@@ -381,7 +385,7 @@ This only can be done by an operator'
         }
 
         if (!this.checkIfAuthorized(request.requester_info.dataValues, user)
-            && !this.chatService.isAdmin(request.requester_info.dataValues, chat.id)) {
+            && !(await this.chatService.isAdminId(request.requester_info.dataValues.id, chat.id))) {
             throw new UnauthorizedException("You can't kick user if you are not an admin");
         }
 
