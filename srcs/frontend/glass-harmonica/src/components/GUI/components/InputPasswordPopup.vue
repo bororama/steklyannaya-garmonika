@@ -1,7 +1,7 @@
 <template>
 	<div class="overlay">
 		<div class="set_number_popup_background">
-			<h3>Enter password</h3>
+			<h3>Enter password (alphanumeric and shorter tha 20)</h3>
 			<div class="text_wrapper">
 				<textarea class="password_input" v-model="password_component"></textarea>
 			</div>

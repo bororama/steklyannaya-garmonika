@@ -46,6 +46,7 @@ export default defineComponent({
     };
   },
   created() {
+    globalThis.canExitMatch = false
     if (!this.socket) {
       this.socket = io(globalThis.backend + "/pong", { path: "/socket.io" });
       this.socket.on("connect_error", (error: any) => {
@@ -105,6 +106,7 @@ export default defineComponent({
   },
   methods: {
     closeGame() {
+      globalThis.canExitMatch = true
       this.socket!.disconnect();
       if (this.metaSocket) {
         this.metaSocket!.emit('endDummyGame', globalThis.id);

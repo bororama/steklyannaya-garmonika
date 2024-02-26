@@ -26,6 +26,6 @@ export class BackendConfig {
     this.ballSpeed = 2;
     this.ballTopSpeed = 4;
     this.paddleSpeed = 3;
-    this.pointsToWin = 1;
+    this.pointsToWin = 7;
   }
 }

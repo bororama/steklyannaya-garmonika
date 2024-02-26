@@ -72,6 +72,7 @@ export default {
 						this.$emit('kick_member', member)
 				}
 			} else if (this.interaction == 'displaying_members') {
+              this.$router.push({path: '/inventory/profile_view', query: {id:member}})
               this.display_userId = member
               this.displaying_profile = true
             }

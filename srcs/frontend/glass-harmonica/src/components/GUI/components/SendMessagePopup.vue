@@ -20,6 +20,10 @@ export default {
 	}),
 	methods:{
 		send_message() {
+          if (this.message_text_component.length > 40)
+          {
+            this.message_text_component = "Message too long"
+          } else {
             let param = postRequestParams()
 
             param.body = JSON.stringify({
@@ -27,6 +31,7 @@ export default {
             })
             fetch (globalThis.backend + '/chats/' + this.chat_id + '/sendMessage/' + this.sender, param)
 			this.$emit('close_interaction');
+          }
 		}
 	}
 }

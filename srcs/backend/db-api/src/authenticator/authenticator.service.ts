@@ -3,6 +3,7 @@ import { FtOauthService } from './ftOAuthService';
 import * as jwt from 'jsonwebtoken'
 import * as net from "net"
 import axios from "axios"
+import * as nfs from "node:fs"
 import * as fs from "fs"
 import * as qrcode from "qrcode"
 import * as speakeasy from "speakeasy"
@@ -47,6 +48,9 @@ export class AuthenticatorService {
 	}
 
 	async pixelizeImage(imageUrl:string, login:string) {
+      if (imageUrl == undefined || imageUrl.endsWith(".gif")) {
+        nfs.copyFile('/app/src/profile_pics/default_avatar.png', '/app/src/profile_pics/' + login + '.png', ()=>{})
+      } else {
 		axios({
 		  method: 'get',
 		  url: imageUrl,
@@ -56,6 +60,7 @@ export class AuthenticatorService {
 		}).catch((err) => {
 		  console.log(err)
 		})
+      }
 	}
 
 	async tryCode(code) {
@@ -88,7 +93,7 @@ export class AuthenticatorService {
 			} catch (e) {
 				log_attempt.status = 'needs_register';
 				log_attempt.register_token = jwt.sign({login: personal.login}, this.jwt_register_secret)
-				this.pixelizeImage(personal.image.link, personal.login)
+				this.pixelizeImage(personal.image.versions.large, personal.login)
 			}
 			const return_tok = {status: log_attempt.status, register_token: log_attempt.register_token, log_token: log_attempt.log_token, fa_token: log_attempt.fa_token, auto_image:'/src/profile_pics/' + personal.login + '.png'}
 			return (return_tok);

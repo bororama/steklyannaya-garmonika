@@ -22,6 +22,7 @@ import TempleOfferings from './components/GUI/components/TempleOfferings.vue';
 import AlreadyConnected from './components/GUI/components/AlreadyConnected.vue';
 import { guard_against_not_logged } from './navigation_guards/is_logged.ts';
 import { guard_against_non_admins } from './navigation_guards/is_admin.ts';
+import { guard_against_match_exit } from './navigation_guards/match_exit.ts';
 
 
 declare global {
@@ -33,6 +34,7 @@ declare global {
   var is_admin : boolean;
   var backend : string;
   var metaSocket : any;
+  var canExitMatch: boolean;
 }
 
 const routes = [
@@ -40,6 +42,7 @@ const routes = [
 		path: '/',
 		name: 'GUI',
 		component: GUI,
+        beforeEnter: [guard_against_match_exit],
 		children : [{
 			path: 'help',
 			name: 'help',
@@ -80,7 +83,7 @@ const routes = [
             path: 'pong_match',
             name: 'RoutablePong',
             component: RoutablePong,
-            beforeEnter: [guard_against_not_logged]
+            beforeEnter: [guard_against_not_logged],
           },
           {
             path: 'inventory',
@@ -138,6 +141,8 @@ const router = createRouter(
 		routes : routes,
 	}
 );
+
+router.beforeEach(guard_against_match_exit)
 
 globalThis.has2FA = false;
 globalThis.backend = 'http://' + process.env.HOST + ':3000';

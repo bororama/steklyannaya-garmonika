@@ -31,6 +31,7 @@ import fondo from '../assets/fondo_objeto.png'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useClickOutside } from '../clickOutside.ts'
+import { check_alpha_numeric } from '../form_validator.ts'
 
 const props = defineProps(['item_data'])
 const emit = defineEmits(['change_active_description', 'reload_inventory'])
@@ -174,6 +175,8 @@ function close_and_reload() {
 }
 
 function set_password(password) {
+    if (check_alpha_numeric(password) == true && password.length < 20)
+    {
        fetch(backend+ "/chats/"+ item.value.chat_id + "/setPassword", {
            method: 'POST',
            mode: 'cors',
@@ -187,9 +190,12 @@ function set_password(password) {
          console.log(r);
         });
        emit('reload_inventory')
+    }
 }
 
 function unlock_password(password) {
+    if (check_alpha_numeric(password) == true && password.length < 20)
+    {
        try {
          fetch(backend + "/chats/"+ item.value.chat_id + "/unsetPassword", {
              method: 'POST',
@@ -210,9 +216,12 @@ function unlock_password(password) {
        } catch (e) {
          console.log(e);
        }
+    }
 }
 
 function unlock_padlock(password) {
+    if (check_alpha_numeric(password) == true && password.length < 20)
+    {
        try {
          fetch(backend + "/chats/"+ item.value.locked_item.chat_id + "/unlock/" + globalThis.id, {
              method: 'POST',
@@ -233,6 +242,7 @@ function unlock_padlock(password) {
        } catch (e) {
          console.log(e);
        }
+    }
 }
 
 function make_admin(member) {

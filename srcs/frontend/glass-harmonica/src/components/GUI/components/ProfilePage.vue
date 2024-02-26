@@ -66,7 +66,6 @@ export default defineComponent({
   },
   methods: {
     async upload_and_emit(registerAnswer) {
-      console.log({tut: "Hola", yup: "Adios"})
        const param = postRequestParams()
        const formData = new FormData()
        await formData.append('image', this.image)
@@ -75,7 +74,6 @@ export default defineComponent({
        param.headers = {
            Authorization: 'Bearer ' + globalThis.logToken
        }
-       console.log(param)
        await fetch(backend + '/users/' + this.username  + '/uploadProfilePic', param)
        this.$emit('successful_register', registerAnswer.meta_token)
     },
@@ -120,14 +118,12 @@ export default defineComponent({
       if (this.display_status != 'registering')
       {
         const formData = new FormData()
-        console.log(new_image)
         formData.append('image', new_image)
         let param = postRequestParams()
         param.body = formData
         param.headers = {
           Authorization: 'Bearer ' + globalThis.logToken
         }
-        console.log(param)
         fetch(backend + '/users/' + globalThis.id + '/uploadProfilePic', param)
       } else {
         this.image = new_image
@@ -151,7 +147,6 @@ export default defineComponent({
     },
     match () {
       fetch (backend + '/matches/' + globalThis.id + '/challenge/' + this.userId, postRequestParams()).then((a) => a.json().then((created_match) => {
-        console.log(created_match)
         this.$router.push({path: '/pong_match', query:{mode:0, id:created_match.roomId}})
       }))
     },
@@ -186,7 +181,6 @@ export default defineComponent({
         }
       }).then((a) => {
         a.json().then((player) => {
-          console.log(player)
           globalThis.id = player.id
           globalThis.my_data = player
           globalThis.is_admin = player.isAdmin
