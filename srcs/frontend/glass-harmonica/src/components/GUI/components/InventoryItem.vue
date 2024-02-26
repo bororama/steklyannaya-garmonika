@@ -262,8 +262,8 @@ function unmake_admin(member) {
     emit('reload_inventory')
 }
 
-function kick_member(member) {
-       fetch(backend + "/chats/" + member + "/" + item.value.chat_id, deleteRequestParams()); 
+async function kick_member(member) {
+  await fetch(backend + "/chats/" + member + "/" + item.value.chat_id, deleteRequestParams()) 
  	for (var i in item.value.target) {
  		if (item.value.target[i] == member)
  			item.value.target.splice(i, 1);
@@ -273,7 +273,7 @@ function kick_member(member) {
  			item.value.admins.splice(j, 1);
  	}
  	active_interaction.value = 'none';
-    emit('reload_inventory')
+  emit('reload_inventory')
 }
 
 function stop_displaying_user() {
