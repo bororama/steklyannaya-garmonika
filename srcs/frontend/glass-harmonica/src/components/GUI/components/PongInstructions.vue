@@ -12,6 +12,7 @@
           To play a public match, say PING or PONG on the public chat<br>
           (Please, write it in capitalized)<br><br>
           You can also play private matches by challenging a friend through their profile page<br>
+          The first to score 7 points wins<br>
           <h3>Pong controls:<br></h3><br>
           Use W↑ and S↓ <br><br>
           Change the background color with O and P.
