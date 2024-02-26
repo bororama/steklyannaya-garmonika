@@ -15,6 +15,7 @@ import EditField from './EditField.vue'
 export default defineComponent({
   name: 'userName',
   props: ['username', 'editable'],
+  emits: ['change_username'],
   components: {
     EditField
   },

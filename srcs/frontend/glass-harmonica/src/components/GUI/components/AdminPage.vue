@@ -2,9 +2,9 @@
 
 <div class="overlay">
   <h1 style="font-family: 'joystix'">ADMIN PAGE</h1>
-  <h1 v-if="!you_are_not_admin">YOU ARE NOT ADMIN</h1>
+  <h1 v-if="you_are_not_admin">YOU ARE NOT ADMIN</h1>
 
-  <div v-if="you_are_not_admin" class="admin_page_columns_container">
+  <div v-if="!you_are_not_admin" class="admin_page_columns_container">
       <div class="admin_page_column" id="user_ban">
           <h3 style="text-align: center">Users</h3>
           <div style="max-height: 800px;overflow-y: scroll;;max-width: 750px;">
@@ -60,6 +60,7 @@ export default defineComponent({
     })
     fetch(globalThis.backend + '/admins/getChatsAndMembers', getRequestParams()).then((a) => {
       if (a.status != 200) {
+          this.you_are_not_admin = true
       } else {
         a.json().then((chats) => {
           this.you_are_not_admin = false

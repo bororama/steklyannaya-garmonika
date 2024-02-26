@@ -28,7 +28,7 @@ import break_rosary from '../break_rosary.js'
 import repair_rosary from '../repair_rosary.js'
 import {getRequestParams, postRequestParams, deleteRequestParams} from './connect_params'
 import fondo from '../assets/fondo_objeto.png'
-import { ref, defineProps, defineEmits, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useClickOutside } from '../clickOutside.ts'
 
@@ -155,6 +155,10 @@ async function act (action) {
          close_drop()
          await fetch (backend + '/chats/' + item.value.chat_id + '/makePrivate', postRequestParams())
          emit('reload_inventory');
+       } else if (action == "exit_chat") {
+         fetch(backend + /chats/ + globalThis.id + '/' + item.value.chat_id, deleteRequestParams()).then(() => {
+            emit('reload_inventory');
+          })
  	} else {
  		console.log("ERROR: Unrecognised option");
  	}

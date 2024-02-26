@@ -1,7 +1,7 @@
 <template>
   <div id="meta_overlay">
     <div class="interface_buttons">
-      <ButtonedInventory @inventory_open="open_inventory" @inventory_close="close_inventory" />
+      <ButtonedInventory/>
       <TogglableRouteButton v-if="is_admin" open_text="Close Admin" closed_text="Adminpage" router_path="/admin_page"/>
       <TogglableRouteButton open_text="Close Profile" closed_text="See Profile" router_path="/profile_page"/>
       <TogglableRouteButton open_text="Close Ranking" closed_text="Ranking" router_path="/leaderboard"/>

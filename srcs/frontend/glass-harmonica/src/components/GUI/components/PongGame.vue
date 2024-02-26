@@ -27,8 +27,8 @@ import { FrontendConfig } from "./FrontendConfig";
 export default defineComponent({
   name: "PongGame",
   props: {
-    modo: Number,
-    pongRoomId: Number,
+    modo: String,
+    pongRoomId: String,
     isGameInProgress: Number, 
     metaSocket: Socket || undefined,
   },

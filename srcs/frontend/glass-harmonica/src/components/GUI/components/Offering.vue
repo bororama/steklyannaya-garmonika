@@ -19,6 +19,7 @@ const props = defineProps(['chat'])
 let offer_taken = ref(false)
 let users = ref([])
 let showing_users = ref(false)
+let user_is_owner = ref(false)
 
 onMounted(() => {
   check_if_offering_was_taken()

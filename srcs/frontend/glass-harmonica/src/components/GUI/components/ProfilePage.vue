@@ -39,6 +39,7 @@ import { postRequestParams, getRequestParams } from './connect_params'
 export default defineComponent({
   name: 'ProfilePage',
   props: ['display_status', 'register_token', 'userId', 'auto_image', 'unmatchable'],
+  emits: ['successful_register'],
   components: {
     StatsDisplay,
     StatusPearl,
@@ -160,11 +161,10 @@ export default defineComponent({
       }))
     },
     spectate () {
-      console.log(this.player_data.matchRoomId)
       const match : any = {
         "match_id": this.player_data.matchRoomId
       }
-      this.$emit('start_match', match)
+      this.$router.push({path: '/pong_match', query: {mode:0, id: this.player_data.matchRoomId}})
     },
     update_user_status (new_status : string) {
       this.online_status = new_status

@@ -4,7 +4,7 @@
 
 <script setup>
 
-import { defineProps, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps(['open_text', 'closed_text', 'router_path'])

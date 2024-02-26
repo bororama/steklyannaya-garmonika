@@ -1,12 +1,8 @@
 <template>
     <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse" @already_connected="go_to_alredy_connected_page"/>
-    <!--div class="overlay" v-if="showing_profile_image">
-        <ProfilePage display_status="profile_display" :userId="meta_colleague_id" :unmatchable="true"/>
-        <button class="fa_button" @click="close_profile">Close Profile</button>
-    </div-->
     <router-view></router-view>
     <MetaOverlay v-if="in_metaverse"/>
-    <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler"/>
+    <Metaverse v-if="in_metaverse" @profileRequest="metaProfileHandler" @storeRequest="storeHandler" @offeringsRequest="offeringsHandler"/>
 </template>
 
 <script lang="ts">
@@ -82,6 +78,9 @@ export default defineComponent({
     closeShop() {
       this.$router.push('/')
     },
+    offeringsHandler() {
+      this.$router.push('/offerings')
+    }
   }
 })
 </script>

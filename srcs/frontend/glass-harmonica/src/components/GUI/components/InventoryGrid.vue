@@ -2,7 +2,7 @@
 
 <div class="ItemDistributor">
 	<InventoryItem v-for="(group,index) in groups" :key="index" @change_active_description="relay_description_change" :item_data="group" @reload_inventory="load_inventory"/>
-	<InventoryItem v-for="(friendship_request,index) in frienship_requests" :key="index" @change_active_description="relay_description_change" :item_data="friendship_request" @close_inventory="close_inventory" @reload_inventory="load_inventory"/>
+	<InventoryItem v-for="(friendship_request,index) in frienship_requests" :key="index" @change_active_description="relay_description_change" :item_data="friendship_request"  @reload_inventory="load_inventory"/>
 	<InventoryItem v-for="(friend,index) in friends" :key="index" @change_active_description="relay_description_change" :item_data="friend" @go_to_pong_match="(param) => {console.log(param); $emit('go_to_pong_match', param)}" @reload_inventory="load_inventory"/>
 	<InventoryItem v-for="(block,index) in blocks" :key="index" @change_active_description="relay_description_change" :item_data="block" @reload_inventory="load_inventory"/>
 
@@ -39,9 +39,6 @@ export default {
 		relay_description_change (new_description) {
 			this.$emit('change_active_description', new_description);
 		},
-        close_inventory() {
-          this.$emit('close_inventory')
-        },
         load_inventory() {
           this.groups = []
           this.frienship_requests =  []
@@ -73,6 +70,8 @@ export default {
                     } else {
                       rosary.owner_options.push( {"text": "Offer at temple", "action": "make_public"})
                     }
+                  } else {
+                      rosary.options.unshift( {"text": "Abandon", "action": "exit_chat"})
                   }
                 }
                 this.groups.push(rosary)

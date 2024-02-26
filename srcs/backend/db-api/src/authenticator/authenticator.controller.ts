@@ -38,7 +38,6 @@ export class AuthenticatorController {
       return token;
     }
     catch {
-      console.log("EXTRACT CATCH")
       throw new UnauthorizedException('Unauthorized - Invalid JWT token');
     }
   }
