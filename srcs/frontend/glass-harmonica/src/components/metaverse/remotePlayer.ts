@@ -23,14 +23,14 @@ export class RemotePlayer extends GameEntity {
     }
 
     showFlamingSoul() {
-        console.log("APOTHEOSIS : ", this._glowingMesh);
+        //console.log("APOTHEOSIS : ", this._glowingMesh);
         this._glowingMesh.position = this.mesh.position;
         toggleMeshVisibility(this.mesh, false);
         toggleMeshVisibility(this._glowingMesh, true);
     }
 
     hideFlamingSoul() {
-        console.log("HIDE FLAMING SOUL");
+        //console.log("HIDE FLAMING SOUL");
         toggleMeshVisibility(this._glowingMesh, false);
         toggleMeshVisibility(this.mesh, true);
     }
@@ -73,7 +73,7 @@ function toggleMeshVisibility(mesh: any, isVisible: boolean) {
 
 
 function setMeshTransparency(mesh: any, alpha: number) {
-    console.log("meshTansparency ", alpha, "mesh material ", mesh.material);
+    ////console.log("meshTansparency ", alpha, "mesh material ", mesh.material);
     if (mesh.material)
         mesh.material.alpha = alpha;
     mesh.getChildMeshes().forEach((m: any) => {
