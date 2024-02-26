@@ -24,7 +24,8 @@ export default defineComponent({
         matches.json().then((m) => {
           for (const match in m) {
             if (m[match].endDate != null) {
-              if (m[match].player1 && m[match].player1.name && m[match].player2 && m[match].player2.name && m[match].pointsPlayer1 && m[match].pointsPlayer2) {
+              console.log(m[match]);
+              if (m[match].player1 && m[match].player1.name && m[match].player2 && m[match].player2.name && m[match].pointsPlayer1 != undefined && m[match].pointsPlayer2 != undefined) {
                   this.history.push({rivals: [m[match].player1.name, m[match].player2.name], result: [m[match].pointsPlayer1, m[match].pointsPlayer2]})
               }
             }
