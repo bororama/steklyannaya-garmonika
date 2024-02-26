@@ -53,6 +53,6 @@ export default defineComponent({
   width: 100%;
   max-height: 400px;
   margin: 0 1em;
-  overflow-y:scroll;
+  overflow-y:auto;
 }
 </style>

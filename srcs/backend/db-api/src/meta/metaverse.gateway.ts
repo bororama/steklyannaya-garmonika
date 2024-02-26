@@ -57,7 +57,7 @@ export class MetaverseGateway implements OnGatewayInit, OnGatewayConnection, OnG
     try {
       const i: number = liveClients.findIndex((c) => { return c.socket === client })
       const disconnectedPlayer: Player = liveClients[i].player;
-      await this.setOnlineStatus(liveClients[i].player.user.name, false)
+      await this.setOnlineStatus(liveClients[i].player.user.id, false)
       liveClients.splice(i, 1);
       this.server.emit('playerLeft', disconnectedPlayer);
     }

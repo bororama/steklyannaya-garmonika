@@ -83,7 +83,7 @@ export default {
 	padding: 0;
 	font-family: monospace;
 	max-height: 600px;
-	overflow-y: scroll;
+	overflow-y: auto;
 	max-width: 750px;
 }
 

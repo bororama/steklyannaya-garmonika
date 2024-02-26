@@ -194,9 +194,10 @@ export class UsersService {
         }
 
         user.userName = newUsername;
+        const id = user.id;
         try {
             await user.save();
-            this.metaverseGateway.changeName(user.id + '', newUsername);
+            this.metaverseGateway.changeName(id + '', newUsername);
         }
         catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {

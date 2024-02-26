@@ -7,7 +7,7 @@
   <div v-if="!you_are_not_admin" class="admin_page_columns_container">
       <div class="admin_page_column" id="user_ban">
           <h3 style="text-align: center">Users</h3>
-          <div style="max-height: 800px;overflow-y: scroll;;max-width: 750px;">
+          <div style="max-height: 800px;overflow-y: auto;;max-width: 750px;">
            <User v-for="(user,index) in users" :key="index" :user="user"/> 
           </div>
           
@@ -15,7 +15,7 @@
 
       <div class="admin_page_column" id="user_ban">
           <h3>Channels</h3>
-          <div style="max-height: 800px;overflow-y: scroll;;max-width: 750px;">
+          <div style="max-height: 800px;overflow-y: auto;;max-width: 750px;">
             <Channel v-for="(channel,index) in channels" :key="index" :channel="channel"/>
   
           </div>
