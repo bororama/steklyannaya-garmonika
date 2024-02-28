@@ -722,10 +722,10 @@ export class ChatService {
             throw new BadRequestException('Chat is locked for this user. Unlock it to be able to read messages');
         }
 
-        const messagesPromise = this.messageService.getMessages(chatRelation);
+        const messages = await this.messageService.getMessages(chatRelation);
         chatRelation.lastMsgReadDate = new Date();
         await chatRelation.save();
-        return messagesPromise;
+        return messages;
     }
 
     async sendMessageToChat(userId: string, chat: Chat, message: string): Promise<void> {

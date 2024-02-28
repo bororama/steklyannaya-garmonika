@@ -47,10 +47,8 @@ export class MessageService {
 				sentDate: {
 					[Op.gte]: chat.lastMsgReadDate
 				},
-				[Op.not]: {
-					senderId: chat.userId
-				},
 				senderId: {
+					[Op.not]: chat.userId,
 					[Op.notIn]: blockedUsers
 				}
 			},
