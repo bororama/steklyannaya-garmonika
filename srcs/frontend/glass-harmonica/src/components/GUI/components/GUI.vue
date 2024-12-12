@@ -1,5 +1,5 @@
 <template>
-    <CookieChecker @register="listen_to_god" @log_success="go_to_metaverse" @already_connected="go_to_alredy_connected_page"/>
+
     <!--div class="overlay" v-if="showing_profile_image">
         <ProfilePage display_status="profile_display" :userId="meta_colleague_id" :unmatchable="true"/>
         <button class="fa_button" @click="close_profile">Close Profile</button>
@@ -33,9 +33,9 @@ export default defineComponent({
    },
   data () {
     return ({
-      register_token: '',
+      register_token: 'foo',
       in_store: false,
-      in_metaverse: false,
+      in_metaverse: true,
       auto_image: '',
       showing_profile_image: false,
       meta_colleague_id: '',

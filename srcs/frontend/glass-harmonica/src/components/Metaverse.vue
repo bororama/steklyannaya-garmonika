@@ -36,9 +36,11 @@ const match = ref(false);
 const router = useRouter();
 
 onMounted(async () => {
-  globalThis.metaSocket = initializeSocket(hostAddress, );
+  globalThis.metaSocket = initializeSocket(hostAddress);
   const metaverseInstance : Metaverse = await initializeMetaverse(globalThis.metaSocket, vueEmitter);
-  connectionManager(globalThis.metaSocket, metaverseInstance, router);
+  metaverseInstance.initPlayerData("noBackend", "Seeker");
+  metaverseInstance.initGameWorld(globalThis.metaSocket);
+  //connectionManager(globalThis.metaSocket, metaverseInstance, router);
 });
 
 function closeGame() {

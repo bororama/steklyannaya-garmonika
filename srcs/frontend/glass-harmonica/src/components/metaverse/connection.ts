@@ -44,10 +44,7 @@ async function spawningRoutine(metaSocket : Socket, metaverse: Metaverse, livePl
 function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRef : any) {		
 
 	metaSocket.on('connect', () => {
-		//setTimeout( () => {
-			//why is globalThis.id a number??????
 			metaSocket.emit('userData', { id : globalThis.id + '', name : globalThis.username});
-		//}, 1)
 	});
 	
 	metaSocket.on('welcomePack', async (payload : { newPlayer : Player, livePlayers : Array<PlayerData>}) => {
@@ -104,7 +101,6 @@ function connectionManager (metaSocket : Socket, metaverse : Metaverse, routerRe
 	});
 
 	metaSocket.on('stopApotheosis', (payload : string) => {
-      console.log("APOTEOSIS parada")
 		metaverse.gameWorld.stopApotheosis(payload);
 	});
 

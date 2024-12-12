@@ -43,7 +43,7 @@ const routes = [
 			path: 'help',
 			name: 'help',
 			component : PongInstructions,
-            beforeEnter: [guard_against_not_logged]
+      beforeEnter: [guard_against_not_logged]
 		  },
           {
             path: 'profile_page',

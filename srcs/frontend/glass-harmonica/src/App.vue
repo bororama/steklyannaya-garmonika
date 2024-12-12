@@ -36,7 +36,6 @@ import PongInstructions from './components/GUI/components/PongInstructions.vue';
 import Home from './components/ProfilePage.vue';
 import { useRouter } from 'vue-router';
 
-
 //const router = useRouter();
 console.log("http://" + process.env.HOST + ":3000");
 

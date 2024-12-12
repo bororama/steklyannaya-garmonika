@@ -1,0 +1,30 @@
+services:
+  frontend:
+    build:
+      context: ./srcs/frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    tty: true
+    restart: always
+    environment:
+      VITE_HOST_IP: ${IP:-host.docker.internal}
+      UID: ${UID}
+      SECRET: ${SECRET}
+      HOST: ${HOST}
+      PORT: ${PORT}
+    volumes:
+      - type: bind
+        source: ./srcs/frontend/glass-harmonica/public
+        target: /app/glass-harmonica/public
+      - type: bind
+        source: ./srcs/frontend/glass-harmonica/src
+        target: /app/glass-harmonica/src
+      - type: bind
+        source: ./srcs/shared
+        target: /app/glass-harmonica/src/components/metaverse/shared
+    networks:
+      - fullstack_network
+    ports:
+        - ${PORT}:${PORT}
+networks:
+  fullstack_network:

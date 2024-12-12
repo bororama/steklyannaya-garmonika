@@ -33,6 +33,7 @@ class Metaverse {
     }
 
     async initGameWorld(metaSocket: Socket) {
+        console.log("Initializing world.")
         if (!this.gameWorld) {
             this.gameWorld = new GameWorld(metaSocket, <PlayerData>this.playerData);
             await this.gameWorld.ready();
@@ -257,7 +258,6 @@ class GameWorld {
 
         let player = this._findLivePlayer(m.user.id);
         if (player) {
-            console.log(" player that's sayin' all this ", player);
             player.say((player.isBlocked) ? 'censored message' : m.text);
         }
     }
@@ -280,7 +280,6 @@ class GameWorld {
         let player = this._findLivePlayer(id);
 
         if (player) {
-            console.log("changingName of remote player ", player);
             player.updateName(newName);
         }
     }
@@ -341,7 +340,6 @@ class GameWorld {
             });
             if (pickInfo!.hit) {
                 if (pickInfo?.pickedMesh?.metadata.type === 'Devil') {
-                    console.log("Emitter ", vueEmitter);
                     vueEmitter('storeRequest', { userId: this._playerData!.user.id });
                 }
                 else if (pickInfo?.pickedMesh?.metadata.type === 'remote') {
@@ -349,7 +347,6 @@ class GameWorld {
                 }
                 else {
                     let NPC = this._NPCS.find((npc: any) => { return npc.name === pickInfo!.pickedMesh!.metadata.name })
-                    console.log(NPC.name, ": About to saySomething()");
                     NPC.saySomething();
                 }
             }
@@ -543,7 +540,6 @@ class GameWorld {
 
         evilTheme.attachToMesh(this._yellowDevil.mesh);
 
-        console.log("theme : ", evilTheme, "mesh position", this._yellowDevil.mesh.position);
     }
 
 
