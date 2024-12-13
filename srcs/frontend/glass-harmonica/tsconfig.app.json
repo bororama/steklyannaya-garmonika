@@ -3,7 +3,9 @@
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/socket.js"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
+	"outDir": "dist",
     "composite": true,
+	"allowJs": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
