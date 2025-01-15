@@ -11,7 +11,6 @@ COPY ./db-api/package*.json ./
 # install project dependencies
 RUN npm install
 
-RUN npm i -g npm install socket.io @nestjs/platform-express
 # copy project files and folders to the current working directory (i.e., 'app' folder)
 COPY ./db-api/ .
 
